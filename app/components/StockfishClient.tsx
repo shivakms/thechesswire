@@ -11,6 +11,7 @@ export default function StockfishClient({ fen }: { fen: string }) {
 
     async function loadEngine() {
       if (typeof window !== 'undefined') {
+        // Dynamically import stockfish.wasm only in the browser
         const stockfish = await import('stockfish.wasm');
         engine = stockfish.default();
         engine.onmessage = (event: any) => {
