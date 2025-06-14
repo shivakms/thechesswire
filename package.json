@@ -12,6 +12,8 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/node": "^20.4.2",
     "typescript": "^5.0.0"
   }
 }
