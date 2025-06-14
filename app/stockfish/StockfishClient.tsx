@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import stockfish from 'stockfish';
-
+import stockfish from 'stockfish.wasm';
 export default function StockfishClient({ fen }: { fen: string }) {
   const [bestMove, setBestMove] = useState<string | null>(null);
 
