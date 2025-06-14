@@ -1,21 +1,12 @@
-// File: /app/api/stockfish/route.ts
-
+// /app/api/stockfish/route.ts
 import { NextResponse } from 'next/server';
-import Stockfish from '@jpweber/stockfish';
+import stockfish from 'stockfish';
 
-// GET request — optional health check
-export async function GET() {
-  const engine = Stockfish();
-  engine.postMessage('uci');
-  return new Response('Stockfish initialized via WASM!');
-}
-
-// POST request — evaluate best move from FEN
 export async function POST(req: Request) {
   const { fen } = await req.json();
 
   return new Promise((resolve) => {
-    const engine = Stockfish();
+    const engine = stockfish();
     let bestMove = '';
 
     engine.onmessage = (line: string) => {
@@ -29,4 +20,10 @@ export async function POST(req: Request) {
     engine.postMessage(`position fen ${fen}`);
     engine.postMessage('go depth 15');
   });
+}
+
+export async function GET() {
+  const engine = stockfish();
+  engine.postMessage('uci');
+  return new Response('Stockfish is working.');
 }
