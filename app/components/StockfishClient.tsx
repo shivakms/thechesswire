@@ -1,17 +1,15 @@
-'use client'
+'use client';
 import { useEffect, useState } from 'react';
-const stockfish = typeof window !== 'undefined' ? require('stockfish') : null;
+import stockfish from 'stockfish';
 
 export default function StockfishClient({ fen }: { fen: string }) {
   const [bestMove, setBestMove] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!stockfish) return;
-
     const engine = stockfish();
     engine.onmessage = (event: any) => {
       const line = typeof event === 'string' ? event : event.data;
-      if (line.startsWith('bestmove')) {
+      if (line && line.startsWith('bestmove')) {
         const move = line.split(' ')[1];
         setBestMove(move);
       }
@@ -20,14 +18,13 @@ export default function StockfishClient({ fen }: { fen: string }) {
     engine.postMessage('uci');
     engine.postMessage(`position fen ${fen}`);
     engine.postMessage('go depth 15');
-
-    return () => engine.terminate?.(); // clean up
   }, [fen]);
 
   return (
     <div>
-      <strong>FEN:</strong> {fen} <br />
-      <strong>Best Move:</strong> {bestMove || 'Calculating...'}
+      <p>Best move for:</p>
+      <code className="block mb-2">{fen}</code>
+      <strong>Best move:</strong> {bestMove || 'Calculating...'}
     </div>
   );
 }
