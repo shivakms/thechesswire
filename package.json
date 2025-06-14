@@ -1,5 +1,4 @@
-{
-  "name": "thechesswire",
+{"name": "thechesswire",
   "version": "1.0.0",
   "scripts": {
     "dev": "next dev",
