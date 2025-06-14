@@ -1,19 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
 
 export default function StockfishClient({ fen }: { fen: string }) {
   const [bestMove, setBestMove] = useState<string | null>(null);
 
   useEffect(() => {
-    // Only run in browser
+    // Dynamic import — browser only
     import('stockfish.wasm').then((sf: any) => {
-      const engine = sf.default(); // Safe import of wasm module
+      const engine = sf.default();
       engine.onmessage = (event: any) => {
         const line = typeof event === 'string' ? event : event.data;
         if (line.startsWith('bestmove')) {
-          setBestMove(line.split(' ')[1]);
+          const move = line.split(' ')[1];
+          setBestMove(move);
         }
       };
 
@@ -24,10 +24,9 @@ export default function StockfishClient({ fen }: { fen: string }) {
   }, [fen]);
 
   return (
-    <div className="mt-4">
-      <p>FEN:</p>
-      <code className="block">{fen}</code>
-      <p className="mt-2 font-bold">Best move: {bestMove || 'Calculating...'}</p>
+    <div>
+      <p><strong>FEN:</strong> {fen}</p>
+      <p><strong>Best move:</strong> {bestMove || 'Calculating...'}</p>
     </div>
   );
 }
