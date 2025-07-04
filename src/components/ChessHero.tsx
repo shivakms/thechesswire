@@ -2,7 +2,7 @@
 // Enhanced Hero Section for TheChessWire.news
 
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
@@ -63,14 +63,6 @@ export default function ChessHero({}: ChessHeroProps) {
   const [typingText, setTypingText] = useState('');
   const [showCTA, setShowCTA] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [chessPieces, setChessPieces] = useState<Array<{
-    piece: string;
-    x: number;
-    y: number;
-    scale: number;
-    delay: number;
-    duration: number;
-  }>>([]);
   
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -91,10 +83,8 @@ export default function ChessHero({}: ChessHeroProps) {
     "The board remembers what the heart feels"
   ];
 
-  // Initialize chess pieces after mount to avoid hydration issues
-  useEffect(() => {
-    setMounted(true);
-    const pieces = [...Array(16)].map((_, i) => ({
+  const chessPieces = useMemo(() => {
+    return [...Array(16)].map((_, i) => ({
       piece: ['♔', '♕', '♖', '♗', '♘', '♙', '♚', '♛', '♜', '♝', '♞', '♟'][i % 12],
       x: Math.random() * 1200,
       y: Math.random() * 800,
@@ -102,7 +92,24 @@ export default function ChessHero({}: ChessHeroProps) {
       delay: Math.random() * 10,
       duration: 25 + Math.random() * 15
     }));
-    setChessPieces(pieces);
+  }, []);
+
+  const animationTargets = useMemo(() => 
+    chessPieces.map(() => ({
+      targetY: Math.random() * 800,
+      targetX: Math.random() * 1200,
+      targetScale: 0.3 + Math.random() * 0.7
+    })), [chessPieces]
+  );
+
+  const selectedPhilosophy = useMemo(() => 
+    chessPhilosophies[Math.floor(Math.random() * chessPhilosophies.length)], 
+    [showCTA]
+  );
+
+  // Initialize mount state
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
   // Enhanced typing animation with phases
@@ -144,8 +151,8 @@ export default function ChessHero({}: ChessHeroProps) {
     }
   }, [currentPhase, showCTA, mounted]);
 
-  // Enhanced mouse tracking with smooth interpolation
-  const handleMouseMove = (e: React.MouseEvent) => {
+  // Enhanced mouse tracking with smooth interpolation - memoized for performance
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!mounted) return;
     
     const rect = e.currentTarget.getBoundingClientRect();
@@ -153,7 +160,7 @@ export default function ChessHero({}: ChessHeroProps) {
     const centerY = rect.top + rect.height / 2;
     mouseX.set((e.clientX - centerX) * 0.1);
     mouseY.set((e.clientY - centerY) * 0.1);
-  };
+  }, [mounted, mouseX, mouseY]);
 
   // Don't render animations until mounted
   if (!mounted) {
@@ -196,11 +203,11 @@ export default function ChessHero({}: ChessHeroProps) {
               scale: piece.scale
             }}
             animate={{ 
-              y: [piece.y, Math.random() * 800],
-              x: [piece.x, Math.random() * 1200],
+              y: [piece.y, animationTargets[i].targetY],
+              x: [piece.x, animationTargets[i].targetX],
               rotate: 360,
               opacity: [0.05, 0.15, 0.05],
-              scale: [piece.scale, 0.3 + Math.random() * 0.7]
+              scale: [piece.scale, animationTargets[i].targetScale]
             }}
             transition={{ 
               duration: piece.duration, 
@@ -353,7 +360,7 @@ export default function ChessHero({}: ChessHeroProps) {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.8 }}
                 >
-                  {chessPhilosophies[Math.floor(Math.random() * chessPhilosophies.length)]}
+                  {selectedPhilosophy}
                 </motion.p>
               )}
             </AnimatePresence>
