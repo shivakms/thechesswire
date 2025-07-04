@@ -1,3 +1,6 @@
+## 4. page.tsx (Terms page)
+
+```tsx
 // app/terms/page.tsx
 
 export default function TermsPage() {
@@ -14,7 +17,7 @@ export default function TermsPage() {
         {/* Header with enhanced styling */}
         <div className="text-center mb-12">
           <h1 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 mb-4 animate-pulse">
-            Terms & Conditions
+            Terms &amp; Conditions
           </h1>
           <div className="h-1 w-32 mx-auto bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mb-8" />
         </div>
@@ -50,7 +53,7 @@ export default function TermsPage() {
           <div className="relative bg-green-900/20 border-2 border-green-500/50 rounded-2xl p-6 backdrop-blur-sm">
             <div className="flex items-center gap-3 mb-4">
               <div className="text-green-500 text-2xl">✓</div>
-              <p className="font-bold text-xl text-green-400">Acceptance & Consent</p>
+              <p className="font-bold text-xl text-green-400">Acceptance &amp; Consent</p>
             </div>
             <p className="text-gray-300 leading-relaxed mb-3">
               By signing up for TheChessWire.news and checking the consent box during registration, you:
@@ -83,15 +86,15 @@ export default function TermsPage() {
         </div>
 
         <p className="text-lg font-medium">
-          Welcome to <strong className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">TheChessWire.news</strong> ("Platform", "Service", "we", "us", or "our"). 
-          By accessing, browsing, or using our Platform, you ("User", "you", or "your") agree to be 
-          bound by these Terms & Conditions ("Terms") in their entirety. If you disagree with any 
+          Welcome to <strong className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">TheChessWire.news</strong> (&quot;Platform&quot;, &quot;Service&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;). 
+          By accessing, browsing, or using our Platform, you (&quot;User&quot;, &quot;you&quot;, or &quot;your&quot;) agree to be 
+          bound by these Terms &amp; Conditions (&quot;Terms&quot;) in their entirety. If you disagree with any
           part of these Terms, you must immediately discontinue use of the Platform and all associated services.
         </p>
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            1. Age Restriction & Eligibility
+            1. Age Restriction &amp; Eligibility
           </h2>
           <div className="bg-red-900/20 border-2 border-red-600/50 rounded-2xl p-6 mb-4 backdrop-blur-sm">
             <p className="font-bold text-red-400 text-xl mb-3">⚠️ IMPORTANT: This Platform is strictly for users aged 18 and above.</p>
@@ -129,7 +132,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            2. Platform Description & AI Disclosure
+            2. Platform Description &amp; AI Disclosure
           </h2>
           <p className="text-gray-300 mb-4">
             TheChessWire.news is an AI-powered chess journalism and training platform featuring:
@@ -165,7 +168,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            3. Account Registration & Security
+            3. Account Registration &amp; Security
           </h2>
           <p className="text-gray-300 mb-4">
             To access certain features, you must create an account. You agree to:
@@ -188,7 +191,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            4. Usage Restrictions & Prohibited Conduct
+            4. Usage Restrictions &amp; Prohibited Conduct
           </h2>
           <p className="text-gray-300 mb-4">
             You agree NOT to:
@@ -309,7 +312,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            7. Subscription & Payment Terms
+            7. Subscription &amp; Payment Terms
           </h2>
           <p className="text-gray-300 mb-6">
             TheChessWire.news operates on a freemium model:
@@ -462,7 +465,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            10. Automated Social Media Interactions & Content Aggregation
+            10. Automated Social Media Interactions &amp; Content Aggregation
           </h2>
           <div className="bg-blue-900/20 border-2 border-blue-600/50 rounded-2xl p-6 backdrop-blur-sm">
             <p className="font-semibold mb-3 text-blue-400">Disclosure of Automated Activity:</p>
@@ -548,10 +551,10 @@ export default function TermsPage() {
           </div>
         </section>
 
-        {/* ENHANCED Section 12 - Privacy & Data Protection with third-party sharing clarity */}
+        {/* ENHANCED Section 12 - Privacy &amp; Data Protection with third-party sharing clarity */}
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            12. Privacy & Data Protection
+            12. Privacy &amp; Data Protection
           </h2>
           <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
             <p className="text-gray-300 mb-4">
@@ -585,7 +588,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            13. Disclaimers & Limitation of Liability
+            13. Disclaimers &amp; Limitation of Liability
           </h2>
           <div className="bg-orange-900/20 border-2 border-orange-600/50 rounded-2xl p-6 backdrop-blur-sm">
             <p className="font-bold mb-3 text-orange-400">IMPORTANT DISCLAIMERS:</p>
@@ -620,7 +623,7 @@ export default function TermsPage() {
           <p className="text-gray-300">
             You agree to defend, indemnify, and hold harmless TheChessWire.news, its officers, directors, 
             employees, agents, and affiliates from and against any claims, liabilities, damages, losses, 
-            and expenses, including reasonable attorney's fees, arising out of or in any way connected 
+            and expenses, including reasonable attorney&apos;s fees, arising out of or in any way connected 
             with your access to or use of the Platform, violation of these Terms, or infringement of 
             any third-party rights.
           </p>
@@ -639,7 +642,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            16. Dispute Resolution & Arbitration
+            16. Dispute Resolution &amp; Arbitration
           </h2>
           <p className="text-gray-300">
             Any disputes arising from these Terms or your use of the Platform shall be resolved through 
@@ -650,7 +653,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            17. Governing Law & Jurisdiction
+            17. Governing Law &amp; Jurisdiction
           </h2>
           <p className="text-gray-300">
             These Terms are governed by Swedish law and international treaties including GDPR. 
@@ -671,7 +674,7 @@ export default function TermsPage() {
             <ul className="space-y-2 text-gray-300">
               <li className="flex items-start gap-3">
                 <span className="text-yellow-500 mt-1">•</span>
-                <span>The updated Terms will be posted on this page with a new "Last Updated" date</span>
+                <span>The updated Terms will be posted on this page with a new &quot;Last Updated&quot; date</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-yellow-500 mt-1">•</span>
@@ -730,7 +733,7 @@ export default function TermsPage() {
           <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-xl p-6 border border-purple-500/30">
             <p className="text-gray-300 font-semibold mb-3">
               By using TheChessWire.news, you acknowledge that you have read, understood, and agree 
-              to be bound by these Terms & Conditions.
+              to be bound by these Terms &amp; Conditions.
             </p>
             <p className="text-gray-400 text-sm">
               This agreement constitutes the entire agreement between you and TheChessWire.news concerning 

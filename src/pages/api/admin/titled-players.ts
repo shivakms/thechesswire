@@ -150,7 +150,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, db: any) {
             review_decision = 'approved',
             reviewed_at = NOW()
           WHERE user_id = $2
-        `, [req.session.userId, userId]);
+        `, [req.session?.userId || 'admin', userId]);
 
         break;
 
@@ -173,7 +173,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, db: any) {
             review_notes = $2,
             reviewed_at = NOW()
           WHERE user_id = $3
-        `, [req.session.userId, reason, userId]);
+        `, [req.session?.userId || 'admin', reason, userId]);
 
         break;
 
@@ -195,7 +195,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, db: any) {
           ) VALUES (
             'titled_player_revoked', $1, $2, 'revoke', $3, NOW()
           )
-        `, [userId, req.session.userId, reason]);
+        `, [userId, req.session?.userId || 'admin', reason]);
 
         break;
 
@@ -254,7 +254,7 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse, db: any) {
       ) VALUES (
         'titled_player_updated', $1, $2, 'manual_update', $3, NOW()
       )
-    `, [userId, req.session.userId, JSON.stringify(updates)]);
+    `, [userId, req.session?.userId || 'admin', JSON.stringify(updates)]);
 
     return res.status(200).json({ success: true });
 

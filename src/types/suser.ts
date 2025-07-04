@@ -69,7 +69,7 @@ export interface SecurityLog {
   type: string;
   userId?: number;
   ipAddress?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -82,7 +82,7 @@ export interface VerificationAbuse {
   abuseScore: number;
   blocked: boolean;
   blockedUntil?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 }
 

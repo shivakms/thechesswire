@@ -6,7 +6,23 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import ConsentAgreement from "@/components/forms/ConsentAgreement";
 import { toast } from "react-hot-toast";
-import { Crown, Volume2, VolumeX, Sparkles, ChevronRight, Shield, Brain, Zap, Eye, EyeOff, Check, X, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { 
+  Volume2, 
+  VolumeX, 
+  Sparkles, 
+  ChevronRight, 
+  Brain, 
+  Eye, 
+  EyeOff, 
+  Check, 
+  X, 
+  Loader2, 
+  CheckCircle2, 
+  Shield, 
+  Crown, 
+  AlertCircle, 
+  Zap 
+} from "lucide-react";
 
 // Module 151: EchoOrigin archetypes
 const ECHO_ORIGINS = [
@@ -235,7 +251,7 @@ export default function SignupForm() {
         setVerificationStatus("failed");
         toast.error(data.message || "Verification failed. Please check your credentials.");
       }
-    } catch (error) {
+    } catch {
       setVerificationStatus("failed");
       toast.error("Verification service temporarily unavailable");
     }
@@ -524,7 +540,7 @@ export default function SignupForm() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <Crown className="w-5 h-5 text-yellow-500" />
-                        <span className="font-semibold text-white">I'm a Titled Player</span>
+                        <span className="font-semibold text-white">I&apos;m a Titled Player</span>
                         {verificationStatus === "verified" && (
                           <CheckCircle2 className="w-5 h-5 text-green-500 ml-auto" />
                         )}

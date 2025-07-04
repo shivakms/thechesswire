@@ -1,6 +1,6 @@
 // File: /lib/ui/use-toast.ts
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 interface Toast {
   id: number;

@@ -2,7 +2,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { Volume2, VolumeX, Crown, Shield, Sparkles, Zap, Star } from 'lucide-react';
+import { Volume2, VolumeX, Star, Sparkles, Zap, Crown } from 'lucide-react';
 import Image from 'next/image';
 import EchoOriginSelector from './EchoOriginSelector';
 import VoiceModeSelector from './VoiceModeSelector';
@@ -63,8 +63,15 @@ export default function SoulGate() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const particles: any[] = [];
-    const connections: any[] = [];
+    const particles: Array<{
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      size: number;
+      color: string;
+      pulse: number;
+    }> = [];
     const particleCount = 150;
 
     // Create particles
@@ -713,7 +720,7 @@ export default function SoulGate() {
                       with your titled status verified,
                     </span>
                   )}
-                  <span className="block mt-2">you're ready to enter TheChessWire.</span>
+                  <span className="block mt-2">you&apos;re ready to enter TheChessWire.</span>
                 </motion.p>
               </motion.div>
 

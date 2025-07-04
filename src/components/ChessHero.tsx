@@ -6,9 +6,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
-// Removed the interface props since we're using direct navigation now
 interface ChessHeroProps {
-  // No longer need onExplore and onJoinCommunity props
+  className?: string;
 }
 
 // Custom SVG Icons
@@ -57,7 +56,7 @@ const ShieldIcon = () => (
   </svg>
 );
 
-export default function ChessHero({}: ChessHeroProps) {
+export default function ChessHero({ className = "" }: ChessHeroProps) {
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [currentPhase, setCurrentPhase] = useState(0);
   const [typingText, setTypingText] = useState('');
@@ -158,7 +157,7 @@ export default function ChessHero({}: ChessHeroProps) {
   // Don't render animations until mounted
   if (!mounted) {
     return (
-      <section className="w-full min-h-screen flex flex-col items-center justify-center px-4 text-center relative overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950/50 to-slate-900">
+      <section className={`w-full min-h-screen flex flex-col items-center justify-center px-4 text-center relative overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950/50 to-slate-900 ${className}`}>
         <div className="relative z-10 flex flex-col items-center justify-center min-h-screen max-w-6xl mx-auto">
           <div className="text-center">
             <div className="mb-8 md:mb-12">
@@ -179,7 +178,7 @@ export default function ChessHero({}: ChessHeroProps) {
 
   return (
     <section 
-      className="w-full min-h-screen flex flex-col items-center justify-center px-4 text-center relative overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950/50 to-slate-900"
+      className={`w-full min-h-screen flex flex-col items-center justify-center px-4 text-center relative overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950/50 to-slate-900 ${className}`}
       onMouseMove={handleMouseMove}
     >
       {/* Enhanced Background Effects */}

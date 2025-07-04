@@ -36,7 +36,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("🔥 TheChessWire.news Error Boundary Caught:", {
       error,
       errorInfo,
@@ -45,16 +45,14 @@ export default class ErrorBoundary extends Component<Props, State> {
     });
 
     if (typeof window !== 'undefined') {
-      const errorLog = {
+      console.error('Error caught by boundary:', {
         type: 'boundary_error',
         message: error.message,
         stack: error.stack,
         component: errorInfo.componentStack,
         timestamp: Date.now(),
         sessionId: window.chessWireConfig?.sessionId || 'unknown'
-      };
-
-      // sendErrorToLoggingService(errorLog);
+      });
     }
   }
 
@@ -119,7 +117,6 @@ export default class ErrorBoundary extends Component<Props, State> {
 
             {/* PGN-style Comment */}
             <p className="text-sm italic text-gray-500 mb-4">
-              {/* [500] {The server sacrificed stability for creativity.} */}
               {'// [500] {The server sacrificed stability for creativity.}'}
             </p>
 
@@ -146,7 +143,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                 <div className="flex-1">
                   <p className="text-sm text-[#40E0D0] font-semibold mb-1">Bambai AI whispers:</p>
                   <p className="text-gray-300 italic">
-                    "Sometimes the board reveals mysteries even we cannot foresee. Let's return to familiar squares..."
+                    &quot;Sometimes the board reveals mysteries even we cannot foresee. Let&apos;s return to familiar squares...&quot;
                   </p>
                 </div>
               </div>

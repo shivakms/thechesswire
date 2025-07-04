@@ -25,24 +25,24 @@ export default function VoiceTest() {
       const femaleVoiceIndex = availableVoices.findIndex(voice => {
         const name = voice.name.toLowerCase();
         return (
-          name.includes('female') ||
-          name.includes('woman') ||
-          name.includes('samantha') ||
-          name.includes('victoria') ||
-          name.includes('karen') ||
-          name.includes('nicole') ||
-          name.includes('zira') ||
-          name.includes('susan') ||
-          name.includes('hazel') ||
-          name.includes('helena') ||
-          (name.includes('google') && name.includes('female')) ||
-          (voice.lang.startsWith('en') && name.includes('female'))
+          name.includes("female") ||
+          name.includes("woman") ||
+          name.includes("samantha") ||
+          name.includes("victoria") ||
+          name.includes("karen") ||
+          name.includes("nicole") ||
+          name.includes("zira") ||
+          name.includes("susan") ||
+          name.includes("hazel") ||
+          name.includes("helena") ||
+          (name.includes("google") && name.includes("female")) ||
+          (voice.lang.startsWith("en") && name.includes("female"))
         );
       });
 
       if (femaleVoiceIndex !== -1) {
         setSelectedVoice(femaleVoiceIndex);
-        console.log('Selected female voice:', availableVoices[femaleVoiceIndex].name);
+        console.log("Selected female voice:", availableVoices[femaleVoiceIndex].name);
       }
     };
 
@@ -81,7 +81,7 @@ export default function VoiceTest() {
           >
             {voices.map((voice, index) => (
               <option key={index} value={index}>
-                {voice.name} ({voice.lang}) {voice.name.toLowerCase().includes('female') ? '👩' : ''}
+                {voice.name} ({voice.lang}) {voice.name.toLowerCase().includes("female") ? "👩" : ""}
               </option>
             ))}
           </select>
@@ -94,7 +94,7 @@ export default function VoiceTest() {
               <>
                 <p>Name: {voices[selectedVoice].name}</p>
                 <p>Language: {voices[selectedVoice].lang}</p>
-                <p>Local: {voices[selectedVoice].localService ? 'Yes' : 'No'}</p>
+                <p>Local: {voices[selectedVoice].localService ? "Yes" : "No"}</p>
               </>
             )}
           </div>
@@ -122,9 +122,9 @@ export default function VoiceTest() {
           <ul className="text-sm space-y-1">
             {voices.filter(v => {
               const name = v.name.toLowerCase();
-              return name.includes('female') || name.includes('woman') || 
-                     name.includes('samantha') || name.includes('victoria') ||
-                     name.includes('zira') || name.includes('hazel');
+              return name.includes("female") || name.includes("woman") || 
+                     name.includes("samantha") || name.includes("victoria") ||
+                     name.includes("zira") || name.includes("hazel");
             }).map((voice, index) => (
               <li key={index}>👩 {voice.name} ({voice.lang})</li>
             ))}

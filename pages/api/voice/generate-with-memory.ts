@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       audioBuffer = await memorySystem.generatePersonalizedNarration(
         userId,
         text,
-        context as any
+        context as 'game' | 'analysis' | 'welcome'
       );
     } else {
       // Standard generation with auto-detection
