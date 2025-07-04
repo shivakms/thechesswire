@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ♟️ TheChessWire.news
 
 **The most secure, emotionally resonant, and visionary chess journalism platform ever built.**  
@@ -58,3 +59,6 @@ npm run dev
 # Visit in your browser:
 http://localhost:3000
 ```
+=======
+# thechesswire
+>>>>>>> 5f08fc2896cf716fd8c35e44c953f377eda1faed
