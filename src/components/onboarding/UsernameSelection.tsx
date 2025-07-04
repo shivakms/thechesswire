@@ -165,7 +165,7 @@ export default function UsernameSelection({ onComplete, voiceEnabled }: Username
 
     // Terms acceptance
     if (!acceptTerms) {
-      newErrors.terms = 'You must accept the Terms & Conditions and Privacy Policy';
+      newErrors.terms = 'You must accept the Terms &amp; Conditions and Privacy Policy';
       valid = false;
     }
 
@@ -488,7 +488,7 @@ export default function UsernameSelection({ onComplete, voiceEnabled }: Username
               )}
             </motion.div>
 
-            {/* Terms & Conditions Checkbox */}
+            {/* Terms &amp; Conditions Checkbox */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

@@ -118,7 +118,7 @@ export default function AgeConfirmationModal({
                     },
                     {
                       icon: Check,
-                      text: 'I accept the Terms & Conditions and Privacy Policy',
+                      text: 'I accept the Terms &amp; Conditions and Privacy Policy',
                       color: '#9333EA'
                     },
                     {

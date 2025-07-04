@@ -330,7 +330,7 @@ export default function PrivacyPage() {
               "Process subscriptions and payments",
               "Generate AI-powered content and recommendations",
               "Detect and prevent abuse, fraud, and security threats",
-              "Enforce our Terms & Conditions",
+              "Enforce our Terms &amp; Conditions",
               "Improve AI models and user experience",
               "Comply with legal obligations",
               "Send service-related communications",

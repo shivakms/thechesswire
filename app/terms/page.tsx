@@ -14,7 +14,7 @@ export default function TermsPage() {
         {/* Header with enhanced styling */}
         <div className="text-center mb-12">
           <h1 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 mb-4 animate-pulse">
-            Terms & Conditions
+            Terms &amp; Conditions
           </h1>
           <div className="h-1 w-32 mx-auto bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mb-8" />
         </div>
@@ -309,7 +309,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            7. Subscription & Payment Terms
+            7. Subscription &amp; Payment Terms
           </h2>
           <p className="text-gray-300 mb-6">
             TheChessWire.news operates on a freemium model:
@@ -548,10 +548,10 @@ export default function TermsPage() {
           </div>
         </section>
 
-        {/* ENHANCED Section 12 - Privacy & Data Protection with third-party sharing clarity */}
+        {/* ENHANCED Section 12 - Privacy &amp; Data Protection with third-party sharing clarity */}
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            12. Privacy & Data Protection
+            12. Privacy &amp; Data Protection
           </h2>
           <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
             <p className="text-gray-300 mb-4">
@@ -730,7 +730,7 @@ export default function TermsPage() {
           <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-xl p-6 border border-purple-500/30">
             <p className="text-gray-300 font-semibold mb-3">
               By using TheChessWire.news, you acknowledge that you have read, understood, and agree 
-              to be bound by these Terms & Conditions.
+              to be bound by these Terms &amp; Conditions.
             </p>
             <p className="text-gray-400 text-sm">
               This agreement constitutes the entire agreement between you and TheChessWire.news concerning 

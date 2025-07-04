@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { User, Lock, Eye, EyeOff, Sparkles, Zap } from 'lucide-react';
 import BambaiNarrator from '@/components/onboarding/BambaiNarrator';
 import Image from 'next/image';
@@ -588,13 +589,13 @@ export default function AuthGateway() {
                       />
                       <label htmlFor="terms" className="text-sm text-gray-400">
                         I agree to the{' '}
-                        <a href="/terms" className="text-[#40E0D0] hover:text-[#40E0D0]/80 transition-colors">
+                        <Link href="/terms" className="text-[#40E0D0] hover:text-[#40E0D0]/80 transition-colors">
                           Terms
-                        </a>
+                        </Link>
                         {' & '}
-                        <a href="/privacy" className="text-[#40E0D0] hover:text-[#40E0D0]/80 transition-colors">
+                        <Link href="/privacy" className="text-[#40E0D0] hover:text-[#40E0D0]/80 transition-colors">
                           Privacy Policy
-                        </a>
+                        </Link>
                       </label>
                     </motion.div>
                   )}
