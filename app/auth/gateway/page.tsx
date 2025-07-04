@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { User, Lock, Eye, EyeOff, Sparkles, Zap } from 'lucide-react';
 import BambaiNarrator from '@/components/onboarding/BambaiNarrator';
 import Image from 'next/image';
@@ -62,7 +63,14 @@ export default function AuthGateway() {
     canvas.width = dimensions.width;
     canvas.height = dimensions.height;
 
-    const particles: any[] = [];
+    const particles: Array<{
+      x: number;
+      y: number;
+      size: number;
+      speedX: number;
+      speedY: number;
+      opacity: number;
+    }> = [];
     const particleCount = 100;
 
     for (let i = 0; i < particleCount; i++) {
@@ -237,12 +245,15 @@ export default function AuthGateway() {
           }, 2000);
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Auth error:', error);
       
       // Handle specific error cases
-      if (error.response?.data?.message) {
-        const message = error.response.data.message;
+      if (error && typeof error === 'object' && 'response' in error && 
+          error.response && typeof error.response === 'object' && 
+          'data' in error.response && error.response.data && 
+          typeof error.response.data === 'object' && 'message' in error.response.data) {
+        const message = (error.response.data as { message: string }).message;
         
         if (message.includes('already exists')) {
           setErrors({ 
@@ -578,13 +589,13 @@ export default function AuthGateway() {
                       />
                       <label htmlFor="terms" className="text-sm text-gray-400">
                         I agree to the{' '}
-                        <a href="/terms" className="text-[#40E0D0] hover:text-[#40E0D0]/80 transition-colors">
+                        <Link href="/terms" className="text-[#40E0D0] hover:text-[#40E0D0]/80 transition-colors">
                           Terms
-                        </a>
+                        </Link>
                         {' & '}
-                        <a href="/privacy" className="text-[#40E0D0] hover:text-[#40E0D0]/80 transition-colors">
+                        <Link href="/privacy" className="text-[#40E0D0] hover:text-[#40E0D0]/80 transition-colors">
                           Privacy Policy
-                        </a>
+                        </Link>
                       </label>
                     </motion.div>
                   )}

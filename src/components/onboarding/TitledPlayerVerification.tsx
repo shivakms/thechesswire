@@ -1,7 +1,7 @@
 // File: /components/onboarding/TitledPlayerVerification.tsx
 'use client';
 import { motion } from 'framer-motion';
-import { Crown, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import BambaiNarrator from './BambaiNarrator';
 import Image from 'next/image';

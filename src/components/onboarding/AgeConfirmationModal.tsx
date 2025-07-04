@@ -1,7 +1,7 @@
 // File: /components/onboarding/AgeConfirmationModal.tsx
 'use client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, AlertCircle, Check, X, Sparkles, Lock } from 'lucide-react';
+import { Shield, Check, X, Sparkles, Lock } from 'lucide-react';
 import BambaiNarrator from './BambaiNarrator';
 import { useEffect } from 'react';
 
@@ -118,7 +118,7 @@ export default function AgeConfirmationModal({
                     },
                     {
                       icon: Check,
-                      text: 'I accept the Terms & Conditions and Privacy Policy',
+                      text: 'I accept the Terms &amp; Conditions and Privacy Policy',
                       color: '#9333EA'
                     },
                     {

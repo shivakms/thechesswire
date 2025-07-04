@@ -1,10 +1,10 @@
-<<<<<<< HEAD
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
 /node_modules
 /.pnp
-=======
+.pnp.*
+
 # Logs
 logs
 *.log
@@ -12,6 +12,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+.pnpm-debug.log*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -28,6 +29,7 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
+/coverage
 
 # nyc test coverage
 .nyc_output
@@ -83,11 +85,16 @@ web_modules/
 
 # Next.js build output
 .next
+/.next/
 out
+/out/
 
 # Nuxt.js build / generate output
 .nuxt
 dist
+
+# production
+/build
 
 # Gatsby files
 .cache/
@@ -100,7 +107,6 @@ dist
 
 # vuepress v2.x temp and cache directory
 .temp
-.cache
 
 # Sveltekit cache directory
 .svelte-kit/
@@ -133,49 +139,23 @@ dist
 .vscode-test
 
 # yarn v3
->>>>>>> 5f08fc2896cf716fd8c35e44c953f377eda1faed
-.pnp.*
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
-<<<<<<< HEAD
+!.yarn/sdks
 !.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
 
 # misc
 .DS_Store
 *.pem
 
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
 # vercel
 .vercel
 
 # typescript
-*.tsbuildinfo
 next-env.d.ts
-=======
-!.yarn/sdks
-!.yarn/versions
 
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
->>>>>>> 5f08fc2896cf716fd8c35e44c953f377eda1faed

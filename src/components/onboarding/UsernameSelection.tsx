@@ -1,7 +1,7 @@
 // File: /components/onboarding/UsernameSelection.tsx
 'use client';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { User, Mail, Lock, CheckCircle, XCircle, AlertCircle, Sparkles, Zap, Shield, Crown, FileText, ShieldCheck } from 'lucide-react';
+import { User, Mail, Lock, CheckCircle, XCircle, AlertCircle, Sparkles, Shield, FileText, ShieldCheck, Crown } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import BambaiNarrator from './BambaiNarrator';
 import Image from 'next/image';
@@ -165,7 +165,7 @@ export default function UsernameSelection({ onComplete, voiceEnabled }: Username
 
     // Terms acceptance
     if (!acceptTerms) {
-      newErrors.terms = 'You must accept the Terms & Conditions and Privacy Policy';
+      newErrors.terms = 'You must accept the Terms &amp; Conditions and Privacy Policy';
       valid = false;
     }
 
@@ -488,7 +488,7 @@ export default function UsernameSelection({ onComplete, voiceEnabled }: Username
               )}
             </motion.div>
 
-            {/* Terms & Conditions Checkbox */}
+            {/* Terms &amp; Conditions Checkbox */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -525,13 +525,13 @@ export default function UsernameSelection({ onComplete, voiceEnabled }: Username
                   
                   <div className="flex-1">
                     <span className="text-gray-300 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                      I've read and accept the{' '}
+                      I&apos;ve read and accept the{' '}
                       <Link 
                         href="/terms" 
                         className="text-[#40E0D0] hover:text-[#40E0D0]/80 underline underline-offset-2 transition-colors inline-flex items-center gap-1"
                         target="_blank"
                       >
-                        Terms & Conditions
+                        Terms &amp; Conditions
                         <FileText className="w-3 h-3" />
                       </Link>
                       {' and '}

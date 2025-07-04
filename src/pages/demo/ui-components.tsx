@@ -18,7 +18,7 @@ export default function UIShowcase() {
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-black to-gray-950 text-white p-8">
       {/* Chess pattern background */}
       <div className="fixed inset-0 opacity-5">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"80\" height=\"80\" viewBox=\"0 0 80 80\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M0 0h40v40H0V0zm40 40h40v40H40V40z\"/%3E%3C/g%3E%3C/svg%3E')]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-800/10 to-gray-900/10" />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto space-y-16">
@@ -48,7 +48,7 @@ export default function UIShowcase() {
             </div>
             
             <div className="space-y-4">
-              <h3 className="text-sm text-gray-400 uppercase tracking-wider">Secondary & Ghost</h3>
+              <h3 className="text-sm text-gray-400 uppercase tracking-wider">Secondary &amp; Ghost</h3>
               <Button variant="secondary">Analyze Game</Button>
               <Button variant="ghost" glow>
                 View Replay
@@ -125,7 +125,7 @@ export default function UIShowcase() {
               </div>
               
               <div>
-                <label className="block text-sm text-gray-400 mb-2">Magnetic Label (Focus & Move Mouse)</label>
+                <label className="block text-sm text-gray-400 mb-2">Magnetic Label (Focus &amp; Move Mouse)</label>
                 <Input 
                   variant="floating"
                   placeholder="Experience the magnetic effect" 

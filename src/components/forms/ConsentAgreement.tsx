@@ -60,7 +60,7 @@ export default function ConsentAgreement({
               onChange={() => setTermsAccepted(!termsAccepted)}
               className="peer sr-only"
               required
-              aria-label="Accept Terms & Conditions"
+              aria-label="Accept Terms &amp; Conditions"
             />
             <div className="w-5 h-5 rounded border-2 border-gray-600 bg-gray-800/50 
                           peer-checked:bg-gradient-to-br peer-checked:from-brand-accent peer-checked:to-purple-600 
@@ -81,7 +81,7 @@ export default function ConsentAgreement({
               rel="noopener noreferrer"
               className="text-brand-accent hover:text-white underline underline-offset-2 transition-colors"
             >
-              Terms & Conditions
+              Terms &amp; Conditions
             </Link>
             , including the zero-tolerance abuse policy and permanent ban system
           </span>

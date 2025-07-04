@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 // Removed the interface props since we're using direct navigation now
 interface ChessHeroProps {
-  // No longer need onExplore and onJoinCommunity props
+  className?: string;
 }
 
 // Custom SVG Icons
