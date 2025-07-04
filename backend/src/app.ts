@@ -75,11 +75,11 @@ app.post('/api/public/analyze-pgn', async (req, res) => {
     }
     
     // Process PGN safely...
-    res.json({ success: true, message: 'PGN analyzed' });
+    return res.json({ success: true, message: 'PGN analyzed' });
     
   } catch (error) {
     securityAdapter.logError(error as Error, { route: '/analyze-pgn' });
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -104,11 +104,11 @@ app.get('/api/check-username/:username', async (req, res) => {
     
     const available = result.rows[0].count === '0';
     
-    res.json({ available });
+    return res.json({ available });
     
   } catch (error) {
     securityAdapter.logError(error as Error, { route: '/check-username' });
-    res.status(500).json({ 
+    return res.status(500).json({ 
       available: false, 
       error: 'Unable to check username availability' 
     });
@@ -197,14 +197,14 @@ app.post('/api/verify-titled-player', async (req, res) => {
         title 
       });
       
-      res.json({ 
+      return res.json({ 
         verified: true, 
         title,
         name,
         platform 
       });
     } else {
-      res.json({ 
+      return res.json({ 
         verified: false,
         message: 'Title not found or not recognized' 
       });
@@ -212,7 +212,7 @@ app.post('/api/verify-titled-player', async (req, res) => {
     
   } catch (error) {
     securityAdapter.logError(error as Error, { route: '/verify-titled-player' });
-    res.status(500).json({ 
+    return res.status(500).json({ 
       verified: false, 
       error: 'Verification service unavailable' 
     });
@@ -295,6 +295,16 @@ app.post('/api/auth/register', async (req, res) => {
       ]
     );
     
+    await secureQuery(`
+      INSERT INTO user_consents (user_id, ip_encrypted, consent_type, accepted, created_at)
+      VALUES ($1, $2, $3, $4, NOW())
+    `, [
+      result.rows[0].id,
+      await securityAdapter.encryptData(req.ip || 'unknown'),
+      'terms_and_privacy',
+      true
+    ]);
+    
     // Generate JWT token
     const token = securityAdapter.generateToken({
       userId: result.rows[0].id,
@@ -309,7 +319,7 @@ app.post('/api/auth/register', async (req, res) => {
       isTitledPlayer: titledPlayerVerified || false
     });
     
-    res.json({ 
+    return res.json({ 
       success: true, 
       token,
       user: {
@@ -322,7 +332,7 @@ app.post('/api/auth/register', async (req, res) => {
     
   } catch (error) {
     securityAdapter.logError(error as Error, { route: '/register' });
-    res.status(500).json({ error: 'Registration failed' });
+    return res.status(500).json({ error: 'Registration failed' });
   }
 });
 
@@ -396,7 +406,7 @@ app.post('/api/auth/login', async (req, res) => {
       method: email ? 'email' : 'username'
     });
     
-    res.json({ 
+    return res.json({ 
       success: true, 
       token,
       user: {
@@ -409,7 +419,7 @@ app.post('/api/auth/login', async (req, res) => {
     
   } catch (error) {
     securityAdapter.logError(error as Error, { route: '/login' });
-    res.status(500).json({ error: 'Login failed' });
+    return res.status(500).json({ error: 'Login failed' });
   }
 });
 
@@ -430,11 +440,11 @@ app.get('/api/user/profile',
         return res.status(404).json({ error: 'User not found' });
       }
       
-      res.json({ user: result.rows[0] });
+      return res.json({ user: result.rows[0] });
       
     } catch (error) {
       securityAdapter.logError(error as Error, { route: '/profile' });
-      res.status(500).json({ error: 'Failed to fetch profile' });
+      return res.status(500).json({ error: 'Failed to fetch profile' });
     }
   }
 );
@@ -457,7 +467,7 @@ app.get('/api/free/soulcinema/remaining', async (req, res) => {
     const usedCount = parseInt(result.rows[0].used_count);
     const remaining = Math.max(0, 3 - usedCount); // 3 free per month
     
-    res.json({ 
+    return res.json({ 
       remaining,
       total: 3,
       resetsAt: new Date(new Date().setMonth(new Date().getMonth() + 1))
@@ -465,13 +475,13 @@ app.get('/api/free/soulcinema/remaining', async (req, res) => {
     
   } catch (error) {
     securityAdapter.logError(error as Error, { route: '/soulcinema/remaining' });
-    res.status(500).json({ error: 'Failed to check usage' });
+    return res.status(500).json({ error: 'Failed to check usage' });
   }
 });
 
 // ========== ERROR HANDLING ==========
 
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   securityAdapter.logError(err, { 
     url: req.url,
     method: req.method,

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/Dialog";
 
 export default function Footer() {
@@ -15,9 +14,9 @@ export default function Footer() {
 
         <Dialog open={termsOpen} onOpenChange={setTermsOpen}>
           <DialogTrigger asChild>
-            <Button variant="link" className="px-2 text-xs">
+            <button className="px-2 text-xs text-blue-500 hover:text-blue-400 underline bg-transparent border-none cursor-pointer">
               Terms & Conditions
-            </Button>
+            </button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-scroll">
             <DialogTitle>Terms & Conditions</DialogTitle>
@@ -35,9 +34,9 @@ export default function Footer() {
 
         <Dialog open={privacyOpen} onOpenChange={setPrivacyOpen}>
           <DialogTrigger asChild>
-            <Button variant="link" className="px-2 text-xs">
+            <button className="px-2 text-xs text-blue-500 hover:text-blue-400 underline bg-transparent border-none cursor-pointer">
               Privacy Policy
-            </Button>
+            </button>
           </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-scroll">
             <DialogTitle>Privacy Policy</DialogTitle>
