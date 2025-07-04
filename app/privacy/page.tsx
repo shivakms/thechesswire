@@ -72,7 +72,7 @@ export default function PrivacyPage() {
         {/* Introduction */}
         <div className="relative mb-12">
           <p className="text-lg leading-relaxed text-gray-300">
-            This Privacy Policy explains how <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">TheChessWire.news</span> ("we", "us", "our", "Platform") 
+            This Privacy Policy explains how <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">TheChessWire.news</span> (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;, &quot;Platform&quot;) 
             collects, uses, stores, and protects your personal data in compliance with the General Data 
             Protection Regulation (GDPR), Swedish data protection laws, and other applicable international 
             privacy regulations.
@@ -306,7 +306,7 @@ export default function PrivacyPage() {
             </div>
             <div className="bg-gradient-to-br from-blue-900/20 to-transparent rounded-xl p-4 border border-blue-500/30">
               <h3 className="font-semibold text-blue-400 mb-1">Contract</h3>
-              <p className="text-sm text-gray-400">To provide Platform services you've registered for</p>
+              <p className="text-sm text-gray-400">To provide Platform services you&apos;ve registered for</p>
             </div>
             <div className="bg-gradient-to-br from-pink-900/20 to-transparent rounded-xl p-4 border border-pink-500/30">
               <h3 className="font-semibold text-pink-400 mb-1">Legitimate Interests</h3>
@@ -774,7 +774,7 @@ export default function PrivacyPage() {
         {/* Section 17 - Children's Privacy (renumbered from 15) */}
         <section className="mb-12">
           <h2 aria-label="Section 17 - Children's Privacy" className="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            17. Children's Privacy
+            17. Children&apos;s Privacy
           </h2>
           <p className="text-gray-300">
             We do not knowingly collect data from anyone under 18. Parents/guardians who believe 
@@ -806,7 +806,7 @@ export default function PrivacyPage() {
             <ul className="space-y-2 text-gray-300">
               <li className="flex items-start gap-3">
                 <span className="text-yellow-500 mt-1">•</span>
-                <span>The updated version will be posted on this page with a new "Last Updated" date</span>
+                <span>The updated version will be posted on this page with a new &quot;Last Updated&quot; date</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-yellow-500 mt-1">•</span>

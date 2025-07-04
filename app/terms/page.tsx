@@ -83,9 +83,9 @@ export default function TermsPage() {
         </div>
 
         <p className="text-lg font-medium">
-          Welcome to <strong className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">TheChessWire.news</strong> ("Platform", "Service", "we", "us", or "our"). 
-          By accessing, browsing, or using our Platform, you ("User", "you", or "your") agree to be 
-          bound by these Terms & Conditions ("Terms") in their entirety. If you disagree with any 
+          Welcome to <strong className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">TheChessWire.news</strong> (&quot;Platform&quot;, &quot;Service&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;). 
+          By accessing, browsing, or using our Platform, you (&quot;User&quot;, &quot;you&quot;, or &quot;your&quot;) agree to be 
+          bound by these Terms &amp; Conditions (&quot;Terms&quot;) in their entirety. If you disagree with any
           part of these Terms, you must immediately discontinue use of the Platform and all associated services.
         </p>
 
@@ -620,7 +620,7 @@ export default function TermsPage() {
           <p className="text-gray-300">
             You agree to defend, indemnify, and hold harmless TheChessWire.news, its officers, directors, 
             employees, agents, and affiliates from and against any claims, liabilities, damages, losses, 
-            and expenses, including reasonable attorney's fees, arising out of or in any way connected 
+            and expenses, including reasonable attorney&apos;s fees, arising out of or in any way connected 
             with your access to or use of the Platform, violation of these Terms, or infringement of 
             any third-party rights.
           </p>
@@ -671,7 +671,7 @@ export default function TermsPage() {
             <ul className="space-y-2 text-gray-300">
               <li className="flex items-start gap-3">
                 <span className="text-yellow-500 mt-1">•</span>
-                <span>The updated Terms will be posted on this page with a new "Last Updated" date</span>
+                <span>The updated Terms will be posted on this page with a new &quot;Last Updated&quot; date</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-yellow-500 mt-1">•</span>

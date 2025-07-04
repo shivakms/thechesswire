@@ -1,21 +1,21 @@
 // src/pages/api/admin/titled-players.ts
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { verifyAdminAuth } from '@/lib/auth/admin';
-import { getDb } from '@/lib/db';
-import { decrypt } from '@/lib/security/encryption';
+// import { verifyAdminAuth } from '@/lib/auth/admin';
+// import { getDb } from '@/lib/db';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Verify admin authentication
-  const admin = await verifyAdminAuth(req);
-  if (!admin) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+  // TODO: Implement admin authentication
+  // const admin = await verifyAdminAuth(req);
+  // if (!admin) {
+  //   return res.status(401).json({ error: 'Unauthorized' });
+  // }
 
-  const db = await getDb();
+  // TODO: Implement database connection
+  const db = null; // Placeholder until database is implemented
 
   switch (req.method) {
     case 'GET':
@@ -30,6 +30,10 @@ export default async function handler(
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse, db: any) {
+  // TODO: Implement database queries when db is available
+  if (!db) {
+    return res.status(503).json({ error: 'Database not available' });
+  }
   const { status = 'all', page = 1, limit = 50 } = req.query;
 
   try {
@@ -128,6 +132,10 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse, db: any) {
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse, db: any) {
+  // TODO: Implement database queries when db is available
+  if (!db) {
+    return res.status(503).json({ error: 'Database not available' });
+  }
   const { action, userId, reason } = req.body;
 
   try {
@@ -150,7 +158,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, db: any) {
             review_decision = 'approved',
             reviewed_at = NOW()
           WHERE user_id = $2
-        `, [req.session.userId, userId]);
+        `, ['admin-user-id', userId]);
 
         break;
 
@@ -173,7 +181,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, db: any) {
             review_notes = $2,
             reviewed_at = NOW()
           WHERE user_id = $3
-        `, [req.session.userId, reason, userId]);
+        `, ['admin-user-id', reason, userId]);
 
         break;
 
@@ -195,7 +203,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, db: any) {
           ) VALUES (
             'titled_player_revoked', $1, $2, 'revoke', $3, NOW()
           )
-        `, [userId, req.session.userId, reason]);
+        `, [userId, 'admin-user-id', reason]);
 
         break;
 
@@ -212,6 +220,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, db: any) {
 }
 
 async function handlePut(req: NextApiRequest, res: NextApiResponse, db: any) {
+  // TODO: Implement database queries when db is available
+  if (!db) {
+    return res.status(503).json({ error: 'Database not available' });
+  }
   const { userId, updates } = req.body;
 
   try {
@@ -254,7 +266,7 @@ async function handlePut(req: NextApiRequest, res: NextApiResponse, db: any) {
       ) VALUES (
         'titled_player_updated', $1, $2, 'manual_update', $3, NOW()
       )
-    `, [userId, req.session.userId, JSON.stringify(updates)]);
+    `, [userId, 'admin-user-id', JSON.stringify(updates)]);
 
     return res.status(200).json({ success: true });
 

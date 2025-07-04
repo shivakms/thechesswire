@@ -62,7 +62,14 @@ export default function AuthGateway() {
     canvas.width = dimensions.width;
     canvas.height = dimensions.height;
 
-    const particles: any[] = [];
+    const particles: Array<{
+      x: number;
+      y: number;
+      size: number;
+      speedX: number;
+      speedY: number;
+      opacity: number;
+    }> = [];
     const particleCount = 100;
 
     for (let i = 0; i < particleCount; i++) {
@@ -237,12 +244,15 @@ export default function AuthGateway() {
           }, 2000);
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Auth error:', error);
       
       // Handle specific error cases
-      if (error.response?.data?.message) {
-        const message = error.response.data.message;
+      if (error && typeof error === 'object' && 'response' in error && 
+          error.response && typeof error.response === 'object' && 
+          'data' in error.response && error.response.data && 
+          typeof error.response.data === 'object' && 'message' in error.response.data) {
+        const message = (error.response.data as { message: string }).message;
         
         if (message.includes('already exists')) {
           setErrors({ 

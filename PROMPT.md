@@ -1,9 +1,14 @@
-TheChessWire.news - Phase 1 Development PROMPT
-DON'T JUST START CODING IMMEDIATELY. GIVE ME THE SUGGESTION AND WHEN I SAY "YES", GO FOR THE CODING.
-MENTION THE FILENAME AT THE CODE'S TOP, WHERE THE CODE SHOULD BE SAVED.
-IF MULTIPLE FILES ARE TO BE CREATED, THEN PLEASE GIVE THEM IN 3 PHASES.
-IN THE PLATFORM / WEBPAGE, DO NOT MENTION FREE ANYWHERE, AS WE WILL CHARGE FOR ACCESSING PREMIUM MODULES IN THE FUTURE.
-🏁 Platform Vision
+# TheChessWire.news - AI-Architected Chess Journalism Platform
+
+**SYSTEM PROMPT FOR AI DEVELOPMENT**
+
+This document defines the complete architectural blueprint for TheChessWire.news - a revolutionary chess journalism platform that combines emotional AI narration, quantum-level security, and cinematic storytelling.
+
+## 🎯 CORE MISSION
+
+Create the world's most secure, emotionally resonant, and visionary chess journalism platform. Every line of code, every design decision, and every feature must serve this singular vision.
+
+## 🏁 Platform Vision
 I am building TheChessWire.news --- the most secure, intelligent, unique, niche, mind-blowing, attractive, addictive, 100% ahead of the world, and visionary chess journalism platform ever conceived.
 This platform must be category-defining, featuring:
 🌐 World-class architecture
@@ -13,7 +18,7 @@ This platform must be category-defining, featuring:
 🎨 Visually stunning design 
 ♟️ Internationally respected chess analysis 
 🚫 Immune to current and future manipulation
-Note: The background of every page should be stunning, user-friendly, attractive, and addictive; fonts should be visible in a lovely, unique, and niche way. All pages should be unique and gorgeous, 100% ahead of the world. The look should be fabulous, attractive, and addictive. DON'T SHOW 100% AHEAD OF THE WORLD, UNIQUE, LOVELY, NICHE, NICE IN THE WEB PAGE.
+
 Core Requirement: All videos should be 100% automated without human intervention. They should also be uploaded to YouTube, Instagram, Twitter, and other social media with excellent, unique, and niche content to get maximum subscriptions, likes, and views. The content should be attractive and addictive so that users watch our videos repeatedly.
 Performance Goal: I don't want you to implement the entire module immediately. Based on the complete module list, I want you to intelligently recommend which modules should be implemented on which pages or routes --- in a way that maximizes performance and avoids code overload. Prioritize page-level mapping, user experience, and lazy loading where possible. The goal is to keep the platform ultra-performant, modular, and scalable.
 

@@ -7,7 +7,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Shield, FileText } from "lucide-react";
 
 // Modal Component
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({ isOpen, onClose, title, children }: {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -81,13 +86,13 @@ const TermsContent = () => (
     <section>
       <h3 className="text-xl font-semibold text-white mb-4">3. Bambai AI Services</h3>
       <p className="leading-relaxed">
-        Our AI-powered voice narration and analysis services are provided "as is" and may be updated or modified at any time.
+        Our AI-powered voice narration and analysis services are provided &quot;as is&quot; and may be updated or modified at any time.
       </p>
     </section>
     
     <div className="bg-[#FFD700]/10 border border-[#FFD700]/20 rounded-lg p-4">
       <p className="text-[#FFD700] text-sm italic">
-        "Every game teaches us something new. These terms ensure we all play by the same rules." — Bambai AI
+        &quot;Every game teaches us something new. These terms ensure we all play by the same rules.&quot; — Bambai AI
       </p>
     </div>
   </div>
@@ -118,7 +123,7 @@ const PrivacyContent = () => (
     
     <div className="bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 rounded-lg p-4">
       <p className="text-[#8B5CF6] text-sm italic">
-        "Your privacy is as important as protecting your king. We guard your data with the same dedication." — Bambai AI
+        &quot;Your privacy is as important as protecting your king. We guard your data with the same dedication.&quot; — Bambai AI
       </p>
     </div>
   </div>
@@ -151,7 +156,7 @@ export default function Footer() {
                 </h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                The world's most intelligent chess journalism platform, powered by Bambai AI voice narration. 
+                The world&apos;s most intelligent chess journalism platform, powered by Bambai AI voice narration. 
                 Experience chess like never before.
               </p>
               <div className="flex space-x-4">
@@ -258,7 +263,7 @@ export default function Footer() {
           {/* Bambai AI Attribution */}
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500 italic">
-              "Where chess meets soul, and every move tells a story." — Bambai AI
+              &quot;Where chess meets soul, and every move tells a story.&quot; — Bambai AI
             </p>
           </div>
         </div>

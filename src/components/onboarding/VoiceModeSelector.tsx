@@ -1,7 +1,7 @@
 // File: /src/components/onboarding/VoiceModeSelector.tsx
 'use client';
 import { motion } from 'framer-motion';
-import { Mic, Heart, Zap, Feather, Volume2, Radio, Waves } from 'lucide-react';
+import { Mic, Heart, Zap, Feather, Volume2, Waves } from 'lucide-react';
 import BambaiNarrator from './BambaiNarrator';
 import { useEffect, useState } from 'react';
 
@@ -232,7 +232,7 @@ export default function VoiceModeSelector({ onSelect, voiceEnabled }: { onSelect
                   className="text-sm text-gray-400 italic relative z-10"
                   style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                 >
-                  "{mode.sample}"
+                  &quot;{mode.sample}&quot;
                 </motion.p>
 
                 {/* Audio waveform indicator */}
