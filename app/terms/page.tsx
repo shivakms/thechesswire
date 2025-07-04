@@ -50,7 +50,7 @@ export default function TermsPage() {
           <div className="relative bg-green-900/20 border-2 border-green-500/50 rounded-2xl p-6 backdrop-blur-sm">
             <div className="flex items-center gap-3 mb-4">
               <div className="text-green-500 text-2xl">✓</div>
-              <p className="font-bold text-xl text-green-400">Acceptance & Consent</p>
+              <p className="font-bold text-xl text-green-400">Acceptance &amp; Consent</p>
             </div>
             <p className="text-gray-300 leading-relaxed mb-3">
               By signing up for TheChessWire.news and checking the consent box during registration, you:
@@ -91,7 +91,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            1. Age Restriction & Eligibility
+            1. Age Restriction &amp; Eligibility
           </h2>
           <div className="bg-red-900/20 border-2 border-red-600/50 rounded-2xl p-6 mb-4 backdrop-blur-sm">
             <p className="font-bold text-red-400 text-xl mb-3">⚠️ IMPORTANT: This Platform is strictly for users aged 18 and above.</p>
@@ -129,7 +129,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            2. Platform Description & AI Disclosure
+            2. Platform Description &amp; AI Disclosure
           </h2>
           <p className="text-gray-300 mb-4">
             TheChessWire.news is an AI-powered chess journalism and training platform featuring:
@@ -165,7 +165,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            3. Account Registration & Security
+            3. Account Registration &amp; Security
           </h2>
           <p className="text-gray-300 mb-4">
             To access certain features, you must create an account. You agree to:
@@ -188,7 +188,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            4. Usage Restrictions & Prohibited Conduct
+            4. Usage Restrictions &amp; Prohibited Conduct
           </h2>
           <p className="text-gray-300 mb-4">
             You agree NOT to:
@@ -462,7 +462,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            10. Automated Social Media Interactions & Content Aggregation
+            10. Automated Social Media Interactions &amp; Content Aggregation
           </h2>
           <div className="bg-blue-900/20 border-2 border-blue-600/50 rounded-2xl p-6 backdrop-blur-sm">
             <p className="font-semibold mb-3 text-blue-400">Disclosure of Automated Activity:</p>
@@ -585,7 +585,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            13. Disclaimers & Limitation of Liability
+            13. Disclaimers &amp; Limitation of Liability
           </h2>
           <div className="bg-orange-900/20 border-2 border-orange-600/50 rounded-2xl p-6 backdrop-blur-sm">
             <p className="font-bold mb-3 text-orange-400">IMPORTANT DISCLAIMERS:</p>
@@ -639,7 +639,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            16. Dispute Resolution & Arbitration
+            16. Dispute Resolution &amp; Arbitration
           </h2>
           <p className="text-gray-300">
             Any disputes arising from these Terms or your use of the Platform shall be resolved through 
@@ -650,7 +650,7 @@ export default function TermsPage() {
 
         <section>
           <h2 className="text-3xl font-bold mt-12 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
-            17. Governing Law & Jurisdiction
+            17. Governing Law &amp; Jurisdiction
           </h2>
           <p className="text-gray-300">
             These Terms are governed by Swedish law and international treaties including GDPR. 
