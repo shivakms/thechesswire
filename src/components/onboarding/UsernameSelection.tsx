@@ -90,7 +90,7 @@ export default function UsernameSelection({ onComplete, voiceEnabled }: Username
         } else {
           setErrors(prev => ({ ...prev, credential: '' }));
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Username check failed:', error);
         // Don't block the user if the check fails
         setCredentialAvailable(true);
