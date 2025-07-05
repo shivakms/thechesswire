@@ -65,7 +65,7 @@ export class StorytellingEngine {
     }
   }
 
-  private analyzeGameForStory(moves: any[]): { keyMoments: StoryElement[] } {
+  private analyzeGameForStory(moves: Array<{ piece: string; captured?: string; san: string; promotion?: string }>): { keyMoments: StoryElement[] } {
     const keyMoments: StoryElement[] = [];
     
     moves.forEach((move, index) => {
@@ -74,7 +74,7 @@ export class StorytellingEngine {
           moveIndex: index,
           type: 'capture',
           description: `${move.piece.toUpperCase()} captures ${move.captured}`,
-          drama: this.evaluateCaptureDrama(move),
+          drama: this.evaluateCaptureDrama({ piece: move.piece, captured: move.captured }),
           emotion: 'tension'
         });
       }
@@ -131,7 +131,7 @@ export class StorytellingEngine {
     return { keyMoments };
   }
 
-  private evaluateCaptureDrama(move: any): 'low' | 'medium' | 'high' | 'climactic' {
+  private evaluateCaptureDrama(move: { piece: string; captured: string }): 'low' | 'medium' | 'high' | 'climactic' {
     const pieceValues: { [key: string]: number } = {
       'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 0
     };
@@ -145,7 +145,7 @@ export class StorytellingEngine {
     return 'low';
   }
 
-  private generateAlternateLines(moves: any[]): AlternateLine[] {
+  private generateAlternateLines(moves: Array<{ san: string; piece: string }>): AlternateLine[] {
     const alternateLines: AlternateLine[] = [];
     
     moves.forEach((move, index) => {
@@ -163,7 +163,7 @@ export class StorytellingEngine {
     return alternateLines;
   }
 
-  private generateAlternativeMoves(move: any): string[] {
+  private generateAlternativeMoves(move: { piece: string; san: string }): string[] {
     const alternatives = [
       `${move.piece}d4`, `${move.piece}f4`, `${move.piece}e5`
     ].filter(alt => alt !== move.san);
@@ -171,7 +171,7 @@ export class StorytellingEngine {
     return alternatives.slice(0, 2);
   }
 
-  private identifyTacticalThemes(moves: any[]): string[] {
+  private identifyTacticalThemes(moves: Array<{ san: string; captured?: string; promotion?: string }>): string[] {
     const themes: string[] = [];
     
     const moveStrings = moves.map(m => m.san).join(' ');
@@ -318,7 +318,7 @@ export class StorytellingEngine {
     }
   }
 
-  private generateHistoricalContext(moves: any[]): string {
+  private generateHistoricalContext(_moves: Array<{ san: string }>): string {
     return "This game echoes the classical principles established by masters like Capablanca and Petrosian, " +
            "demonstrating how timeless chess wisdom continues to guide modern play. The strategic themes " +
            "present here can be traced back to the great tournament games of the early 20th century.";

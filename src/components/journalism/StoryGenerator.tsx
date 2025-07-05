@@ -162,7 +162,7 @@ export default function StoryGenerator() {
                     ].map((styleOption) => (
                       <button
                         key={styleOption.key}
-                        onClick={() => setStyle(styleOption.key as any)}
+                        onClick={() => setStyle(styleOption.key as 'dramatic' | 'humorous' | 'historical' | 'analytical')}
                         className={`p-4 rounded-lg text-left transition-all ${
                           style === styleOption.key
                             ? 'bg-purple-600/30 border border-purple-500/50 text-white'
@@ -244,7 +244,7 @@ export default function StoryGenerator() {
                         <h3 className="text-lg font-semibold text-white mb-4">💭 Chess Wisdom</h3>
                         {story.quotes.map((quote, index) => (
                           <blockquote key={index} className="text-gray-300 italic mb-3 last:mb-0">
-                            "{quote.split(' - ')[0]}"
+                            &quot;{quote.split(' - ')[0]}&quot;
                             <footer className="text-gray-400 text-sm mt-1">
                               — {quote.split(' - ')[1]}
                             </footer>

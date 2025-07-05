@@ -2,7 +2,6 @@
 
 import axios from 'axios';
 import crypto from 'crypto';
-import fs from 'fs/promises';
 import path from 'path';
 import { DynamicVoiceModulation } from './DynamicVoiceModulation';
 
@@ -77,16 +76,19 @@ export class BambaiVoiceEngine {
     philosophical: /life|soul|journey|wisdom|eternal/i
   };
 
-  // Voice cache configuration (Module 304)
-  private cacheDir = path.join(process.cwd(), '.cache', 'voice');
-  private cacheEnabled = true;
+  // Voice cache configuration (Module 304) - disabled in browser
+  private cacheDir = typeof window !== 'undefined' ? '' : path.join(process.cwd(), '.cache', 'voice');
+  private cacheEnabled = typeof window === 'undefined'; // Only enable on server-side
 
   constructor() {
-    this.initializeCache();
+    if (typeof window === 'undefined') {
+      this.initializeCache();
+    }
   }
 
   private async initializeCache() {
-    if (this.cacheEnabled) {
+    if (this.cacheEnabled && typeof window === 'undefined') {
+      const fs = await import('fs/promises');
       await fs.mkdir(this.cacheDir, { recursive: true });
     }
   }
@@ -101,9 +103,10 @@ export class BambaiVoiceEngine {
 
   // Check cache for existing audio
   private async checkCache(cacheKey: string): Promise<Buffer | null> {
-    if (!this.cacheEnabled) return null;
+    if (!this.cacheEnabled || typeof window !== 'undefined') return null;
     
     try {
+      const fs = await import('fs/promises');
       const cachePath = path.join(this.cacheDir, `${cacheKey}.mp3`);
       const audio = await fs.readFile(cachePath);
       console.log('🎵 Voice cache hit:', cacheKey);
@@ -115,9 +118,10 @@ export class BambaiVoiceEngine {
 
   // Save audio to cache
   private async saveToCache(cacheKey: string, audio: Buffer): Promise<void> {
-    if (!this.cacheEnabled) return;
+    if (!this.cacheEnabled || typeof window !== 'undefined') return;
     
     try {
+      const fs = await import('fs/promises');
       const cachePath = path.join(this.cacheDir, `${cacheKey}.mp3`);
       await fs.writeFile(cachePath, audio);
       console.log('💾 Voice cached:', cacheKey);
@@ -181,7 +185,7 @@ export class BambaiVoiceEngine {
     }
 
     // Add emotional bookends for better flow
-    const bookends = {
+    const bookends: Record<string, { start: string; end: string }> = {
       inspiring: { start: '<break time="500ms"/>', end: '<break time="800ms"/>' },
       dramatic: { start: '<break time="700ms"/>', end: '<break time="1s"/>' },
       whisper: { start: '<break time="400ms"/>', end: '<break time="600ms"/>' }
@@ -260,7 +264,7 @@ export class BambaiVoiceEngine {
     mode: keyof typeof this.voiceProfiles = 'poeticStoryteller'
   ): Promise<Buffer> {
     // Language-specific adjustments
-    const languageAdjustments: Record<string, any> = {
+    const languageAdjustments: Record<string, { style: number; similarity_boost: number }> = {
       'es': { style: 0.5, similarity_boost: 0.7 },
       'fr': { style: 0.4, similarity_boost: 0.75 },
       'hi': { style: 0.45, similarity_boost: 0.8 },
@@ -295,7 +299,10 @@ export class BambaiVoiceEngine {
 
   // Clear voice cache
   async clearCache(): Promise<void> {
+    if (typeof window !== 'undefined') return;
+    
     try {
+      const fs = await import('fs/promises');
       const files = await fs.readdir(this.cacheDir);
       await Promise.all(
         files.map(file => fs.unlink(path.join(this.cacheDir, file)))
