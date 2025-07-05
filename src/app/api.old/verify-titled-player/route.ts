@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     switch (platform) {
       case 'fide':
         // Check FIDE database (includes Arena titles)
-        const fideResult = await checkFIDEDatabase(username);
+        const fideResult = await checkFIDEDatabase();
         if (fideResult && ALL_TITLES.includes(fideResult.title)) {
           title = fideResult.title;
           verified = true;
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
       case 'chesscom':
         // Check Chess.com API
-        const chesscomResult = await checkChessComAPI(username);
+        const chesscomResult = await checkChessComAPI();
         if (chesscomResult && chesscomResult.title) {
           // Chess.com might not show Arena titles, so also check FIDE
           if (ALL_TITLES.includes(chesscomResult.title)) {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
             verified = true;
           } else {
             // Fallback to FIDE check for Arena titles
-            const fideCheck = await checkFIDEByUsername(username);
+            const fideCheck = await checkFIDEByUsername();
             if (fideCheck && ALL_TITLES.includes(fideCheck.title)) {
               title = fideCheck.title;
               verified = true;
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
       case 'lichess':
         // Check Lichess API
-        const lichessResult = await checkLichessAPI(username);
+        const lichessResult = await checkLichessAPI();
         if (lichessResult && lichessResult.title && ALL_TITLES.includes(lichessResult.title)) {
           title = lichessResult.title;
           verified = true;
@@ -82,22 +82,26 @@ function getTitleCategory(title: string | null): string | null {
 }
 
 // Helper functions (implement these based on your APIs)
-async function checkFIDEDatabase(fideId: string) {
+async function checkFIDEDatabase(): Promise<{ title: string; name: string } | null> {
   // Implement FIDE database check
   // Returns: { title: 'GM', name: 'Player Name' } or null
+  return null;
 }
 
-async function checkFIDEByUsername(username: string) {
+async function checkFIDEByUsername(): Promise<{ title: string; name: string } | null> {
   // Implement FIDE search by name
   // Returns: { title: 'AGM', name: 'Player Name' } or null
+  return null;
 }
 
-async function checkChessComAPI(username: string) {
+async function checkChessComAPI(): Promise<{ title: string; verified: boolean } | null> {
   // Implement Chess.com API check
   // Returns: { title: 'IM', verified: true } or null
+  return null;
 }
 
-async function checkLichessAPI(username: string) {
+async function checkLichessAPI(): Promise<{ title: string; verified: boolean } | null> {
   // Implement Lichess API check
   // Returns: { title: 'FM', verified: true } or null
+  return null;
 }
