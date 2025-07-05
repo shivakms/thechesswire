@@ -15,7 +15,7 @@ export default function LayoutContent({
   const pathname = usePathname();
   
   // Hide navbar/footer on onboarding and auth pages
-  const hideLayout = pathname === '/' || pathname.startsWith('/auth/');
+  const hideLayout = pathname === '/' || pathname?.startsWith('/auth/') || false;
 
   return (
     <ErrorBoundary>
