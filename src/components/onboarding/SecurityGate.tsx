@@ -70,7 +70,7 @@ function checkSuspiciousPatterns() {
   if (navigator.webdriver) return true;
   
   // Check for headless browsers
-  if (!(window as any).chrome && navigator.userAgent.includes('Chrome')) return true;
+  if (!(window as unknown as Record<string, unknown>).chrome && navigator.userAgent.includes('Chrome')) return true;
   
   // Check for common automation properties
   if (window.document.documentElement.getAttribute('webdriver')) return true;
