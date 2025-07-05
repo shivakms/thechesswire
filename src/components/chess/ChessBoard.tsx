@@ -53,7 +53,7 @@ export default function ChessBoard({
     setGame(newGame);
   }, [pgn, position]);
 
-  const handleMove = ({ piece: _piece, sourceSquare, targetSquare }: PieceDropHandlerArgs) => {
+  const handleMove = ({ piece, sourceSquare, targetSquare }: PieceDropHandlerArgs) => {
     if (!interactive) return false;
 
     try {
