@@ -26,14 +26,13 @@ export default function ArticleEditor() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [detectedPgn, setDetectedPgn] = useState<string>('');
   const [chessPosition, setChessPosition] = useState<string>('start');
-  const [showPreview, setShowPreview] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
   const detectPGN = (text: string): string => {
     const lines = text.split('\n');
-    let pgnLines: string[] = [];
+    const pgnLines: string[] = [];
     let inPgnSection = false;
     
     for (const line of lines) {
@@ -128,7 +127,7 @@ export default function ArticleEditor() {
     }
   };
 
-  const enhanceTone = async (content: string, tone: string): Promise<string> => {
+  const enhanceTone = async (content: string): Promise<string> => {
     return content.trim();
   };
 
@@ -141,7 +140,7 @@ export default function ArticleEditor() {
     setIsSubmitting(true);
     
     try {
-      const enhancedContent = await enhanceTone(article.content, article.toneStyle);
+      const enhancedContent = await enhanceTone(article.content);
       
       const formData = new FormData();
       formData.append('title', article.title);
@@ -324,9 +323,11 @@ export default function ArticleEditor() {
                 <h3 className="text-xl font-bold text-white mb-4">Chess Position</h3>
                 <div className="flex justify-center">
                   <Chessboard
-                    position={chessPosition}
-                    boardWidth={400}
-                    arePiecesDraggable={false}
+                    options={{
+                      position: chessPosition,
+                      boardStyle: { width: '400px', height: '400px' },
+                      allowDragging: false
+                    }}
                   />
                 </div>
               </motion.div>

@@ -1,7 +1,7 @@
 // File: /components/onboarding/UsernameSelection.tsx
 'use client';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { User, Mail, Lock, CheckCircle, XCircle, AlertCircle, Sparkles, Zap, Shield, Crown, FileText, ShieldCheck } from 'lucide-react';
+import { User, Mail, Lock, CheckCircle, XCircle, AlertCircle, Sparkles, Shield, Crown, FileText, ShieldCheck } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import BambaiNarrator from './BambaiNarrator';
 import Image from 'next/image';
