@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Chess } from 'chess.js';
-import { Chessboard } from 'react-chessboard';
 import { BambaiVoiceEngine } from '../../lib/voice/BambaiVoiceEngine';
 
 interface ReplayTheaterProps {
@@ -28,8 +27,8 @@ export default function ReplayTheater({
   autoPlay = false,
   playbackSpeed = 2000 
 }: ReplayTheaterProps) {
-  const [game] = useState(new Chess());
-  const [gameHistory, setGameHistory] = useState<any[]>([]);
+  // const [_game] = useState(new Chess());
+  const [gameHistory, setGameHistory] = useState<Array<{ san: string; piece: string; captured?: string }>>([]);
   const [currentMove, setCurrentMove] = useState(0);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [annotations, setAnnotations] = useState<MoveAnnotation[]>([]);
@@ -79,7 +78,7 @@ export default function ReplayTheater({
     };
   }, [isPlaying, currentMove, gameHistory.length, playbackSpeed]);
 
-  const generateMoveAnnotation = (move: any, index: number, history: any[]): MoveAnnotation => {
+  const generateMoveAnnotation = (move: { san: string; piece: string; captured?: string; promotion?: string }, index: number, history: Array<{ san: string; piece: string; captured?: string }>): MoveAnnotation => {
     let annotation = '';
     let emotion: MoveAnnotation['emotion'] = 'neutral';
     
@@ -125,7 +124,7 @@ export default function ReplayTheater({
     
     const tempGame = new Chess();
     for (let i = 0; i < moveIndex; i++) {
-      tempGame.move(gameHistory[i]);
+      tempGame.move(gameHistory[i].san);
     }
     setCurrentPosition(tempGame.fen());
     

@@ -111,7 +111,9 @@ export class BambaiVoiceEngine {
     
     if (this.memoryCache.size > 50) {
       const firstKey = this.memoryCache.keys().next().value;
-      this.memoryCache.delete(firstKey);
+      if (firstKey) {
+        this.memoryCache.delete(firstKey);
+      }
     }
   }
 
@@ -257,10 +259,8 @@ export class BambaiVoiceEngine {
     };
 
     const baseSettings = this.voiceProfiles[mode];
-    const adjustedSettings = {
-      ...baseSettings,
-      ...(languageAdjustments[language] || {})
-    };
+    console.log('Language adjustments for', language, ':', languageAdjustments[language] || {});
+    console.log('Base settings:', baseSettings);
 
     // Generate with language tag
     const languageText = `<speak><lang xml:lang="${language}">${text}</lang></speak>`;

@@ -60,7 +60,7 @@ export default function TitledPlayerVerification({ onComplete, voiceEnabled }: T
         platform,
         username: username.trim(),
         fideId: platform === 'fide' ? username.trim() : undefined,
-        acceptedTitles: ALL_TITLES
+        // acceptedTitles: ALL_TITLES // Not supported by API
       });
 
       if (response.verified && response.title) {
@@ -101,12 +101,13 @@ export default function TitledPlayerVerification({ onComplete, voiceEnabled }: T
         }
         setVerifying(false);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Verification error:', err);
       
-      if (err.response?.status === 404) {
+      const error = err as { response?: { status?: number } };
+      if (error.response?.status === 404) {
         setError('Player not found. Please check your username.');
-      } else if (err.response?.status === 429) {
+      } else if (error.response?.status === 429) {
         setError('Too many attempts. Please try again later.');
       } else {
         setError('Verification service unavailable. Please try again.');
@@ -159,7 +160,7 @@ export default function TitledPlayerVerification({ onComplete, voiceEnabled }: T
             {['fide', 'chesscom', 'lichess'].map((p) => (
               <button
                 key={p}
-                onClick={() => setPlatform(p as any)}
+                onClick={() => setPlatform(p as 'fide' | 'chesscom' | 'lichess')}
                 disabled={verifying}
                 className={`p-3 rounded-lg border transition-all ${
                   platform === p 

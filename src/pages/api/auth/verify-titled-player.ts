@@ -111,7 +111,10 @@ export default async function handler(
         const fideResult = await verifyFidePlayer(fideId);
         if (fideResult.verified) {
           verificationResult = {
-            ...fideResult,
+            verified: fideResult.verified,
+            title: fideResult.title || '',
+            name: fideResult.name || '',
+            rating: fideResult.rating || 0,
             method: 'fide',
             platform: 'FIDE'
           };
@@ -127,7 +130,10 @@ export default async function handler(
         const chessComResult = await verifyChessComPlayer(chessComUsername);
         if (chessComResult.verified) {
           verificationResult = {
-            ...chessComResult,
+            verified: chessComResult.verified,
+            title: chessComResult.title || '',
+            name: chessComResult.name || '',
+            rating: chessComResult.rating || 0,
             method: 'chess_com',
             platform: 'Chess.com'
           };
@@ -143,7 +149,10 @@ export default async function handler(
         const lichessResult = await verifyLichessPlayer(chessComUsername);
         if (lichessResult.verified) {
           verificationResult = {
-            ...lichessResult,
+            verified: lichessResult.verified,
+            title: lichessResult.title || '',
+            name: lichessResult.name || '',
+            rating: lichessResult.rating || 0,
             method: 'lichess',
             platform: 'Lichess'
           };

@@ -1,7 +1,7 @@
 // File: /components/onboarding/UsernameSelection.tsx
 'use client';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { User, Mail, Lock, CheckCircle, XCircle, AlertCircle, Sparkles, Zap, Shield, Crown, FileText, ShieldCheck } from 'lucide-react';
+import { User, Mail, Lock, CheckCircle, XCircle, AlertCircle, Sparkles, Shield, Crown, FileText, ShieldCheck } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import BambaiNarrator from './BambaiNarrator';
 import Image from 'next/image';
@@ -90,7 +90,7 @@ export default function UsernameSelection({ onComplete, voiceEnabled }: Username
         } else {
           setErrors(prev => ({ ...prev, credential: '' }));
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Username check failed:', error);
         // Don't block the user if the check fails
         setCredentialAvailable(true);

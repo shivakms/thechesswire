@@ -38,7 +38,7 @@ export function BambaiVoice({ text, autoPlay = false, onEnd }: BambaiVoiceProps)
 
     // Fallback timeout
     setTimeout(() => setIsReady(true), 1000);
-  }, []);
+  }, [autoPlay, text]);
 
   const speak = (textToSpeak: string) => {
     if (!('speechSynthesis' in window)) {

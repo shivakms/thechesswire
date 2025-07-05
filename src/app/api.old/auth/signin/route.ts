@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       username: user.username,
       email: user.email,
       isTitledPlayer: user.isTitledPlayer,
-      ipHash: hashIP(request.headers.get('x-forwarded-for') || '')
+      ipHash: await hashIP(request.headers.get('x-forwarded-for') || '')
     });
 
   } catch (error) {
@@ -63,7 +63,13 @@ export async function POST(request: NextRequest) {
 }
 
 // Helper functions
-async function findUserByEmailOrUsername(field: string, value: string) {
+async function findUserByEmailOrUsername(_field: string, _value: string): Promise<{
+  id: string;
+  email: string;
+  username: string;
+  passwordHash: string;
+  isTitledPlayer: boolean;
+} | null> {
   // In production, query your database
   // Example with Prisma:
   // return await prisma.user.findFirst({
@@ -72,6 +78,7 @@ async function findUserByEmailOrUsername(field: string, value: string) {
   //   }
   // });
   
+  console.log('Finding user by', _field, ':', _value);
   // Placeholder
   return {
     id: '123',
@@ -87,9 +94,10 @@ function generateSessionToken(userId: string): string {
   return `session_${userId}_${Date.now()}`;
 }
 
-function hashIP(ip: string): string {
+async function hashIP(ip: string): Promise<string> {
   // Hash IP for privacy
-  return require('crypto').createHash('sha256').update(ip).digest('hex');
+  const crypto = await import('crypto');
+  return crypto.createHash('sha256').update(ip).digest('hex');
 }
 
 async function logSigninEvent(userId: string, request: NextRequest) {
@@ -97,7 +105,7 @@ async function logSigninEvent(userId: string, request: NextRequest) {
   const event = {
     userId,
     timestamp: new Date().toISOString(),
-    ipHash: hashIP(request.headers.get('x-forwarded-for') || ''),
+    ipHash: await hashIP(request.headers.get('x-forwarded-for') || ''),
     userAgent: request.headers.get('user-agent'),
     method: request.headers.get('referer')?.includes('username') ? 'username' : 'email'
   };
