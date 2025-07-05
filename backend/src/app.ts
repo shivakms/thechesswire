@@ -449,6 +449,114 @@ app.get('/api/user/profile',
   }
 );
 
+// ========== PHASE 2B: REPLAY SESSION ENDPOINTS ==========
+
+// Create replay session
+app.post('/api/replay/sessions',
+  securityAdapter.authMiddleware(),
+  securityAdapter.rateLimitMiddleware(),
+  async (req: express.Request, res: express.Response) => {
+  try {
+    const { articleId, pgnData, voiceMode, narrationEnabled } = req.body;
+    const userId = (req as any).user.userId;
+    
+    const abuseCheck = await securityAdapter.checkForAbuse(req);
+    if (abuseCheck.isAbusive) {
+      return res.status(403).json({ error: 'Request blocked due to suspicious activity' });
+    }
+    
+    // Validate inputs
+    if (!pgnData) {
+      return res.status(400).json({ error: 'PGN data is required' });
+    }
+    
+    // Create replay session
+    const result = await secureQuery(`
+      INSERT INTO replay_sessions (article_id, user_id, pgn_data, voice_mode, narration_enabled, session_data)
+      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, created_at
+    `, [
+      articleId || null, 
+      userId, 
+      pgnData, 
+      voiceMode || 'dramaticNarrator', 
+      narrationEnabled !== false,
+      JSON.stringify({ initialized: true })
+    ]);
+    
+    await securityAdapter.logSecurityEvent(userId, 'replay_session_created');
+    
+    return res.json({
+      success: true,
+      sessionId: result.rows[0].id,
+      createdAt: result.rows[0].created_at
+    });
+    
+  } catch (error) {
+    securityAdapter.logError(error as Error, { route: '/api/replay/sessions' });
+    return res.status(500).json({ error: 'Failed to create replay session' });
+  }
+});
+
+app.put('/api/replay/sessions/:id',
+  securityAdapter.authMiddleware(),
+  async (req: express.Request, res: express.Response) => {
+  try {
+    const sessionId = parseInt(req.params.id);
+    const { currentMove, sessionData } = req.body;
+    const userId = (req as any).user.userId;
+    
+    if (!sessionId) {
+      return res.status(400).json({ error: 'Invalid session ID' });
+    }
+    
+    const result = await secureQuery(`
+      UPDATE replay_sessions 
+      SET current_move = $1, session_data = $2, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $3 AND user_id = $4
+      RETURNING id
+    `, [currentMove || 0, JSON.stringify(sessionData || {}), sessionId, userId]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    return res.json({ success: true });
+    
+  } catch (error) {
+    securityAdapter.logError(error as Error, { route: '/api/replay/sessions/:id' });
+    return res.status(500).json({ error: 'Failed to update session' });
+  }
+});
+
+app.get('/api/replay/sessions',
+  securityAdapter.authMiddleware(),
+  async (req: express.Request, res: express.Response) => {
+  try {
+    const userId = (req as any).user.userId;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+    
+    const result = await secureQuery(`
+      SELECT 
+        rs.id, rs.article_id, rs.current_move, rs.narration_enabled,
+        rs.voice_mode, rs.created_at, rs.updated_at,
+        a.title as article_title
+      FROM replay_sessions rs
+      LEFT JOIN articles a ON rs.article_id = a.id
+      WHERE rs.user_id = $1
+      ORDER BY rs.updated_at DESC
+      LIMIT $2
+    `, [userId, limit]);
+    
+    return res.json({
+      sessions: result.rows
+    });
+    
+  } catch (error) {
+    securityAdapter.logError(error as Error, { route: '/api/replay/sessions GET' });
+    return res.status(500).json({ error: 'Failed to fetch sessions' });
+  }
+});
+
 // Module 231: Core Access Example
 app.get('/api/free/soulcinema/remaining', async (req, res) => {
   try {
