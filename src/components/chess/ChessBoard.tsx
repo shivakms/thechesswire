@@ -3,7 +3,7 @@ import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 
 type PieceDropHandlerArgs = {
-  piece: unknown;
+  piece: string;
   sourceSquare: string;
   targetSquare: string;
 };
@@ -53,7 +53,7 @@ export default function ChessBoard({
     setGame(newGame);
   }, [pgn, position]);
 
-  const handleMove = ({ sourceSquare, targetSquare }: PieceDropHandlerArgs) => {
+  const handleMove = ({ piece, sourceSquare, targetSquare }: PieceDropHandlerArgs) => {
     if (!interactive) return false;
 
     try {

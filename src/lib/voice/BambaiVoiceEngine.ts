@@ -75,11 +75,27 @@ export class BambaiVoiceEngine {
     philosophical: /life|soul|journey|wisdom|eternal/i
   };
 
-  // Voice cache configuration (Module 304) - in-memory only for client compatibility
+  // Voice cache configuration (Module 304) - environment-aware caching
   private memoryCache = new Map<string, Buffer>();
-  private cacheEnabled = true;
+  private cacheEnabled = typeof window === 'undefined';
 
   constructor() {
+    if (typeof window === 'undefined') {
+      this.initializeServerCache();
+    }
+  }
+
+  private async initializeServerCache() {
+    if (this.cacheEnabled) {
+      try {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const cacheDir = path.join(process.cwd(), '.cache', 'voice');
+        await fs.mkdir(cacheDir, { recursive: true });
+      } catch (error) {
+        console.warn('Server cache initialization failed:', error);
+      }
+    }
   }
 
   // Generate cache key for voice requests
@@ -96,9 +112,25 @@ export class BambaiVoiceEngine {
     
     const cached = this.memoryCache.get(cacheKey);
     if (cached) {
-      console.log('🎵 Voice cache hit:', cacheKey);
+      console.log('🎵 Voice memory cache hit:', cacheKey);
       return cached;
     }
+
+    if (typeof window === 'undefined') {
+      try {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const cacheDir = path.join(process.cwd(), '.cache', 'voice');
+        const cachePath = path.join(cacheDir, `${cacheKey}.mp3`);
+        const audio = await fs.readFile(cachePath);
+        console.log('🎵 Voice file cache hit:', cacheKey);
+        this.memoryCache.set(cacheKey, audio);
+        return audio;
+      } catch {
+        return null;
+      }
+    }
+    
     return null;
   }
 
@@ -111,7 +143,22 @@ export class BambaiVoiceEngine {
     
     if (this.memoryCache.size > 50) {
       const firstKey = this.memoryCache.keys().next().value;
-      this.memoryCache.delete(firstKey);
+      if (firstKey) {
+        this.memoryCache.delete(firstKey);
+      }
+    }
+
+    if (typeof window === 'undefined') {
+      try {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const cacheDir = path.join(process.cwd(), '.cache', 'voice');
+        const cachePath = path.join(cacheDir, `${cacheKey}.mp3`);
+        await fs.writeFile(cachePath, audio);
+        console.log('💾 Voice cached to file:', cacheKey);
+      } catch (error) {
+        console.warn('File cache save failed:', error);
+      }
     }
   }
 
@@ -290,5 +337,20 @@ export class BambaiVoiceEngine {
     
     this.memoryCache.clear();
     console.log('🧹 Voice memory cache cleared');
+
+    if (typeof window === 'undefined') {
+      try {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const cacheDir = path.join(process.cwd(), '.cache', 'voice');
+        const files = await fs.readdir(cacheDir);
+        await Promise.all(
+          files.map(file => fs.unlink(path.join(cacheDir, file)))
+        );
+        console.log('🧹 Voice file cache cleared');
+      } catch (error) {
+        console.warn('File cache clear failed:', error);
+      }
+    }
   }
 }
