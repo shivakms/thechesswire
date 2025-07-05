@@ -111,7 +111,10 @@ export default async function handler(
         const fideResult = await verifyFidePlayer(fideId);
         if (fideResult.verified) {
           verificationResult = {
-            ...fideResult,
+            verified: fideResult.verified,
+            title: fideResult.title || '',
+            name: fideResult.name || '',
+            rating: fideResult.rating || 0,
             method: 'fide',
             platform: 'FIDE'
           };
