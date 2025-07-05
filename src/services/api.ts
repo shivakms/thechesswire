@@ -56,7 +56,7 @@ interface SignUpData {
   echoOrigin?: string;
   voiceMode?: string;
   isTitledPlayer?: boolean;
-  titledPlayerData?: any;
+  titledPlayerData?: Record<string, unknown>;
 }
 
 interface SignInData {

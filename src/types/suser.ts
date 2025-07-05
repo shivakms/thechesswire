@@ -44,7 +44,7 @@ export interface TitledPlayerVerification {
   attemptMetadata?: {
     ipAddress?: string;
     userAgent?: string;
-    behaviorFingerprint?: any;
+    behaviorFingerprint?: Record<string, unknown>;
   };
   verifiedAt?: string;
   createdAt: string;
@@ -55,7 +55,7 @@ export interface TitledPlayerReviewQueue {
   id: number;
   userId: number;
   reason: string;
-  verificationData: any;
+  verificationData: Record<string, unknown>;
   reviewed: boolean;
   reviewedBy?: number;
   reviewDecision?: 'approved' | 'rejected' | 'needs_more_info';

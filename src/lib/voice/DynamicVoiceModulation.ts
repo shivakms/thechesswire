@@ -1,8 +1,15 @@
 // Filename: src/lib/voice/DynamicVoiceModulation.ts
 
+interface VoiceSettings {
+  stability: number;
+  similarity_boost: number;
+  style: number;
+  [key: string]: unknown;
+}
+
 export class DynamicVoiceModulation {
   // Add subtle variations to keep voice feeling alive
-  static addHumanVariation(baseSettings: any): any {
+  static addHumanVariation(baseSettings: VoiceSettings): VoiceSettings {
     return {
       ...baseSettings,
       stability: this.varyValue(baseSettings.stability, 0.05),

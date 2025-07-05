@@ -26,6 +26,7 @@ export default function VoiceTestPage() {
         setError(data.error || 'Failed to generate voice');
       }
     } catch (err) {
+      console.error('Voice API error:', err);
       setError('Failed to connect to voice API');
     } finally {
       setLoading(false);
