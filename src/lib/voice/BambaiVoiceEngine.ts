@@ -111,7 +111,9 @@ export class BambaiVoiceEngine {
     
     if (this.memoryCache.size > 50) {
       const firstKey = this.memoryCache.keys().next().value;
-      this.memoryCache.delete(firstKey);
+      if (firstKey) {
+        this.memoryCache.delete(firstKey);
+      }
     }
   }
 
