@@ -148,3 +148,78 @@ CREATE TRIGGER update_titled_player_verifications_updated_at
     BEFORE UPDATE ON titled_player_verifications
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+
+CREATE TABLE IF NOT EXISTS articles (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  pgn_data TEXT,
+  voice_recording_path TEXT,
+  tone_style VARCHAR(50) DEFAULT 'neutral',
+  status VARCHAR(20) DEFAULT 'draft',
+  emotion_tags JSONB,
+  ai_enhanced BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS pgn_analyses (
+  id SERIAL PRIMARY KEY,
+  article_id INTEGER REFERENCES articles(id) ON DELETE CASCADE,
+  pgn_text TEXT NOT NULL,
+  move_annotations JSONB,
+  emotion_timeline JSONB,
+  key_moments JSONB,
+  alternate_lines JSONB,
+  stockfish_analysis JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS replay_sessions (
+  id SERIAL PRIMARY KEY,
+  article_id INTEGER REFERENCES articles(id) ON DELETE CASCADE,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  pgn_data TEXT NOT NULL,
+  current_move INTEGER DEFAULT 0,
+  narration_enabled BOOLEAN DEFAULT TRUE,
+  voice_mode VARCHAR(50) DEFAULT 'dramaticNarrator',
+  session_data JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS story_generations (
+  id SERIAL PRIMARY KEY,
+  article_id INTEGER REFERENCES articles(id) ON DELETE CASCADE,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  pgn_data TEXT NOT NULL,
+  story_style VARCHAR(50) DEFAULT 'dramatic',
+  generated_narrative TEXT,
+  voice_narration_path TEXT,
+  key_moments JSONB,
+  alternate_lines JSONB,
+  historical_context JSONB,
+  humor_elements JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_articles_user ON articles(user_id);
+CREATE INDEX IF NOT EXISTS idx_articles_status ON articles(status);
+CREATE INDEX IF NOT EXISTS idx_articles_created ON articles(created_at);
+CREATE INDEX IF NOT EXISTS idx_pgn_analyses_article ON pgn_analyses(article_id);
+CREATE INDEX IF NOT EXISTS idx_replay_sessions_user ON replay_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_replay_sessions_article ON replay_sessions(article_id);
+CREATE INDEX IF NOT EXISTS idx_story_generations_user ON story_generations(user_id);
+CREATE INDEX IF NOT EXISTS idx_story_generations_article ON story_generations(article_id);
+
+CREATE TRIGGER update_articles_updated_at
+    BEFORE UPDATE ON articles
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_replay_sessions_updated_at
+    BEFORE UPDATE ON replay_sessions
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();

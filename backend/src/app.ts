@@ -449,6 +449,138 @@ app.get('/api/user/profile',
   }
 );
 
+// ========== PHASE 2A: ARTICLE SUBMISSION ENDPOINTS ==========
+
+// Create article
+app.post('/api/articles', 
+  securityAdapter.authMiddleware(),
+  securityAdapter.rateLimitMiddleware(),
+  async (req: express.Request, res: express.Response) => {
+  try {
+    const { title, content, pgnData, toneStyle, voiceRecordingPath } = req.body;
+    const userId = (req as any).user.userId;
+    
+    const abuseCheck = await securityAdapter.checkForAbuse(req);
+    if (abuseCheck.isAbusive) {
+      return res.status(403).json({ error: 'Request blocked due to suspicious activity' });
+    }
+    
+    // Validate and sanitize inputs
+    if (!title || !content) {
+      return res.status(400).json({ error: 'Title and content are required' });
+    }
+    
+    if (title.length > 255) {
+      return res.status(400).json({ error: 'Title too long (max 255 characters)' });
+    }
+    
+    if (content.length > 50000) {
+      return res.status(400).json({ error: 'Content too long (max 50,000 characters)' });
+    }
+    
+    let validatedPgn = null;
+    if (pgnData) {
+      const pgnPattern = /^(\s*\[.*?\]\s*)*\s*1\.\s*[a-h][1-8]|[KQRBN][a-h]?[1-8]?x?[a-h][1-8]/;
+      if (pgnPattern.test(pgnData.trim())) {
+        validatedPgn = pgnData.trim();
+      }
+    }
+    
+    // Create article
+    const result = await secureQuery(`
+      INSERT INTO articles (user_id, title, content, pgn_data, tone_style, voice_recording_path)
+      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, created_at
+    `, [userId, title, content, validatedPgn, toneStyle || 'neutral', voiceRecordingPath]);
+    
+    if (validatedPgn) {
+      await secureQuery(`
+        INSERT INTO pgn_analyses (article_id, pgn_text, move_annotations)
+        VALUES ($1, $2, $3)
+      `, [result.rows[0].id, validatedPgn, JSON.stringify({ analyzed: false })]);
+    }
+    
+    await securityAdapter.logSecurityEvent(userId, 'article_created', {
+      articleId: result.rows[0].id,
+      hasPgn: !!validatedPgn
+    });
+    
+    return res.json({ 
+      success: true, 
+      articleId: result.rows[0].id,
+      createdAt: result.rows[0].created_at
+    });
+    
+  } catch (error) {
+    securityAdapter.logError(error as Error, { route: '/api/articles' });
+    return res.status(500).json({ error: 'Failed to create article' });
+  }
+});
+
+app.get('/api/articles', 
+  securityAdapter.authMiddleware(),
+  async (req: express.Request, res: express.Response) => {
+  try {
+    const userId = (req as any).user.userId;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 50);
+    const offset = (page - 1) * limit;
+    
+    const result = await secureQuery(`
+      SELECT 
+        a.id, a.title, a.content, a.pgn_data, a.tone_style, 
+        a.status, a.created_at, a.updated_at,
+        CASE WHEN a.pgn_data IS NOT NULL THEN true ELSE false END as has_pgn
+      FROM articles a
+      WHERE a.user_id = $1
+      ORDER BY a.created_at DESC
+      LIMIT $2 OFFSET $3
+    `, [userId, limit, offset]);
+    
+    return res.json({ 
+      articles: result.rows,
+      page,
+      limit,
+      total: result.rows.length
+    });
+    
+  } catch (error) {
+    securityAdapter.logError(error as Error, { route: '/api/articles GET' });
+    return res.status(500).json({ error: 'Failed to fetch articles' });
+  }
+});
+
+app.get('/api/articles/:id', 
+  securityAdapter.authMiddleware(),
+  async (req: express.Request, res: express.Response) => {
+  try {
+    const userId = (req as any).user.userId;
+    const articleId = parseInt(req.params.id);
+    
+    if (!articleId) {
+      return res.status(400).json({ error: 'Invalid article ID' });
+    }
+    
+    const result = await secureQuery(`
+      SELECT 
+        a.*, 
+        p.move_annotations, p.emotion_timeline, p.key_moments
+      FROM articles a
+      LEFT JOIN pgn_analyses p ON a.id = p.article_id
+      WHERE a.id = $1 AND a.user_id = $2
+    `, [articleId, userId]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Article not found' });
+    }
+    
+    return res.json({ article: result.rows[0] });
+    
+  } catch (error) {
+    securityAdapter.logError(error as Error, { route: '/api/articles/:id' });
+    return res.status(500).json({ error: 'Failed to fetch article' });
+  }
+});
+
 // Module 231: Core Access Example
 app.get('/api/free/soulcinema/remaining', async (req, res) => {
   try {
