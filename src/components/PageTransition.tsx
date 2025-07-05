@@ -118,7 +118,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
           initial={transitionConfig.initial}
           animate={transitionConfig.animate}
           exit={transitionConfig.exit}
-          transition={transitionConfig.transition as any}
+          transition={transitionConfig.transition as object}
           style={{
             background: pathname?.startsWith('/replay') 
               ? 'radial-gradient(ellipse at center, rgba(139, 69, 19, 0.03) 0%, transparent 70%)'
