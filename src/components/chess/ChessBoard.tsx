@@ -2,12 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 
-type PieceDropHandlerArgs = {
-  piece: string;
-  sourceSquare: string;
-  targetSquare: string;
-};
-
 interface ChessBoardProps {
   pgn?: string;
   position?: string;
@@ -53,14 +47,14 @@ export default function ChessBoard({
     setGame(newGame);
   }, [pgn, position]);
 
-  const handleMove = ({ sourceSquare, targetSquare }: { sourceSquare: string; targetSquare: string }) => {
+  const handleMove = (sourceSquare: string, targetSquare: string) => {
     if (!interactive) return false;
 
     try {
       const move = game.move({
         from: sourceSquare,
         to: targetSquare,
-        promotion: 'q' // Always promote to queen for simplicity
+        promotion: 'q'
       });
 
       if (move) {
@@ -81,7 +75,7 @@ export default function ChessBoard({
         position={currentPosition}
         boardWidth={width}
         arePiecesDraggable={interactive}
-        onPieceDrop={interactive ? (args: { piece: string; sourceSquare: string; targetSquare: string }) => handleMove({ sourceSquare: args.sourceSquare, targetSquare: args.targetSquare }) : undefined}
+        onPieceDrop={interactive ? handleMove : undefined}
         boardOrientation="white"
         customDarkSquareStyle={{ backgroundColor: '#779952' }}
         customLightSquareStyle={{ backgroundColor: '#edeed1' }}
