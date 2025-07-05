@@ -12,7 +12,7 @@ const ALL_TITLES = Object.values(RECOGNIZED_TITLES).flat();
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { username, platform } = body;
+  const { platform } = body;
 
   try {
     let title = null;

@@ -8,7 +8,6 @@ export async function POST(request: NextRequest) {
 
   try {
     // Determine which credential was provided
-    const loginField = email ? 'email' : 'username';
     const loginValue = email || username;
 
     if (!loginValue || !password) {

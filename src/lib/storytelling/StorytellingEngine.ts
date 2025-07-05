@@ -48,7 +48,7 @@ export class StorytellingEngine {
       
       const voiceNarration = await this.generateVoiceNarration(narrative, style);
       
-      const historicalContext = style === 'historical' ? this.generateHistoricalContext(moves) : undefined;
+      const historicalContext = style === 'historical' ? this.generateHistoricalContext() : undefined;
       
       return {
         textStory: narrative,
@@ -318,7 +318,7 @@ export class StorytellingEngine {
     }
   }
 
-  private generateHistoricalContext(_moves: Array<{ san: string }>): string {
+  private generateHistoricalContext(): string {
     return "This game echoes the classical principles established by masters like Capablanca and Petrosian, " +
            "demonstrating how timeless chess wisdom continues to guide modern play. The strategic themes " +
            "present here can be traced back to the great tournament games of the early 20th century.";
