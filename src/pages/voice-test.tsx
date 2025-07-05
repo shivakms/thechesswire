@@ -25,7 +25,7 @@ export default function VoiceTestPage() {
       } else {
         setError(data.error || 'Failed to generate voice');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to connect to voice API');
     } finally {
       setLoading(false);
