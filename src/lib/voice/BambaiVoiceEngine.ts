@@ -265,6 +265,8 @@ export class BambaiVoiceEngine {
     // Generate with language tag
     const languageText = `<speak><lang xml:lang="${language}">${text}</lang></speak>`;
     
+    console.log('Using adjusted settings for language:', language, adjustedSettings);
+    
     return this.generateVoice(languageText, mode, 'neutral');
   }
 
