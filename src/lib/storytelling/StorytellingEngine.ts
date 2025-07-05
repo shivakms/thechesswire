@@ -330,7 +330,7 @@ export class StorytellingEngine {
       const emotion = this.getEmotionForStyle(style);
       
       const voiceBuffer = await this.bambai.generateVoice(narrative, voiceMode, emotion);
-      return voiceBuffer ? voiceBuffer.buffer : undefined;
+      return voiceBuffer ? voiceBuffer.buffer as ArrayBuffer : undefined;
     } catch (error) {
       console.error('Voice narration generation failed:', error);
       return undefined;
