@@ -237,7 +237,7 @@ export default async function handler(
     await logSecurityEvent({
       type: 'signup_error',
       error: error instanceof Error ? error.message : 'Unknown error',
-      ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || '',
+      ip: (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '',
       timestamp: new Date()
     });
 
