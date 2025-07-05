@@ -53,7 +53,7 @@ export default function ChessBoard({
     setGame(newGame);
   }, [pgn, position]);
 
-  const handleMove = ({ piece, sourceSquare, targetSquare }: PieceDropHandlerArgs) => {
+  const handleMove = ({ sourceSquare, targetSquare }: { sourceSquare: string; targetSquare: string }) => {
     if (!interactive) return false;
 
     try {
@@ -78,20 +78,13 @@ export default function ChessBoard({
   return (
     <div className="chess-board-container">
       <Chessboard
-        options={{
-          position: currentPosition,
-          boardStyle: { 
-            width: `${width}px`, 
-            height: `${width}px`,
-            borderRadius: '8px',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
-          },
-          allowDragging: interactive,
-          onPieceDrop: interactive ? handleMove : undefined,
-          boardOrientation: "white",
-          darkSquareStyle: { backgroundColor: '#779952' },
-          lightSquareStyle: { backgroundColor: '#edeed1' }
-        }}
+        position={currentPosition}
+        boardWidth={width}
+        arePiecesDraggable={interactive}
+        onPieceDrop={interactive ? (args: { piece: string; sourceSquare: string; targetSquare: string }) => handleMove({ sourceSquare: args.sourceSquare, targetSquare: args.targetSquare }) : undefined}
+        boardOrientation="white"
+        customDarkSquareStyle={{ backgroundColor: '#779952' }}
+        customLightSquareStyle={{ backgroundColor: '#edeed1' }}
       />
     </div>
   );
