@@ -2,7 +2,6 @@
 
 import axios from 'axios';
 import crypto from 'crypto';
-import path from 'path';
 import { DynamicVoiceModulation } from './DynamicVoiceModulation';
 
 const API_KEY = process.env.ELEVENLABS_API_KEY;
@@ -76,21 +75,11 @@ export class BambaiVoiceEngine {
     philosophical: /life|soul|journey|wisdom|eternal/i
   };
 
-  // Voice cache configuration (Module 304) - disabled in browser
-  private cacheDir = typeof window !== 'undefined' ? '' : path.join(process.cwd(), '.cache', 'voice');
-  private cacheEnabled = typeof window === 'undefined'; // Only enable on server-side
+  // Voice cache configuration (Module 304) - in-memory only for client compatibility
+  private memoryCache = new Map<string, Buffer>();
+  private cacheEnabled = true;
 
   constructor() {
-    if (typeof window === 'undefined') {
-      this.initializeCache();
-    }
-  }
-
-  private async initializeCache() {
-    if (this.cacheEnabled && typeof window === 'undefined') {
-      const fs = await import('fs/promises');
-      await fs.mkdir(this.cacheDir, { recursive: true });
-    }
   }
 
   // Generate cache key for voice requests
@@ -103,30 +92,26 @@ export class BambaiVoiceEngine {
 
   // Check cache for existing audio
   private async checkCache(cacheKey: string): Promise<Buffer | null> {
-    if (!this.cacheEnabled || typeof window !== 'undefined') return null;
+    if (!this.cacheEnabled) return null;
     
-    try {
-      const fs = await import('fs/promises');
-      const cachePath = path.join(this.cacheDir, `${cacheKey}.mp3`);
-      const audio = await fs.readFile(cachePath);
+    const cached = this.memoryCache.get(cacheKey);
+    if (cached) {
       console.log('🎵 Voice cache hit:', cacheKey);
-      return audio;
-    } catch {
-      return null;
+      return cached;
     }
+    return null;
   }
 
   // Save audio to cache
   private async saveToCache(cacheKey: string, audio: Buffer): Promise<void> {
-    if (!this.cacheEnabled || typeof window !== 'undefined') return;
+    if (!this.cacheEnabled) return;
     
-    try {
-      const fs = await import('fs/promises');
-      const cachePath = path.join(this.cacheDir, `${cacheKey}.mp3`);
-      await fs.writeFile(cachePath, audio);
-      console.log('💾 Voice cached:', cacheKey);
-    } catch (error) {
-      console.error('Cache save error:', error);
+    this.memoryCache.set(cacheKey, audio);
+    console.log('💾 Voice cached in memory:', cacheKey);
+    
+    if (this.memoryCache.size > 50) {
+      const firstKey = this.memoryCache.keys().next().value;
+      this.memoryCache.delete(firstKey);
     }
   }
 
@@ -276,6 +261,8 @@ export class BambaiVoiceEngine {
       ...baseSettings,
       ...(languageAdjustments[language] || {})
     };
+    
+    console.log('Using adjusted settings for language:', language, adjustedSettings);
 
     // Generate with language tag
     const languageText = `<speak><lang xml:lang="${language}">${text}</lang></speak>`;
@@ -299,17 +286,9 @@ export class BambaiVoiceEngine {
 
   // Clear voice cache
   async clearCache(): Promise<void> {
-    if (typeof window !== 'undefined') return;
+    if (!this.cacheEnabled) return;
     
-    try {
-      const fs = await import('fs/promises');
-      const files = await fs.readdir(this.cacheDir);
-      await Promise.all(
-        files.map(file => fs.unlink(path.join(this.cacheDir, file)))
-      );
-      console.log('🧹 Voice cache cleared');
-    } catch (error) {
-      console.error('Cache clear error:', error);
-    }
+    this.memoryCache.clear();
+    console.log('🧹 Voice memory cache cleared');
   }
 }
