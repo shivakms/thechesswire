@@ -2,10 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 
+type PieceDropHandlerArgs = {
+  piece: {
+    isSparePiece: boolean;
+    position: string;
+    pieceType: string;
+  };
+  sourceSquare: string;
+  targetSquare: string | null;
+};
+
 interface ChessBoardProps {
   pgn?: string;
   position?: string;
-  width?: number;
   interactive?: boolean;
   showCoordinates?: boolean;
   onMove?: (move: string) => void;
@@ -14,7 +23,6 @@ interface ChessBoardProps {
 export default function ChessBoard({ 
   pgn, 
   position, 
-  width = 400, 
   interactive = false,
   onMove 
 }: ChessBoardProps) {
@@ -47,8 +55,8 @@ export default function ChessBoard({
     setGame(newGame);
   }, [pgn, position]);
 
-  const handleMove = (sourceSquare: string, targetSquare: string) => {
-    if (!interactive) return false;
+  const handlePieceDrop = ({ sourceSquare, targetSquare }: PieceDropHandlerArgs) => {
+    if (!interactive || !targetSquare) return false;
 
     try {
       const move = game.move({
@@ -72,13 +80,14 @@ export default function ChessBoard({
   return (
     <div className="chess-board-container">
       <Chessboard
-        position={currentPosition}
-        boardWidth={width}
-        arePiecesDraggable={interactive}
-        onPieceDrop={interactive ? handleMove : undefined}
-        boardOrientation="white"
-        customDarkSquareStyle={{ backgroundColor: '#779952' }}
-        customLightSquareStyle={{ backgroundColor: '#edeed1' }}
+        options={{
+          position: currentPosition,
+          allowDragging: interactive,
+          onPieceDrop: interactive ? handlePieceDrop : undefined,
+          boardOrientation: "white",
+          darkSquareStyle: { backgroundColor: '#779952' },
+          lightSquareStyle: { backgroundColor: '#edeed1' }
+        }}
       />
     </div>
   );

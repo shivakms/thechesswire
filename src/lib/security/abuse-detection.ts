@@ -2,9 +2,6 @@
 // Modules 73-75: OWASP Platform-Wide Enforcement, Adaptive Threat Intelligence, Real-Time Behavior Fingerprinting
 
 import axios from 'axios';
-import crypto from 'crypto';
-// import { getDb } from '@/lib/db';
-import { encrypt } from '@/lib/security/encryption';
 
 interface AbuseCheckParams {
   ip: string;
@@ -281,9 +278,10 @@ function analyzeBehaviorPattern(behaviorData: Record<string, unknown>): {suspici
  */
 async function checkRateLimit(_ip: string, _fingerprint: string, _action: string): Promise<{exceeded: boolean}> {
   // const db = await getDb();
-  const _key = `${_ip}_${_fingerprint}_${_action}`;
-  const _window = 60000; // 1 minute
-  const _maxAttempts = getMaxAttemptsForAction(_action);
+  const key = `${_ip}_${_fingerprint}_${_action}`;
+  const window = 60000; // 1 minute
+  const maxAttempts = getMaxAttemptsForAction(_action);
+  console.log('Rate limit check:', { key, window, maxAttempts });
 
   try {
     // const result = await db.query(`
@@ -307,8 +305,9 @@ async function checkRateLimit(_ip: string, _fingerprint: string, _action: string
 /**
  * Check abuse history in database
  */
-async function checkAbuseHistory(_ip: string, _fingerprint: string): Promise<{previousAbuse: boolean; score: number}> {
+async function checkAbuseHistory(ip: string, fingerprint: string): Promise<{previousAbuse: boolean; score: number}> {
   // const db = await getDb();
+  console.log('Checking abuse history for:', { ip, fingerprint });
   
   try {
     // const result = await db.query(`
@@ -466,7 +465,7 @@ function getMaxAttemptsForAction(action: string): number {
   return limits[action] || 10;
 }
 
-async function logAbuseCheck(_data: Record<string, unknown>): Promise<void> {
+async function logAbuseCheck(data: Record<string, unknown>): Promise<void> {
   // const db = await getDb();
   
   try {
@@ -488,7 +487,7 @@ async function logAbuseCheck(_data: Record<string, unknown>): Promise<void> {
     //   data.blocked,
     //   JSON.stringify({ patterns: data.patterns })
     // ]);
-    console.log('Abuse check logged');
+    console.log('Abuse check logged for:', data);
   } catch (error) {
     console.error('Failed to log abuse check:', error);
   }
