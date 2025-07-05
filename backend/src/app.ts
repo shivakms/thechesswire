@@ -479,6 +479,114 @@ app.get('/api/free/soulcinema/remaining', async (req, res) => {
   }
 });
 
+// ========== PHASE 3: AI JOURNALISM ENDPOINTS ==========
+
+// Generate AI story from PGN
+app.post('/api/journalism/generate-story',
+  securityAdapter.authMiddleware(),
+  securityAdapter.rateLimitMiddleware(),
+  async (req: express.Request, res: express.Response) => {
+  try {
+    const { pgn, style, title } = req.body;
+    const userId = (req as any).user.userId;
+    
+    const abuseCheck = await securityAdapter.checkForAbuse(req);
+    if (abuseCheck.isAbusive) {
+      return res.status(403).json({ error: 'Request blocked due to suspicious activity' });
+    }
+    
+    // Validate inputs
+    if (!pgn || !style) {
+      return res.status(400).json({ error: 'PGN and style are required' });
+    }
+    
+    const result = await secureQuery(`
+      INSERT INTO story_generations (user_id, pgn_data, style, title, status, generation_data)
+      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, created_at
+    `, [
+      userId, 
+      pgn, 
+      style, 
+      title || 'Untitled Story',
+      'processing',
+      JSON.stringify({ requested: true })
+    ]);
+    
+    await securityAdapter.logSecurityEvent(userId, 'story_generation_requested');
+    
+    return res.json({
+      success: true,
+      storyId: result.rows[0].id,
+      createdAt: result.rows[0].created_at,
+      message: 'Story generation initiated'
+    });
+    
+  } catch (error) {
+    securityAdapter.logError(error as Error, { route: '/api/journalism/generate-story' });
+    return res.status(500).json({ error: 'Failed to generate story' });
+  }
+});
+
+app.get('/api/journalism/stories',
+  securityAdapter.authMiddleware(),
+  async (req: express.Request, res: express.Response) => {
+  try {
+    const userId = (req as any).user.userId;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+    
+    const result = await secureQuery(`
+      SELECT 
+        id, title, style, status, created_at, updated_at,
+        CASE 
+          WHEN status = 'completed' THEN generation_data
+          ELSE NULL 
+        END as story_data
+      FROM story_generations 
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      LIMIT $2
+    `, [userId, limit]);
+    
+    return res.json({
+      stories: result.rows
+    });
+    
+  } catch (error) {
+    securityAdapter.logError(error as Error, { route: '/api/journalism/stories GET' });
+    return res.status(500).json({ error: 'Failed to fetch stories' });
+  }
+});
+
+app.get('/api/journalism/stories/:id',
+  securityAdapter.authMiddleware(),
+  async (req: express.Request, res: express.Response) => {
+  try {
+    const storyId = parseInt(req.params.id);
+    const userId = (req as any).user.userId;
+    
+    if (!storyId) {
+      return res.status(400).json({ error: 'Invalid story ID' });
+    }
+    
+    const result = await secureQuery(`
+      SELECT * FROM story_generations 
+      WHERE id = $1 AND user_id = $2
+    `, [storyId, userId]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Story not found' });
+    }
+    
+    return res.json({
+      story: result.rows[0]
+    });
+    
+  } catch (error) {
+    securityAdapter.logError(error as Error, { route: '/api/journalism/stories/:id' });
+    return res.status(500).json({ error: 'Failed to fetch story' });
+  }
+});
+
 // ========== ERROR HANDLING ==========
 
 app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {

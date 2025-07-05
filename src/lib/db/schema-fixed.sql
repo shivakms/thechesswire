@@ -148,3 +148,31 @@ CREATE TRIGGER update_titled_player_verifications_updated_at
     BEFORE UPDATE ON titled_player_verifications
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TABLE IF NOT EXISTS story_generations (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  pgn_data TEXT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  style VARCHAR(50) NOT NULL CHECK (style IN ('dramatic', 'humorous', 'historical', 'analytical')),
+  status VARCHAR(20) DEFAULT 'processing' CHECK (status IN ('processing', 'completed', 'failed')),
+  generation_data JSONB,
+  story_text TEXT,
+  voice_narration_path TEXT,
+  key_moments JSONB,
+  alternate_lines JSONB,
+  tactical_themes JSONB,
+  quotes JSONB,
+  historical_context TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_story_generations_user_id ON story_generations(user_id);
+CREATE INDEX IF NOT EXISTS idx_story_generations_status ON story_generations(status);
+
+-- Trigger for story_generations
+CREATE TRIGGER update_story_generations_updated_at
+    BEFORE UPDATE ON story_generations
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
