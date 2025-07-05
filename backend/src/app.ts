@@ -499,10 +499,7 @@ app.post('/api/articles',
       `, [result.rows[0].id, validatedPgn, JSON.stringify({ analyzed: false })]);
     }
     
-    await securityAdapter.logSecurityEvent(userId, 'article_created', {
-      articleId: result.rows[0].id,
-      hasPgn: !!validatedPgn
-    });
+    await securityAdapter.logSecurityEvent(userId, 'article_created');
     
     return res.json({ 
       success: true, 

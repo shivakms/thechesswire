@@ -75,7 +75,6 @@ export default function ChessBoard({
       <Chessboard
         position={currentPosition}
         boardWidth={width}
-        areArrowsAllowed={false}
         arePiecesDraggable={interactive}
         onPieceDrop={interactive ? handleMove : undefined}
         boardOrientation="white"

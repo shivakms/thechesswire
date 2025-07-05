@@ -327,7 +327,6 @@ export default function ArticleEditor() {
                     position={chessPosition}
                     boardWidth={400}
                     arePiecesDraggable={false}
-                    areArrowsAllowed={false}
                   />
                 </div>
               </motion.div>
