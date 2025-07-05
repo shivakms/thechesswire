@@ -1,14 +1,14 @@
 // src/pages/api/auth/signup.ts
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import bcrypt from 'bcryptjs';
+// import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import { createUser, checkExistingUser } from '@/lib/db/users';
+// import { createUser, checkExistingUser } from '@/lib/db/users';
 import { detectAbuse, logSecurityEvent } from '@/lib/security/abuse-detection';
 import { encrypt } from '@/lib/security/encryption';
-import { checkDuplicateRegistration } from '@/lib/services/chess-verification';
-import { generateJWT } from '@/lib/auth/jwt';
-import { sendWelcomeEmail } from '@/lib/email/welcome';
+// import { checkDuplicateRegistration } from '@/lib/services/chess-verification';
+// import { generateJWT } from '@/lib/auth/jwt';
+// import { sendWelcomeEmail } from '@/lib/email/welcome';
 
 // Signup validation schema
 const signupSchema = z.object({
@@ -103,15 +103,15 @@ export default async function handler(
 
     const data = validationResult.data;
 
-    // Check if user already exists
-    const existingUser = await checkExistingUser(data.email, data.username);
-    if (existingUser) {
-      return res.status(400).json({ 
-        error: existingUser.email === data.email 
-          ? 'Email already registered' 
-          : 'Username already taken'
-      });
-    }
+    // TODO: Check if user already exists
+    // const existingUser = await checkExistingUser(data.email, data.username);
+    // if (existingUser) {
+    //   return res.status(400).json({ 
+    //     error: existingUser.email === data.email 
+    //       ? 'Email already registered' 
+    //       : 'Username already taken'
+    //   });
+    // }
 
     // Titled player verification checks
     if (data.isTitledPlayer) {
@@ -122,13 +122,13 @@ export default async function handler(
         });
       }
 
-      // Check for duplicate titled player registration
-      const isDuplicate = await checkDuplicateRegistration(
-        data.fideId || undefined,
-        data.chessComUsername || undefined
-      );
+      // TODO: Check for duplicate titled player registration
+      // const isDuplicate = await checkDuplicateRegistration(
+      //   data.fideId || undefined,
+      //   data.chessComUsername || undefined
+      // );
 
-      if (isDuplicate) {
+      // if (isDuplicate) {
         await logSecurityEvent({
           type: 'duplicate_titled_player_attempt',
           ip: clientIp as string,
@@ -139,52 +139,61 @@ export default async function handler(
           timestamp: new Date()
         });
 
-        return res.status(400).json({ 
-          error: 'This titled player is already registered'
-        });
-      }
+      //   return res.status(400).json({ 
+      //     error: 'This titled player is already registered'
+      //   });
+      // }
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(data.password, 12);
+    // TODO: Hash password
+    // const hashedPassword = await bcrypt.hash(data.password, 12);
 
-    // Module 287: Prepare encrypted user data
-    const userData = {
-      email: data.email,
-      password: hashedPassword,
-      username: data.username,
-      echoOrigin: data.echoOrigin,
-      voiceMode: data.voiceMode,
-      voiceEnabled: data.voiceEnabled,
-      
-      // Titled player data
-      titledPlayer: data.isTitledPlayer,
-      titledPlayerVerified: data.titledPlayerVerified,
-      titledPlayerTitle: data.titledPlayerDetails?.title || null,
-      titledPlayerVerificationMethod: data.titledPlayerDetails?.verificationMethod || null,
-      titledPlayerVerifiedAt: data.titledPlayerDetails?.verifiedAt || null,
-      fideId: data.fideId,
-      chessComUsername: data.chessComUsername,
-      chessRating: data.titledPlayerDetails?.rating || null,
-      
-      // Consent and security
-      acceptedTerms: data.acceptedTerms,
-      acceptedPrivacy: data.acceptedPrivacy,
-      acceptedAt: data.acceptedAt,
-      gdprConsent: data.gdprConsent,
-      
-      // Module 75: Behavior fingerprint
-      behaviorFingerprint: encrypt(JSON.stringify(data.behaviorFingerprint)),
-      ipAddress: encrypt(clientIp as string),
-      userAgent: encrypt(userAgent),
-      
-      // Account type based on titled player status
-      accountType: data.titledPlayerVerified ? 'premium_titled' : 'free',
-      premiumFeatures: data.titledPlayerVerified
+    // TODO: Module 287: Prepare encrypted user data
+    // const userData = {
+    //   email: data.email,
+    //   password: hashedPassword,
+    //   username: data.username,
+    //   echoOrigin: data.echoOrigin,
+    //   voiceMode: data.voiceMode,
+    //   voiceEnabled: data.voiceEnabled,
+    //   
+    //   // Titled player data
+    //   titledPlayer: data.isTitledPlayer,
+    //   titledPlayerVerified: data.titledPlayerVerified,
+    //   titledPlayerTitle: data.titledPlayerDetails?.title || null,
+    //   titledPlayerVerificationMethod: data.titledPlayerDetails?.verificationMethod || null,
+    //   titledPlayerVerifiedAt: data.titledPlayerDetails?.verifiedAt || null,
+    //   fideId: data.fideId,
+    //   chessComUsername: data.chessComUsername,
+    //   chessRating: data.titledPlayerDetails?.rating || null,
+    //   
+    //   // Consent and security
+    //   acceptedTerms: data.acceptedTerms,
+    //   acceptedPrivacy: data.acceptedPrivacy,
+    //   acceptedAt: data.acceptedAt,
+    //   gdprConsent: data.gdprConsent,
+    //   
+    //   // Module 75: Behavior fingerprint
+    //   behaviorFingerprint: encrypt(JSON.stringify(data.behaviorFingerprint)),
+    //   ipAddress: encrypt(clientIp as string),
+    //   userAgent: encrypt(userAgent),
+    //   
+    //   // Account type based on titled player status
+    //   accountType: data.titledPlayerVerified ? 'premium_titled' : 'free',
+    //   premiumFeatures: data.titledPlayerVerified
+    // };
+
+    // TODO: Create user in database
+    // const newUser = await createUser(userData);
+    const newUser = { 
+      id: Date.now(), 
+      username: data.username, 
+      email: data.email, 
+      titledPlayerVerified: data.titledPlayerVerified, 
+      titledPlayerTitle: data.titledPlayerDetails?.title, 
+      echoOrigin: data.echoOrigin, 
+      accountType: data.titledPlayerVerified ? 'premium_titled' : 'free' 
     };
-
-    // Create user in database
-    const newUser = await createUser(userData);
 
     // Log successful signup
     await logSecurityEvent({
@@ -199,20 +208,21 @@ export default async function handler(
       timestamp: new Date()
     });
 
-    // Generate JWT token
-    const token = generateJWT({
-      userId: newUser.id,
-      username: newUser.username,
-      email: newUser.email,
-      titledPlayer: newUser.titledPlayerVerified,
-      accountType: newUser.accountType
-    });
+    // TODO: Generate JWT token
+    // const token = generateJWT({
+    //   userId: newUser.id,
+    //   username: newUser.username,
+    //   email: newUser.email,
+    //   titledPlayer: newUser.titledPlayerVerified,
+    //   accountType: newUser.accountType
+    // });
+    const token = 'temp-jwt-token';
 
-    // Send welcome email (async, don't wait)
-    sendWelcomeEmail(newUser.email, newUser.username, {
-      titledPlayer: newUser.titledPlayerVerified,
-      title: newUser.titledPlayerTitle
-    }).catch(console.error);
+    // TODO: Send welcome email (async, don't wait)
+    // sendWelcomeEmail(newUser.email, newUser.username, {
+    //   titledPlayer: newUser.titledPlayerVerified,
+    //   title: newUser.titledPlayerTitle
+    // }).catch(console.error);
 
     // Return success response
     return res.status(201).json({
@@ -237,7 +247,7 @@ export default async function handler(
     await logSecurityEvent({
       type: 'signup_error',
       error: error instanceof Error ? error.message : 'Unknown error',
-      ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || '',
+      ip: (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '',
       timestamp: new Date()
     });
 

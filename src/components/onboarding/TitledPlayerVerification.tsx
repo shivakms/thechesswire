@@ -59,8 +59,7 @@ export default function TitledPlayerVerification({ onComplete, voiceEnabled }: T
       const response = await titledPlayer.verify({
         platform,
         username: username.trim(),
-        fideId: platform === 'fide' ? username.trim() : undefined,
-        acceptedTitles: ALL_TITLES
+        fideId: platform === 'fide' ? username.trim() : undefined
       });
 
       if (response.verified && response.title) {

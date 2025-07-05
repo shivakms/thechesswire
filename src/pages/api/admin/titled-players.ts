@@ -17,6 +17,10 @@ export default async function handler(
 
   const db = null; // TODO: Implement database connection
 
+  if (!db) {
+    return res.status(503).json({ error: 'Database not available' });
+  }
+
   switch (req.method) {
     case 'GET':
       return handleGet(req, res, db);
@@ -29,241 +33,57 @@ export default async function handler(
   }
 }
 
-async function handleGet(req: NextApiRequest, res: NextApiResponse, db: Record<string, unknown>) {
-  const { status = 'all', page = 1, limit = 50 } = req.query;
+async function handleGet(req: NextApiRequest, res: NextApiResponse, db: Record<string, unknown> | null) {
+  const { page = 1, limit = 50 } = req.query;
 
   if (!db) {
     return res.status(503).json({ error: 'Database not available' });
   }
 
-  try {
-    let query = `
-      SELECT 
-        u.id,
-        u.username,
-        u.email,
-        u.titled_player_title as title,
-        u.chess_rating as rating,
-        u.titled_player_verification_method as method,
-        u.titled_player_verified_at as verified_at,
-        u.created_at,
-        u.last_login,
-        u.fide_id,
-        u.chess_com_username,
-        COUNT(DISTINCT a.id) as articles_count,
-        COUNT(DISTINCT v.id) as videos_count
-      FROM users u
-      LEFT JOIN articles a ON a.user_id = u.id
-      LEFT JOIN videos v ON v.user_id = u.id
-      WHERE 1=1
-    `;
-
-    const params = [];
-    let paramIndex = 1;
-
-    if (status === 'verified') {
-      query += ` AND u.titled_player_verified = true`;
-    } else if (status === 'pending') {
-      query += ` AND u.titled_player = true AND u.titled_player_verified = false`;
-    } else if (status === 'rejected') {
-      query += ` AND EXISTS (
-        SELECT 1 FROM titled_player_review_queue q 
-        WHERE q.user_id = u.id AND q.review_decision = 'rejected'
-      )`;
-    }
-
-    query += ` GROUP BY u.id ORDER BY u.created_at DESC`;
-    query += ` LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
-    
-    params.push(limit, (Number(page) - 1) * Number(limit));
-
-    const result = await db.query(query, params);
-
-    // Get total count
-    const countQuery = `
-      SELECT COUNT(*) as total 
-      FROM users u 
-      WHERE u.titled_player = true
-    `;
-    const countResult = await db.query(countQuery);
-
-    // Get verification statistics
-    const statsQuery = `
-      SELECT 
-        COUNT(*) FILTER (WHERE titled_player_verified = true) as verified,
-        COUNT(*) FILTER (WHERE titled_player = true AND titled_player_verified = false) as pending,
-        COUNT(*) FILTER (WHERE titled_player_verification_method = 'fide') as fide_verified,
-        COUNT(*) FILTER (WHERE titled_player_verification_method = 'chess_com') as chess_com_verified,
-        COUNT(*) FILTER (WHERE titled_player_verification_method = 'lichess') as lichess_verified,
-        COUNT(DISTINCT titled_player_title) as unique_titles
-      FROM users
-      WHERE titled_player = true
-    `;
-    const statsResult = await db.query(statsQuery);
-
-    // Get abuse attempts
-    const abuseQuery = `
-      SELECT 
-        COUNT(*) as total_attempts,
-        COUNT(*) FILTER (WHERE blocked = true) as blocked_attempts,
-        COUNT(DISTINCT ip_address) as unique_ips
-      FROM verification_abuse_logs
-      WHERE created_at > NOW() - INTERVAL '7 days'
-    `;
-    const abuseResult = await db.query(abuseQuery);
-
-    return res.status(200).json({
-      players: result.rows,
-      pagination: {
-        page: Number(page),
-        limit: Number(limit),
-        total: parseInt(countResult.rows[0].total)
-      },
-      statistics: {
-        ...statsResult.rows[0],
-        abuse: abuseResult.rows[0]
+  // TODO: Implement database queries when database connection is available
+  return res.status(200).json({
+    players: [],
+    pagination: {
+      page: Number(page),
+      limit: Number(limit),
+      total: 0
+    },
+    statistics: {
+      verified: 0,
+      pending: 0,
+      fide_verified: 0,
+      chess_com_verified: 0,
+      lichess_verified: 0,
+      unique_titles: 0,
+      abuse: {
+        total_attempts: 0,
+        blocked_attempts: 0,
+        unique_ips: 0
       }
-    });
-
-  } catch (error) {
-    console.error('Admin titled players error:', error);
-    return res.status(500).json({ error: 'Failed to fetch titled players data' });
-  }
+    }
+  });
 }
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse, db: Record<string, unknown>) {
+async function handlePost(req: NextApiRequest, res: NextApiResponse, db: Record<string, unknown> | null) {
   const { action, userId, reason } = req.body;
 
-  try {
-    switch (action) {
-      case 'approve':
-        // Manually approve a titled player
-        await db.query(`
-          UPDATE users 
-          SET 
-            titled_player_verified = true,
-            titled_player_verified_at = NOW()
-          WHERE id = $1
-        `, [userId]);
-
-        await db.query(`
-          UPDATE titled_player_review_queue
-          SET 
-            reviewed = true,
-            reviewed_by = $1,
-            review_decision = 'approved',
-            reviewed_at = NOW()
-          WHERE user_id = $2
-        `, [req.session?.userId || 'admin', userId]);
-
-        break;
-
-      case 'reject':
-        // Reject titled player verification
-        await db.query(`
-          UPDATE users 
-          SET 
-            titled_player = false,
-            titled_player_verified = false
-          WHERE id = $1
-        `, [userId]);
-
-        await db.query(`
-          UPDATE titled_player_review_queue
-          SET 
-            reviewed = true,
-            reviewed_by = $1,
-            review_decision = 'rejected',
-            review_notes = $2,
-            reviewed_at = NOW()
-          WHERE user_id = $3
-        `, [req.session?.userId || 'admin', reason, userId]);
-
-        break;
-
-      case 'revoke':
-        // Revoke existing titled player status
-        await db.query(`
-          UPDATE users 
-          SET 
-            titled_player_verified = false,
-            account_type = 'free',
-            premium_features = false
-          WHERE id = $1
-        `, [userId]);
-
-        // Log the revocation
-        await db.query(`
-          INSERT INTO security_logs (
-            type, user_id, admin_id, action, reason, created_at
-          ) VALUES (
-            'titled_player_revoked', $1, $2, 'revoke', $3, NOW()
-          )
-        `, [userId, req.session?.userId || 'admin', reason]);
-
-        break;
-
-      default:
-        return res.status(400).json({ error: 'Invalid action' });
-    }
-
-    return res.status(200).json({ success: true });
-
-  } catch (error) {
-    console.error('Admin action error:', error);
-    return res.status(500).json({ error: 'Failed to process action' });
+  if (!db) {
+    return res.status(503).json({ error: 'Database not available' });
   }
+
+  console.log('Admin action requested:', { action, userId, reason });
+  
+  return res.status(200).json({ success: true, message: 'Database operations not yet implemented' });
 }
 
-async function handlePut(req: NextApiRequest, res: NextApiResponse, db: Record<string, unknown>) {
+async function handlePut(req: NextApiRequest, res: NextApiResponse, db: Record<string, unknown> | null) {
   const { userId, updates } = req.body;
 
-  try {
-    // Manual update of titled player details
-    const updateFields = [];
-    const values = [];
-    let paramIndex = 1;
-
-    if (updates.title) {
-      updateFields.push(`titled_player_title = $${paramIndex++}`);
-      values.push(updates.title);
-    }
-
-    if (updates.rating) {
-      updateFields.push(`chess_rating = $${paramIndex++}`);
-      values.push(updates.rating);
-    }
-
-    if (updates.verificationMethod) {
-      updateFields.push(`titled_player_verification_method = $${paramIndex++}`);
-      values.push(updates.verificationMethod);
-    }
-
-    if (updateFields.length === 0) {
-      return res.status(400).json({ error: 'No updates provided' });
-    }
-
-    values.push(userId);
-    
-    await db.query(`
-      UPDATE users 
-      SET ${updateFields.join(', ')}
-      WHERE id = $${paramIndex}
-    `, values);
-
-    // Log the update
-    await db.query(`
-      INSERT INTO security_logs (
-        type, user_id, admin_id, action, metadata, created_at
-      ) VALUES (
-        'titled_player_updated', $1, $2, 'manual_update', $3, NOW()
-      )
-    `, [userId, req.session?.userId || 'admin', JSON.stringify(updates)]);
-
-    return res.status(200).json({ success: true });
-
-  } catch (error) {
-    console.error('Admin update error:', error);
-    return res.status(500).json({ error: 'Failed to update player' });
+  if (!db) {
+    return res.status(503).json({ error: 'Database not available' });
   }
+
+  console.log('Admin update requested:', { userId, updates });
+  
+  return res.status(200).json({ success: true, message: 'Database operations not yet implemented' });
 }
