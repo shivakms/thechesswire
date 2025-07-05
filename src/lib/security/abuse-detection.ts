@@ -6,12 +6,18 @@ import axios from 'axios';
 // import { getDb } from '@/lib/db';
 // import { encrypt } from '@/lib/security/encryption';
 
+interface BehaviorData {
+  typingRhythm?: number[];
+  mouseMovements?: Array<{ x: number; y: number; time: number }>;
+  formInteractions?: number;
+}
+
 interface AbuseCheckParams {
   ip: string;
   userAgent: string;
   fingerprint: string;
   action: string;
-  behaviorData?: Record<string, unknown>;
+  behaviorData?: BehaviorData;
 }
 
 interface AbuseCheckResult {
@@ -221,7 +227,7 @@ async function checkProxyVpn(ip: string): Promise<{isProxy: boolean; isVpn: bool
 /**
  * Module 75: Analyze behavior patterns
  */
-function analyzeBehaviorPattern(behaviorData: any): {suspicious: boolean; score: number; patterns: string[]} {
+function analyzeBehaviorPattern(behaviorData: BehaviorData): {suspicious: boolean; score: number; patterns: string[]} {
   const patterns: string[] = [];
   let score = 0;
 
@@ -261,7 +267,7 @@ function analyzeBehaviorPattern(behaviorData: any): {suspicious: boolean; score:
   }
 
   // Check form interaction count
-  if (behaviorData.formInteractions < 3) {
+  if (behaviorData.formInteractions !== undefined && behaviorData.formInteractions < 3) {
     score += 10;
     patterns.push('minimal_interaction');
   }
