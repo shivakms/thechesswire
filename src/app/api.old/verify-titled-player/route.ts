@@ -82,22 +82,30 @@ function getTitleCategory(title: string | null): string | null {
 }
 
 // Helper functions (implement these based on your APIs)
-async function checkFIDEDatabase(fideId: string) {
+async function checkFIDEDatabase(fideId: string): Promise<{ title: string; name: string } | null> {
   // Implement FIDE database check
   // Returns: { title: 'GM', name: 'Player Name' } or null
+  console.log(`Checking FIDE database for ID: ${fideId}`);
+  return null;
 }
 
-async function checkFIDEByUsername(username: string) {
+async function checkFIDEByUsername(username: string): Promise<{ title: string; name: string } | null> {
   // Implement FIDE search by name
   // Returns: { title: 'AGM', name: 'Player Name' } or null
+  console.log(`Checking FIDE by username: ${username}`);
+  return null;
 }
 
-async function checkChessComAPI(username: string) {
+async function checkChessComAPI(username: string): Promise<{ title: string; verified: boolean } | null> {
   // Implement Chess.com API check
   // Returns: { title: 'IM', verified: true } or null
+  console.log(`Checking Chess.com API for: ${username}`);
+  return null;
 }
 
-async function checkLichessAPI(username: string) {
+async function checkLichessAPI(username: string): Promise<{ title: string; verified: boolean } | null> {
   // Implement Lichess API check
   // Returns: { title: 'FM', verified: true } or null
+  console.log(`Checking Lichess API for: ${username}`);
+  return null;
 }

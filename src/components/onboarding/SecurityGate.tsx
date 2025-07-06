@@ -45,7 +45,7 @@ function getCanvasFingerprint() {
     ctx.font = '14px Arial';
     ctx.fillText('ChessWire Security Check', 2, 2);
     return canvas.toDataURL().slice(-50);
-  } catch (_e) {
+  } catch {
     return '';
   }
 }
@@ -60,7 +60,7 @@ function getWebGLFingerprint() {
     if (!debugInfo) return '';
     
     return gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
-  } catch (_e) {
+  } catch {
     return '';
   }
 }
@@ -70,7 +70,7 @@ function checkSuspiciousPatterns() {
   if (navigator.webdriver) return true;
   
   // Check for headless browsers
-  if (!(window as any).chrome && navigator.userAgent.includes('Chrome')) return true;
+  if (!(window as unknown as { chrome?: unknown }).chrome && navigator.userAgent.includes('Chrome')) return true;
   
   // Check for common automation properties
   if (window.document.documentElement.getAttribute('webdriver')) return true;
