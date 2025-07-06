@@ -11,8 +11,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { pgn, config } = req.body;
 
-    if (!pgn || typeof pgn !== 'string') {
-      return res.status(400).json({ error: 'Valid PGN is required' });
+    if (!pgn || typeof pgn !== 'string' || pgn.length > 50000) {
+      return res.status(400).json({ error: 'Valid PGN is required (max 50KB)' });
+    }
+    
+    if (pgn.trim().length === 0) {
+      return res.status(400).json({ error: 'PGN cannot be empty' });
     }
 
     const geniusShort = await geniusGenerator.generateDailyShort(pgn, config);

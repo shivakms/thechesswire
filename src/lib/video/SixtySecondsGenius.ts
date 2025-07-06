@@ -41,16 +41,33 @@ export class SixtySecondsGenius {
 
   private async initializeOutputDir(): Promise<void> {
     const sanitizedOutputDir = path.resolve(this.outputDir);
-    if (!sanitizedOutputDir.includes(process.cwd())) {
-      throw new Error('Invalid output directory path');
+    const cwd = process.cwd();
+    
+    if (!sanitizedOutputDir.startsWith(cwd) || sanitizedOutputDir.includes('..')) {
+      throw new Error('Invalid output directory path - potential path traversal detected');
     }
+    
+    const allowedDirs = ['videos', 'audio', 'thumbnails'];
     await fs.mkdir(sanitizedOutputDir, { recursive: true });
-    await fs.mkdir(path.join(sanitizedOutputDir, 'videos'), { recursive: true });
-    await fs.mkdir(path.join(sanitizedOutputDir, 'audio'), { recursive: true });
-    await fs.mkdir(path.join(sanitizedOutputDir, 'thumbnails'), { recursive: true });
+    
+    for (const dir of allowedDirs) {
+      const dirPath = path.join(sanitizedOutputDir, dir);
+      if (!dirPath.startsWith(sanitizedOutputDir)) {
+        throw new Error(`Invalid subdirectory path: ${dir}`);
+      }
+      await fs.mkdir(dirPath, { recursive: true });
+    }
   }
 
   async generateDailyShort(pgn: string, config?: Partial<ShortGenerationConfig>): Promise<GeniusShort> {
+    if (!pgn || typeof pgn !== 'string' || pgn.length > 50000) {
+      throw new Error('Invalid PGN input - must be string under 50KB');
+    }
+    
+    if (pgn.trim().length === 0) {
+      throw new Error('PGN cannot be empty');
+    }
+    
     const defaultConfig: ShortGenerationConfig = {
       targetDuration: 60,
       voiceMode: 'dramatic',
@@ -85,7 +102,12 @@ export class SixtySecondsGenius {
   }
 
   private  extractKeyMoment(pgn: string, analysis: PGNEmotionAnalysis): EmotionalTimeline {
-    const moves = pgn.split(/\d+\./).filter(move => move.trim());
+    if (!pgn || typeof pgn !== 'string' || pgn.length > 50000) {
+      throw new Error('Invalid PGN input for key moment extraction');
+    }
+    
+    const sanitizedPgn = pgn.slice(0, 10000);
+    const moves = sanitizedPgn.split(/\d{1,3}\./).filter(move => move.trim());
     const criticalMoves = analysis.emotionalTimeline?.filter((point: EmotionalTimeline) => 
       point.intensity > 0.7 && ['sacrifice', 'blunder', 'brilliancy'].includes(point.emotion)
     ) || [];
@@ -133,7 +155,8 @@ export class SixtySecondsGenius {
     };
 
     const templates = twistTemplates[emotion as keyof typeof twistTemplates] || twistTemplates.brilliancy;
-    return templates[Math.floor(Math.random() * templates.length)];
+    const safeIndex = (Date.now() % templates.length);
+    return templates[safeIndex];
   }
 
   private generateVoiceScript(keyMoment: EmotionalTimeline, twistEnding: string, voiceMode: string): string {
@@ -197,7 +220,8 @@ ${mode.closing}`;
     };
 
     const templates = titleTemplates[emotion as keyof typeof titleTemplates] || titleTemplates.brilliancy;
-    return templates[Math.floor(Math.random() * templates.length)];
+    const safeIndex = (Date.now() % templates.length);
+    return templates[safeIndex];
   }
 
   private generateDescription(keyMoment: EmotionalTimeline, twistEnding: string): string {
@@ -274,6 +298,16 @@ ${mode.closing}`;
   }
 
   async generateBatchShorts(pgnList: string[], count: number = 5): Promise<GeniusShort[]> {
+    if (!Array.isArray(pgnList) || pgnList.length === 0) {
+      throw new Error('Invalid PGN list - must be non-empty array');
+    }
+    
+    for (const pgn of pgnList) {
+      if (!pgn || typeof pgn !== 'string' || pgn.length > 50000) {
+        throw new Error('Each PGN must be valid string under 50KB');
+      }
+    }
+    
     const shorts: GeniusShort[] = [];
     const selectedPGNs = pgnList.slice(0, Math.min(count, 10));
 
@@ -301,7 +335,8 @@ ${mode.closing}`;
       '1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 a6 6.Be3 e6 7.f3 b5 8.Qd2 Bb7 9.O-O-O Nbd7 10.h4'
     ];
 
-    const randomPGN = samplePGNs[Math.floor(Math.random() * samplePGNs.length)];
+    const safeIndex = (Date.now() % samplePGNs.length);
+    const randomPGN = samplePGNs[safeIndex];
     await this.generateDailyShort(randomPGN);
   }
 

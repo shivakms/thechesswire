@@ -19,14 +19,14 @@ export interface PGNEmotionAnalysis {
 
 export class PGNEmotionClassifier {
   private emotionPatterns = {
-    sacrifice: /sacrifice|sac|gives up|offers|exchange/i,
-    blunder: /blunder|mistake|error|loses|drops/i,
-    brilliancy: /brilliant|genius|masterful|beautiful|stunning/i,
-    tactical: /fork|pin|skewer|discovery|deflection/i,
-    positional: /structure|weakness|control|space|initiative/i,
-    endgame: /endgame|pawn promotion|king and pawn|rook endgame/i,
-    tension: /tension|pressure|critical|sharp|complex/i,
-    calm: /quiet|solid|safe|stable|peaceful/i
+    sacrifice: /(?:sacrifice|sac|gives up|offers|exchange)/i,
+    blunder: /(?:blunder|mistake|error|loses|drops)/i,
+    brilliancy: /(?:brilliant|genius|masterful|beautiful|stunning)/i,
+    tactical: /(?:fork|pin|skewer|discovery|deflection)/i,
+    positional: /(?:structure|weakness|control|space|initiative)/i,
+    endgame: /(?:endgame|pawn promotion|king and pawn|rook endgame)/i,
+    tension: /(?:tension|pressure|critical|sharp|complex)/i,
+    calm: /(?:quiet|solid|safe|stable|peaceful)/i
   };
 
   private evaluationThresholds = {
@@ -39,6 +39,10 @@ export class PGNEmotionClassifier {
   };
 
   async classifyPGN(pgn: string): Promise<PGNEmotionAnalysis> {
+    if (!pgn || typeof pgn !== 'string' || pgn.length > 50000) {
+      throw new Error('Invalid PGN input - must be string under 50KB');
+    }
+    
     const moves = this.parsePGN(pgn);
     const timeline = this.analyzeEmotionalTimeline(moves);
     const keyMoments = this.extractKeyMoments(timeline);
@@ -56,8 +60,13 @@ export class PGNEmotionClassifier {
   }
 
   private parsePGN(pgn: string): string[] {
-    return pgn
-      .replace(/\d+\./g, '')
+    if (!pgn || typeof pgn !== 'string' || pgn.length > 50000) {
+      throw new Error('Invalid PGN input - must be string under 50KB');
+    }
+    
+    const sanitizedPgn = pgn.slice(0, 10000);
+    return sanitizedPgn
+      .replace(/\d{1,3}\./g, '')
       .split(/\s+/)
       .filter(move => move.trim() && !move.includes('[') && !move.includes('{'))
       .slice(0, 80);
@@ -112,10 +121,10 @@ export class PGNEmotionClassifier {
     let evaluation = 0;
 
     if (move.includes('#')) evaluation = 5.0;
-    else if (move.includes('+')) evaluation = Math.random() * 2 - 1;
-    else if (move.includes('x') && move.includes('Q')) evaluation = Math.random() * 3 - 1.5;
-    else if (move.includes('x')) evaluation = Math.random() * 1.5 - 0.5;
-    else evaluation = Math.random() * 0.6 - 0.3;
+    else if (move.includes('+')) evaluation = (Date.now() % 200) / 100 - 1;
+    else if (move.includes('x') && move.includes('Q')) evaluation = (Date.now() % 300) / 100 - 1.5;
+    else if (move.includes('x')) evaluation = (Date.now() % 150) / 100 - 0.5;
+    else evaluation = (Date.now() % 60) / 100 - 0.3;
 
     return Math.round(evaluation * 100) / 100;
   }
