@@ -41,9 +41,13 @@ export class VoiceTweetGenerator {
   }
 
   private async initializeOutputDir(): Promise<void> {
-    await fs.mkdir(this.outputDir, { recursive: true });
-    await fs.mkdir(path.join(this.outputDir, 'audio'), { recursive: true });
-    await fs.mkdir(path.join(this.outputDir, 'images'), { recursive: true });
+    const sanitizedOutputDir = path.resolve(this.outputDir);
+    if (!sanitizedOutputDir.includes(process.cwd())) {
+      throw new Error('Invalid output directory path');
+    }
+    await fs.mkdir(sanitizedOutputDir, { recursive: true });
+    await fs.mkdir(path.join(sanitizedOutputDir, 'audio'), { recursive: true });
+    await fs.mkdir(path.join(sanitizedOutputDir, 'images'), { recursive: true });
   }
 
   async generateTweetableStory(
@@ -241,7 +245,8 @@ export class VoiceTweetGenerator {
         }
         
         if (scheduleDelay > 0) {
-          await new Promise(resolve => setTimeout(resolve, scheduleDelay));
+          const safeDelay = Math.min(scheduleDelay, 30000);
+          await new Promise(resolve => setTimeout(resolve, safeDelay));
         }
       }
       
@@ -376,7 +381,7 @@ export class VoiceTweetGenerator {
       config
     });
     
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, Math.min(1000, 5000)));
     
     return outputPath;
   }
@@ -394,7 +399,7 @@ export class VoiceTweetGenerator {
       outputPath
     });
     
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, Math.min(500, 2000)));
   }
 
   private generateId(): string {
