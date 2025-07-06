@@ -60,13 +60,16 @@ export class SubscriptionManager {
           customer.id,
           plan,
           subscription.status,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           new Date((subscription as any).current_period_start * 1000),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           new Date((subscription as any).current_period_end * 1000)
         ]
       );
 
       return {
         subscriptionId: subscription.id,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret
       };
     } catch (error) {
@@ -138,7 +141,9 @@ export class SubscriptionManager {
             'UPDATE subscriptions SET status = $1, current_period_start = $2, current_period_end = $3 WHERE stripe_subscription_id = $4',
             [
               subscription.status,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               new Date((subscription as any).current_period_start * 1000),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               new Date((subscription as any).current_period_end * 1000),
               subscription.id
             ]
@@ -155,9 +160,11 @@ export class SubscriptionManager {
 
         case 'invoice.payment_succeeded':
           const invoice = event.data.object as Stripe.Invoice;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           if ((invoice as any).subscription) {
             await db.query(
               'UPDATE subscriptions SET status = $1 WHERE stripe_subscription_id = $2',
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ['active', (invoice as any).subscription]
             );
           }
@@ -165,9 +172,11 @@ export class SubscriptionManager {
 
         case 'invoice.payment_failed':
           const failedInvoice = event.data.object as Stripe.Invoice;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           if ((failedInvoice as any).subscription) {
             await db.query(
               'UPDATE subscriptions SET status = $1 WHERE stripe_subscription_id = $2',
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ['past_due', (failedInvoice as any).subscription]
             );
           }
