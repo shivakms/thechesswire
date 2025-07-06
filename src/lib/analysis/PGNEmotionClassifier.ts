@@ -129,25 +129,36 @@ export class PGNEmotionClassifier {
   }
 
   private static generatePGNHash(pgn: string): string {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const crypto = require('crypto');
-    return crypto.createHash('sha256').update(pgn.trim()).digest('hex');
+    let hash = 0;
+    const str = pgn.trim();
+    if (str.length === 0) return '0';
+    
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    
+    return Math.abs(hash).toString(16);
   }
 
   private static parsePGNMoves(pgn: string): Array<{moveNumber: number; move: string; fen: string}> {
     const moves: Array<{moveNumber: number; move: string; fen: string}> = [];
     
-    const movePattern = /(\d+)\.?\s*([NBRQK]?[a-h]?[1-8]?x?[a-h][1-8](?:=[NBRQ])?[+#]?)/g;
+    const movePattern = /(\d{1,3})\.?\s*([NBRQK]?[a-h]?[1-8]?x?[a-h][1-8](?:=[NBRQ])?[+#]?)/g;
     let match;
     let moveNumber = 1;
+    let iterations = 0;
+    const maxIterations = 1000;
     
-    while ((match = movePattern.exec(pgn)) !== null) {
+    while ((match = movePattern.exec(pgn)) !== null && iterations < maxIterations) {
       moves.push({
         moveNumber: parseInt(match[1]) || moveNumber,
         move: match[2],
         fen: `fen_placeholder_${moveNumber}`
       });
       moveNumber++;
+      iterations++;
     }
     
     return moves;
