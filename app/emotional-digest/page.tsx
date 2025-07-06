@@ -3,8 +3,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '../../src/components/ui/Button';
-import { Textarea } from '../../src/components/ui/Textarea';
+import Button from '../../src/components/ui/Button';
+import Textarea from '../../src/components/ui/Textarea';
 
 interface DigestStory {
   id: string;
@@ -32,7 +32,7 @@ interface WeeklyDigest {
 }
 
 export default function EmotionalDigestPage() {
-  const [games, setGames] = useState<Array<{ pgn: string; metadata: any }>>([]);
+  const [games, setGames] = useState<Array<{ pgn: string; metadata: Record<string, unknown> }>>([]);
   const [currentDigest, setCurrentDigest] = useState<WeeklyDigest | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedStory, setSelectedStory] = useState<DigestStory | null>(null);
@@ -125,7 +125,7 @@ export default function EmotionalDigestPage() {
   };
 
   const getEmotionColor = (type: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
       brilliance: 'from-yellow-400 to-orange-500',
       sacrifice: 'from-red-500 to-pink-600',
       heartbreak: 'from-blue-500 to-indigo-600',
@@ -136,7 +136,7 @@ export default function EmotionalDigestPage() {
   };
 
   const getEmotionEmoji = (type: string) => {
-    const emojis = {
+    const emojis: Record<string, string> = {
       brilliance: '✨',
       sacrifice: '⚔️',
       heartbreak: '💔',
@@ -201,7 +201,7 @@ export default function EmotionalDigestPage() {
           <div className="space-y-4">
             <Textarea
               value={newPgn}
-              onChange={(e) => setNewPgn(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewPgn(e.target.value)}
               placeholder="Paste PGN notation here..."
               className="min-h-[120px] bg-black/20 border-white/20 text-white placeholder-gray-400"
             />
@@ -232,7 +232,7 @@ export default function EmotionalDigestPage() {
                     </span>
                     <Button
                       onClick={() => removeGame(index)}
-                      variant="outline"
+                      variant="danger"
                       size="sm"
                       className="ml-2 text-red-400 border-red-400 hover:bg-red-400 hover:text-white"
                     >
@@ -315,7 +315,7 @@ export default function EmotionalDigestPage() {
                         </span>
                         {story.voiceNarration && (
                           <Button
-                            onClick={(e) => {
+                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                               e.stopPropagation();
                               playNarration(story.voiceNarration!);
                             }}
@@ -402,7 +402,7 @@ export default function EmotionalDigestPage() {
                   
                   <div className="bg-black/20 rounded-lg p-4 mb-4">
                     <h3 className="font-semibold mb-2">💭 Emotional Quote:</h3>
-                    <p className="text-sm italic">"{selectedStory.thumbnailData.quote}"</p>
+                    <p className="text-sm italic">&ldquo;{selectedStory.thumbnailData.quote}&rdquo;</p>
                   </div>
                   
                   {selectedStory.voiceNarration && (

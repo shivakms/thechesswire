@@ -36,7 +36,7 @@ export class EmotionalDigestEngine {
     this.pgnAnalyzer = new PGNAnalyzer();
   }
 
-  async generateWeeklyDigest(games: Array<{ pgn: string; metadata: any }>): Promise<WeeklyDigest> {
+  async generateWeeklyDigest(games: Array<{ pgn: string; metadata: Record<string, unknown> }>): Promise<WeeklyDigest> {
     try {
       const analyzedGames = await Promise.all(
         games.map(async (game) => {
@@ -70,8 +70,10 @@ export class EmotionalDigestEngine {
     }
   }
 
-  private async selectTopStories(analyzedGames: any[]): Promise<DigestStory[]> {
-    const categories = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async selectTopStories(analyzedGames: Array<{ pgn: string; metadata: Record<string, unknown>; analysis: any }>): Promise<DigestStory[]> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const categories: Record<string, Array<{ pgn: string; metadata: Record<string, unknown>; analysis: any; emotionScore: number }>> = {
       brilliance: [],
       sacrifice: [],
       heartbreak: [],
@@ -150,15 +152,12 @@ export class EmotionalDigestEngine {
       stories.map(async (story) => {
         const narrationText = this.createNarrationScript(story);
         
-        const voiceNarration = await this.voiceEngine.generateVoiceWithEmotion(
+        const audioBuffer = await this.voiceEngine.generateVoice(
           narrationText,
-          this.getVoiceModeForStory(story.type),
-          { 
-            emotion: story.type,
-            intensity: Math.min(story.emotionScore / 10, 1.0),
-            pace: story.type === 'heartbreak' ? 'slow' : 'normal'
-          }
+          this.getVoiceModeForStory(story.type)
         );
+        
+        const voiceNarration = `data:audio/mpeg;base64,${audioBuffer.toString('base64')}`;
 
         return {
           ...story,
@@ -186,16 +185,16 @@ export class EmotionalDigestEngine {
     return scripts[story.type] || story.description;
   }
 
-  private getVoiceModeForStory(type: DigestStory['type']): string {
+  private getVoiceModeForStory(type: DigestStory['type']): keyof typeof this.voiceEngine['voiceProfiles'] {
     const voiceModes = {
-      brilliance: 'expressive',
-      sacrifice: 'dramatic',
-      heartbreak: 'calm',
-      comeback: 'expressive',
-      blunder: 'calm'
-    };
+      brilliance: 'enthusiasticCommentator',
+      sacrifice: 'dramaticNarrator',
+      heartbreak: 'warmEncourager',
+      comeback: 'enthusiasticCommentator',
+      blunder: 'thoughtfulPhilosopher'
+    } as const;
 
-    return voiceModes[type] || 'calm';
+    return voiceModes[type] || 'wiseMentor';
   }
 
   private async generateSocialCarousel(stories: DigestStory[]): Promise<string[]> {
@@ -213,29 +212,33 @@ export class EmotionalDigestEngine {
     return carousel;
   }
 
-  private async generateWeeklyIntro(stories: DigestStory[]): Promise<string> {
-    const introText = `Welcome to this week's emotional journey through chess. We've curated ${stories.length} stories that capture the full spectrum of human experience on the 64 squares. From brilliant sacrifices to heartbreaking blunders, each game tells a story worth remembering.`;
+  private async generateWeeklyIntro(_stories: DigestStory[]): Promise<string> {
+    const introText = `Welcome to this week's emotional journey through chess. We've curated ${_stories.length} stories that capture the full spectrum of human experience on the 64 squares. From brilliant sacrifices to heartbreaking blunders, each game tells a story worth remembering.`;
     
-    return await this.voiceEngine.generateVoiceWithEmotion(
+    const audioBuffer = await this.voiceEngine.generateVoice(
       introText,
-      'expressive',
-      { emotion: 'anticipation', intensity: 0.7 }
+      'enthusiasticCommentator'
     );
+    
+    return `data:audio/mpeg;base64,${audioBuffer.toString('base64')}`;
   }
 
-  private async generateWeeklyOutro(stories: DigestStory[]): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async generateWeeklyOutro(_stories: DigestStory[]): Promise<string> {
     const outroText = `These stories remind us why chess is more than a game—it's a mirror of the human condition. Until next week, may your moves be bold, your sacrifices meaningful, and your spirit unbreakable.`;
     
-    return await this.voiceEngine.generateVoiceWithEmotion(
+    const audioBuffer = await this.voiceEngine.generateVoice(
       outroText,
-      'poetic',
-      { emotion: 'reflection', intensity: 0.8 }
+      'poeticStoryteller'
     );
+    
+    return `data:audio/mpeg;base64,${audioBuffer.toString('base64')}`;
   }
 
-  private generateStoryTitle(type: string, game: any): string {
-    const titles = {
-      brilliance: `Genius Unleashed: ${game.metadata?.white || 'Unknown'} vs ${game.metadata?.black || 'Unknown'}`,
+  private generateStoryTitle(type: string, game: Record<string, unknown>): string {
+    const metadata = game.metadata as Record<string, unknown> || {};
+    const titles: Record<string, string> = {
+      brilliance: `Genius Unleashed: ${metadata.white || 'Unknown'} vs ${metadata.black || 'Unknown'}`,
       sacrifice: `The Art of Letting Go: A Masterful Sacrifice`,
       heartbreak: `When Dreams Crumble: A Tale of Near Victory`,
       comeback: `Phoenix Rising: The Impossible Recovery`,
@@ -245,8 +248,9 @@ export class EmotionalDigestEngine {
     return titles[type] || `Chess Story: ${type}`;
   }
 
-  private generateStoryDescription(type: string, game: any): string {
-    const descriptions = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private generateStoryDescription(type: string, _game: Record<string, unknown>): string {
+    const descriptions: Record<string, string> = {
       brilliance: `A moment of pure chess artistry that left spectators breathless and opponents in awe.`,
       sacrifice: `Material was offered on the altar of position, and the chess gods smiled.`,
       heartbreak: `Victory was within reach, but the cruel hand of time and pressure intervened.`,
@@ -257,8 +261,9 @@ export class EmotionalDigestEngine {
     return descriptions[type] || `An emotional chess journey worth experiencing.`;
   }
 
-  private generateSocialText(type: string, game: any): string {
-    const socialTexts = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private generateSocialText(type: string, _game: Record<string, unknown>): string {
+    const socialTexts: Record<string, string> = {
       brilliance: `✨ When chess becomes art, and art becomes immortal. This move will be remembered.`,
       sacrifice: `⚔️ Sometimes you must lose a piece to win a soul. This sacrifice tells that story.`,
       heartbreak: `💔 So close to glory, yet so far. In chess, as in life, timing is everything.`,
@@ -270,7 +275,7 @@ export class EmotionalDigestEngine {
   }
 
   private generateEmotionalQuote(type: string): string {
-    const quotes = {
+    const quotes: Record<string, string> = {
       brilliance: `"Genius is one percent inspiration, ninety-nine percent perspiration."`,
       sacrifice: `"The pawns are the soul of chess."`,
       heartbreak: `"Every chess master was once a beginner."`,
@@ -282,7 +287,7 @@ export class EmotionalDigestEngine {
   }
 
   private getEmotionEmoji(type: string): string {
-    const emojis = {
+    const emojis: Record<string, string> = {
       brilliance: '✨',
       sacrifice: '⚔️',
       heartbreak: '💔',
@@ -322,15 +327,12 @@ export class EmotionalDigestEngine {
 
       const narrationText = this.createNarrationScript(story);
       
-      return await this.voiceEngine.generateVoiceWithEmotion(
+      const audioBuffer = await this.voiceEngine.generateVoice(
         narrationText,
-        this.getVoiceModeForStory(storyType),
-        { 
-          emotion: storyType,
-          intensity: 0.7,
-          pace: storyType === 'heartbreak' ? 'slow' : 'normal'
-        }
+        this.getVoiceModeForStory(storyType)
       );
+      
+      return `data:audio/mpeg;base64,${audioBuffer.toString('base64')}`;
 
     } catch (error) {
       console.error('Error generating story narration:', error);

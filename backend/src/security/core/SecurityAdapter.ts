@@ -17,12 +17,14 @@ interface IEncryptor {
   compareHash(password: string, hash: string): Promise<boolean>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface IStorage {
   saveFile(fileName: string, data: Buffer): Promise<string>;
   getFile(fileName: string): Promise<Buffer>;
   deleteFile(fileName: string): Promise<void>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ISecrets {
   getSecret(key: string): Promise<string>;
   setSecret(key: string, value: string): Promise<void>;
@@ -44,7 +46,7 @@ class LocalEncryptor implements IEncryptor {
 
   async encrypt(data: string): Promise<string> {
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv(this.algorithm, this.secretKey, iv);
+    const cipher = crypto.createCipheriv(this.algorithm, this.secretKey, iv) as crypto.CipherGCM;
     
     let encrypted = cipher.update(data, 'utf8', 'hex');
     encrypted += cipher.final('hex');
@@ -65,7 +67,7 @@ class LocalEncryptor implements IEncryptor {
       this.algorithm, 
       this.secretKey, 
       Buffer.from(iv, 'hex')
-    );
+    ) as crypto.DecipherGCM;
     
     decipher.setAuthTag(Buffer.from(authTag, 'hex'));
     
@@ -87,12 +89,14 @@ class LocalEncryptor implements IEncryptor {
 // AWS implementation for production (placeholder)
 class AWSKMSEncryptor implements IEncryptor {
   // This would use AWS KMS SDK
-  async encrypt(data: string): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async encrypt(_data: string): Promise<string> {
     // AWS KMS encryption logic
     throw new Error('AWS KMS not configured for local dev');
   }
   
-  async decrypt(data: string): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async decrypt(_data: string): Promise<string> {
     // AWS KMS decryption logic
     throw new Error('AWS KMS not configured for local dev');
   }
@@ -221,8 +225,9 @@ export class SecurityAdapter {
   }
 
   // ========== JWT HANDLING ==========
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   generateToken(payload: any, expiresIn: string = '7d'): string {
-    return jwt.sign(payload, this.jwtSecret, { expiresIn });
+    return jwt.sign(payload as string | object | Buffer, this.jwtSecret, { expiresIn } as jwt.SignOptions);
   }
 
   verifyToken(token: string): any {
@@ -249,7 +254,8 @@ export class SecurityAdapter {
   
   // Input sanitization middleware
   sanitizeMiddleware() {
-    return (req: Request, res: Response, next: NextFunction) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return (req: Request, _res: Response, next: NextFunction): void => {
       // Sanitize body
       if (req.body) {
         Object.keys(req.body).forEach(key => {
@@ -283,14 +289,15 @@ export class SecurityAdapter {
 
   // Rate limiting middleware
   rateLimitMiddleware() {
-    return async (req: Request, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const identifier = req.ip || 'anonymous';
       const allowed = await this.checkRateLimit(identifier);
       
       if (!allowed) {
-        return res.status(429).json({ 
+        res.status(429).json({ 
           error: 'Too many requests, please try again later.' 
         });
+        return;
       }
       
       next();
@@ -299,11 +306,12 @@ export class SecurityAdapter {
 
   // JWT authentication middleware
   authMiddleware() {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: Request, res: Response, next: NextFunction): void => {
       const token = req.headers.authorization?.split(' ')[1];
       
       if (!token) {
-        return res.status(401).json({ error: 'No token provided' });
+        res.status(401).json({ error: 'No token provided' });
+        return;
       }
 
       try {
@@ -311,7 +319,8 @@ export class SecurityAdapter {
         (req as any).user = decoded;
         next();
       } catch (error) {
-        return res.status(401).json({ error: 'Invalid token' });
+        res.status(401).json({ error: 'Invalid token' });
+        return;
       }
     };
   }
@@ -331,7 +340,8 @@ export class SecurityAdapter {
 
   // Security headers middleware
   securityHeadersMiddleware() {
-    return (req: Request, res: Response, next: NextFunction) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return (_req: Request, res: Response, next: NextFunction): void => {
       // Equivalent to Module 73 requirements
       res.setHeader('X-Content-Type-Options', 'nosniff');
       res.setHeader('X-Frame-Options', 'DENY');
