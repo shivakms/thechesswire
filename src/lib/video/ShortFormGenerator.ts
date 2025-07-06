@@ -1,4 +1,4 @@
-import { VideoConfig, VideoMetadata } from './SoulCinemaRenderer';
+import { VideoConfig } from './SoulCinemaRenderer';
 
 export interface ShortFormOptions {
   inputPath: string;
@@ -306,8 +306,7 @@ export class ShortFormGenerator {
 
   async generateMultipleFormats(
     inputPath: string,
-    baseOutputPath: string,
-    highlights: HighlightMoment[]
+    baseOutputPath: string
   ): Promise<Array<{ platform: string; path: string; config: VideoConfig }>> {
     console.log('📱 Generating multiple platform formats');
 

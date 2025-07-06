@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     // Get user session
     const session = await getServerSession(req, res, authOptions);
-    const userId = session?.user?.id || 'anonymous';
+    const userId = (session?.user as { id?: string })?.id || 'anonymous';
 
     const { 
       text, 

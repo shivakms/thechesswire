@@ -15,7 +15,7 @@ export default function Footer() {
 
         <Dialog open={termsOpen} onOpenChange={setTermsOpen}>
           <DialogTrigger asChild>
-            <Button variant="link" className="px-2 text-xs">
+            <Button variant="ghost" className="px-2 text-xs">
               Terms & Conditions
             </Button>
           </DialogTrigger>
@@ -35,7 +35,7 @@ export default function Footer() {
 
         <Dialog open={privacyOpen} onOpenChange={setPrivacyOpen}>
           <DialogTrigger asChild>
-            <Button variant="link" className="px-2 text-xs">
+            <Button variant="ghost" className="px-2 text-xs">
               Privacy Policy
             </Button>
           </DialogTrigger>

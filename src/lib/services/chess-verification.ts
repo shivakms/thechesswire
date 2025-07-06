@@ -210,7 +210,7 @@ export async function verifyFidePlayer(fideId: string): Promise<VerificationResu
 export async function checkDuplicateRegistration(
   fideId?: string,
   chessComUsername?: string,
-  dbConnection?: any
+  dbConnection?: { query: (sql: string, params?: unknown[]) => Promise<{ rows: unknown[] }> }
 ): Promise<boolean> {
   if (!dbConnection) return false;
 

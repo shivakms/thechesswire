@@ -52,7 +52,6 @@ export class SoulCinemaRenderer {
     console.log('🎬 Starting SoulCinema render:', options.title);
     
     try {
-      const chess = new Chess();
       const moves = this.parsePGN(options.pgn);
       const metadata = this.generateMetadata(options);
       
@@ -196,7 +195,7 @@ export class SoulCinemaRenderer {
   private async exportVideo(options: RenderOptions): Promise<string> {
     if (!this.canvas) throw new Error('Canvas not available');
 
-    const dataURL = this.canvas.toDataURL('image/png');
+    this.canvas.toDataURL('image/png');
     const outputPath = options.outputPath || `soulcinema_${Date.now()}.png`;
     
     console.log('📸 Frame exported as image:', outputPath);
