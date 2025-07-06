@@ -181,7 +181,7 @@ export class BambaiVoiceEngine {
     }
 
     // Add emotional bookends for better flow
-    const bookends = {
+    const bookends: Record<string, { start: string; end: string }> = {
       inspiring: { start: '<break time="500ms"/>', end: '<break time="800ms"/>' },
       dramatic: { start: '<break time="700ms"/>', end: '<break time="1s"/>' },
       whisper: { start: '<break time="400ms"/>', end: '<break time="600ms"/>' }
@@ -219,9 +219,11 @@ export class BambaiVoiceEngine {
       const enhancedText = this.enhanceText(text, tone);
       
       // Apply human variation to voice settings
-      const voiceSettings = DynamicVoiceModulation.addHumanVariation(
-        this.voiceProfiles[mode]
-      );
+      const { use_speaker_boost, ...numericSettings } = this.voiceProfiles[mode];
+      const voiceSettings = {
+        ...DynamicVoiceModulation.addHumanVariation(numericSettings),
+        use_speaker_boost
+      };
 
       // Generate voice via ElevenLabs
       const response = await axios.post(
