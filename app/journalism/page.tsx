@@ -90,7 +90,7 @@ export default function JournalismPage() {
                   </label>
                   <select
                     value={config.mode}
-                    onChange={(e) => setConfig({...config, mode: e.target.value as any})}
+                    onChange={(e) => setConfig({...config, mode: e.target.value as StorytellingConfig['mode']})}
                     className="w-full p-2 bg-slate-700 border border-slate-600 rounded text-white"
                   >
                     <option value="dramatic">Dramatic</option>
@@ -107,7 +107,7 @@ export default function JournalismPage() {
                   </label>
                   <select
                     value={config.emotionalIntensity}
-                    onChange={(e) => setConfig({...config, emotionalIntensity: e.target.value as any})}
+                    onChange={(e) => setConfig({...config, emotionalIntensity: e.target.value as StorytellingConfig['emotionalIntensity']})}
                     className="w-full p-2 bg-slate-700 border border-slate-600 rounded text-white"
                   >
                     <option value="low">Low</option>
@@ -123,7 +123,7 @@ export default function JournalismPage() {
                   </label>
                   <select
                     value={config.targetAudience}
-                    onChange={(e) => setConfig({...config, targetAudience: e.target.value as any})}
+                    onChange={(e) => setConfig({...config, targetAudience: e.target.value as StorytellingConfig['targetAudience']})}
                     className="w-full p-2 bg-slate-700 border border-slate-600 rounded text-white"
                   >
                     <option value="casual">Casual</option>
@@ -138,7 +138,7 @@ export default function JournalismPage() {
                   </label>
                   <select
                     value={config.accessLevel}
-                    onChange={(e) => setConfig({...config, accessLevel: e.target.value as any})}
+                    onChange={(e) => setConfig({...config, accessLevel: e.target.value as StorytellingConfig['accessLevel']})}
                     className="w-full p-2 bg-slate-700 border border-slate-600 rounded text-white"
                   >
                     <option value="freemium">Freemium</option>

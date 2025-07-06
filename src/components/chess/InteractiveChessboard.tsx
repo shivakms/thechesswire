@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { PGNAnalysis } from '../../lib/chess/PGNAnalyzer';
@@ -28,7 +28,7 @@ export default function InteractiveChessboard({
   const [currentPosition, setCurrentPosition] = useState(chess.fen());
   const [currentMoveIndex, setCurrentMoveIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [moves, setMoves] = useState<any[]>([]);
+  const [moves, setMoves] = useState<Array<{ from: string; to: string; san: string }>>([]);
 
   useEffect(() => {
     if (pgn) {
@@ -42,13 +42,7 @@ export default function InteractiveChessboard({
     }
   }, [pgn, chess]);
 
-  useEffect(() => {
-    if (autoPlay && moves.length > 0 && !isPlaying) {
-      playGame();
-    }
-  }, [autoPlay, moves]);
-
-  const playGame = async () => {
+  const playGame = useCallback(async () => {
     if (accessLevel === 'freemium') {
       return;
     }
@@ -69,7 +63,13 @@ export default function InteractiveChessboard({
     }
 
     setIsPlaying(false);
-  };
+  }, [accessLevel, moves, isPlaying, playbackSpeed, onMoveSelect, chess]);
+
+  useEffect(() => {
+    if (autoPlay && moves.length > 0 && !isPlaying) {
+      playGame();
+    }
+  }, [autoPlay, moves, isPlaying, playGame]);
 
   const goToMove = (moveIndex: number) => {
     chess.reset();
@@ -150,10 +150,12 @@ export default function InteractiveChessboard({
     <div className="space-y-6">
       <div className="relative">
         <Chessboard
-          position={currentPosition}
-          customSquareStyles={getMoveHighlights()}
-          boardWidth={400}
-          arePiecesDraggable={false}
+          options={{
+            position: currentPosition,
+            squareStyles: getMoveHighlights(),
+            boardOrientation: "white",
+            allowDragging: false
+          }}
         />
         
         {accessLevel === 'freemium' && autoPlay && (
@@ -223,7 +225,7 @@ export default function InteractiveChessboard({
                 max="3"
                 step="0.5"
                 value={playbackSpeed}
-                onChange={(e) => {}}
+                onChange={() => {}}
                 className="w-32"
               />
               <span className="ml-2">{playbackSpeed}x speed</span>

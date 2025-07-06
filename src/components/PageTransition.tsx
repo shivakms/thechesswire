@@ -17,7 +17,8 @@ export default function PageTransition({ children, className = "" }: PageTransit
   const [loadingMessage, setLoadingMessage] = useState("Loading...");
 
   // Determine loader variant and message based on route
-  const getLoaderConfig = (path: string) => {
+  const getLoaderConfig = (path: string | null) => {
+    if (!path) return { variant: 'default' as const, message: "Loading experience..." };
     if (path.startsWith('/replay') || path.startsWith('/analysis')) {
       return { variant: 'chess' as const, message: "Preparing the board..." };
     }
@@ -48,13 +49,20 @@ export default function PageTransition({ children, className = "" }: PageTransit
 
   // Define different transition styles based on route type
   const transitionConfig = useMemo(() => {
+    if (!pathname) {
+      return {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -20 },
+      };
+    }
+    
     // Chess-themed transitions for different sections
     if (pathname.startsWith('/replay') || pathname.startsWith('/analysis')) {
       return {
         initial: { opacity: 0, scale: 0.95, rotateX: -10, filter: "blur(10px)" },
         animate: { opacity: 1, scale: 1, rotateX: 0, filter: "blur(0px)" },
         exit: { opacity: 0, scale: 1.05, rotateX: 10, filter: "blur(10px)" },
-        transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }
       };
     }
     
@@ -63,7 +71,6 @@ export default function PageTransition({ children, className = "" }: PageTransit
         initial: { opacity: 0, y: 40, filter: "blur(8px)" },
         animate: { opacity: 1, y: 0, filter: "blur(0px)" },
         exit: { opacity: 0, y: -40, filter: "blur(8px)" },
-        transition: { duration: 0.5, ease: "easeInOut" }
       };
     }
 
@@ -72,7 +79,6 @@ export default function PageTransition({ children, className = "" }: PageTransit
         initial: { opacity: 0, scale: 1.1, filter: "brightness(0.3) blur(20px)" },
         animate: { opacity: 1, scale: 1, filter: "brightness(1) blur(0px)" },
         exit: { opacity: 0, scale: 0.9, filter: "brightness(0.3) blur(20px)" },
-        transition: { duration: 0.8, ease: [0.43, 0.13, 0.23, 0.96] }
       };
     }
 
@@ -81,11 +87,6 @@ export default function PageTransition({ children, className = "" }: PageTransit
         initial: { opacity: 0, scale: 0.9, y: 30 },
         animate: { opacity: 1, scale: 1, y: 0 },
         exit: { opacity: 0, scale: 1.1, y: -30 },
-        transition: { 
-          duration: 0.7, 
-          ease: [0.165, 0.84, 0.44, 1],
-          scale: { type: "spring", stiffness: 300, damping: 30 }
-        }
       };
     }
 
@@ -94,7 +95,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
       initial: { opacity: 0, y: 20 },
       animate: { opacity: 1, y: 0 },
       exit: { opacity: 0, y: -20 },
-      transition: { duration: 0.4, ease: "easeInOut" }
+      transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
     };
   }, [pathname]);
 
@@ -118,17 +119,17 @@ export default function PageTransition({ children, className = "" }: PageTransit
           initial={transitionConfig.initial}
           animate={transitionConfig.animate}
           exit={transitionConfig.exit}
-          transition={transitionConfig.transition}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
           style={{
-            background: pathname.startsWith('/replay') 
+            background: pathname?.startsWith('/replay') 
               ? 'radial-gradient(ellipse at center, rgba(139, 69, 19, 0.03) 0%, transparent 70%)'
-              : pathname.startsWith('/soulcinema')
+              : pathname?.startsWith('/soulcinema')
               ? 'radial-gradient(ellipse at center, rgba(64, 224, 208, 0.02) 0%, transparent 70%)'
               : undefined
           }}
         >
           {/* Chess-themed decorative elements for replay pages */}
-          {pathname.startsWith('/replay') && (
+          {pathname?.startsWith('/replay') && (
             <motion.div
               className="absolute inset-0 pointer-events-none overflow-hidden"
               initial={{ opacity: 0 }}
@@ -182,7 +183,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
           )}
 
           {/* SoulCinema film strip effect */}
-          {pathname.startsWith('/soulcinema') && (
+          {pathname?.startsWith('/soulcinema') && (
             <motion.div
               className="absolute inset-0 pointer-events-none overflow-hidden"
               initial={{ opacity: 0 }}
@@ -195,7 +196,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
           )}
 
           {/* Ambient particles for voice/AI pages */}
-          {pathname.startsWith('/echosage') && (
+          {pathname?.startsWith('/echosage') && (
             <motion.div className="absolute inset-0 pointer-events-none">
               {[...Array(5)].map((_, i) => (
                 <motion.div

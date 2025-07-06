@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable';
-import { PGNAnalyzer } from '../../../lib/chess/PGNAnalyzer';
 import { BambaiVoiceEngine } from '../../../lib/voice/BambaiVoiceEngine';
 
 export const config = {
@@ -9,7 +8,6 @@ export const config = {
   },
 };
 
-const pgnAnalyzer = new PGNAnalyzer();
 const voiceEngine = new BambaiVoiceEngine();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -19,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const form = formidable({});
-    const [fields, files] = await form.parse(req);
+    const [fields] = await form.parse(req);
 
     const articleDataStr = Array.isArray(fields.articleData) ? fields.articleData[0] : fields.articleData;
     const pgnAnalysisStr = Array.isArray(fields.pgnAnalysis) ? fields.pgnAnalysis[0] : fields.pgnAnalysis;
@@ -35,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (articleData.voiceNarration && articleData.accessLevel === 'premium') {
       try {
         const narrationText = `${articleData.title}. ${articleData.content}`;
-        const audioBuffer = await voiceEngine.generateVoice(
+        await voiceEngine.generateVoice(
           narrationText,
           'poeticStoryteller',
           'dramatic'

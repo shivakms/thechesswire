@@ -2,7 +2,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 interface LoaderProps {
   variant?: 'default' | 'chess' | 'voice' | 'security' | 'minimal' | 'soulcinema';
@@ -18,13 +18,13 @@ export default function Loader({
   const [dots, setDots] = useState("");
   const [chessQuote, setChessQuote] = useState("");
 
-  const quotes = [
+  const quotes = useMemo(() => [
     "Every move tells a story...",
     "In chess, as in life, forethought wins...",
     "The board whispers secrets to those who listen...",
     "Patience is the soul of chess...",
     "A moment of brilliance approaches..."
-  ];
+  ], []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -35,7 +35,7 @@ export default function Loader({
 
   useEffect(() => {
     setChessQuote(quotes[Math.floor(Math.random() * quotes.length)]);
-  }, []);
+  }, [quotes]);
 
   // Chess piece rotating animation with aurora effect
   const ChessLoader = () => (

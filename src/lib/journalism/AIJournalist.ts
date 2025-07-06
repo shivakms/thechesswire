@@ -264,7 +264,7 @@ export class AIJournalist {
   private async generateVoiceNarration(content: string, config: StorytellingConfig): Promise<string> {
     try {
       const voiceMode = this.selectVoiceModeForConfig(config);
-      const audioBuffer = await this.voiceEngine.generateVoice(
+      await this.voiceEngine.generateVoice(
         content.substring(0, 500),
         voiceMode,
         config.mode === 'dramatic' ? 'dramatic' : 'neutral'
@@ -289,7 +289,13 @@ export class AIJournalist {
     return modeMap[config.mode] || 'wiseMentor';
   }
 
-  private generateMetadata(content: string, analysis: PGNAnalysis): any {
+  private generateMetadata(content: string, analysis: PGNAnalysis): {
+    wordCount: number;
+    readingTime: number;
+    emotionalArc: string;
+    keyMoments: string[];
+    difficulty: string;
+  } {
     const wordCount = content.split(/\s+/).length;
     const readingTime = Math.ceil(wordCount / 200);
     

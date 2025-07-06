@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '../../../src/components/ui/Button';
 import Input from '../../../src/components/ui/Input';
@@ -37,17 +37,9 @@ export default function CreateArticlePage() {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 
-  const pgnAnalyzer = new PGNAnalyzer();
+  const pgnAnalyzer = useMemo(() => new PGNAnalyzer(), []);
 
-  useEffect(() => {
-    if (articleData.pgn.trim()) {
-      analyzePGN();
-    } else {
-      setPgnAnalysis(null);
-    }
-  }, [articleData.pgn]);
-
-  const analyzePGN = async () => {
+  const analyzePGN = useCallback(async () => {
     if (!articleData.pgn.trim()) return;
     
     setIsAnalyzing(true);
@@ -68,12 +60,20 @@ export default function CreateArticlePage() {
           tags: [...new Set([...prev.tags, ...suggestedTags])]
         }));
       }
-    } catch (error) {
-      console.error('PGN analysis failed:', error);
+    } catch {
+      console.error('PGN analysis failed');
     } finally {
       setIsAnalyzing(false);
     }
-  };
+  }, [articleData.pgn, pgnAnalyzer]);
+
+  useEffect(() => {
+    if (articleData.pgn.trim()) {
+      analyzePGN();
+    } else {
+      setPgnAnalysis(null);
+    }
+  }, [articleData.pgn, analyzePGN]);
 
   const startVoiceRecording = async () => {
     try {
@@ -90,7 +90,7 @@ export default function CreateArticlePage() {
       recorder.start();
       setMediaRecorder(recorder);
       setIsRecording(true);
-    } catch (error) {
+    } catch {
       setError('Failed to access microphone');
     }
   };
@@ -112,7 +112,7 @@ export default function CreateArticlePage() {
         pgnAnalysis
       );
       setArticleData(prev => ({ ...prev, content: enhancedContent }));
-    } catch (error) {
+    } catch {
       setError('AI enhancement failed');
     }
   };

@@ -2,7 +2,7 @@
 // Enhanced Hero Section for TheChessWire.news
 
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
@@ -76,12 +76,12 @@ export default function ChessHero({ className = "" }: ChessHeroProps) {
   const rotateX = useSpring(useTransform(mouseY, [-300, 300], [15, -15]));
   const rotateY = useSpring(useTransform(mouseX, [-300, 300], [-15, 15]));
   
-  const heroPhases = [
+  const heroPhases = useMemo(() => [
     "Where every move tells a story",
     "Powered by revolutionary AI storytelling", 
     "Experience chess like never before",
     "Join the future of chess journalism"
-  ];
+  ], []);
   
   const chessPhilosophies = [
     "Every sacrifice echoes in eternity",
@@ -127,7 +127,7 @@ export default function ChessHero({ className = "" }: ChessHeroProps) {
       }
     }, 80);
     return () => clearInterval(timer);
-  }, [currentPhase, mounted]);
+  }, [currentPhase, mounted, heroPhases]);
 
   // Cycle through phases
   useEffect(() => {
@@ -141,7 +141,7 @@ export default function ChessHero({ className = "" }: ChessHeroProps) {
       }, 8000);
       return () => clearTimeout(cycleTimer);
     }
-  }, [currentPhase, showCTA, mounted]);
+  }, [currentPhase, showCTA, mounted, heroPhases.length]);
 
   // Enhanced mouse tracking with smooth interpolation
   const handleMouseMove = (e: React.MouseEvent) => {

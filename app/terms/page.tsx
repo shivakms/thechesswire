@@ -1,6 +1,3 @@
-## 4. page.tsx (Terms page)
-
-```tsx
 // app/terms/page.tsx
 
 export default function TermsPage() {

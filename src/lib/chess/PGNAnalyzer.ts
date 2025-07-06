@@ -56,7 +56,7 @@ export class PGNAnalyzer {
     
     try {
       chess.loadPgn(pgnString);
-    } catch (error) {
+    } catch {
       return {
         isValid: false,
         moves: [],
@@ -132,7 +132,7 @@ export class PGNAnalyzer {
     };
   }
 
-  private generateMoveAnnotation(move: any, chess: Chess): string {
+  private generateMoveAnnotation(move: { san: string; captured?: string; promotion?: string; flags: string }, chess: Chess): string {
     const annotations = [];
 
     if (chess.inCheck()) {
@@ -191,15 +191,15 @@ export class PGNAnalyzer {
     return Math.round(evaluation * 100) / 100;
   }
 
-  private isBlunder(move: any, evaluation: number): boolean {
+  private isBlunder(move: { captured?: string }, evaluation: number): boolean {
     return Math.abs(evaluation) > 3 && move.captured === undefined;
   }
 
-  private isBrilliant(move: any, evaluation: number): boolean {
-    return evaluation > 2 || (move.captured && evaluation > 0);
+  private isBrilliant(move: { captured?: string }, evaluation: number): boolean {
+    return evaluation > 2 || (!!move.captured && evaluation > 0);
   }
 
-  private detectTacticalTheme(move: any, annotation: string): string | undefined {
+  private detectTacticalTheme(move: { san: string }, annotation: string): string | undefined {
     for (const [theme, pattern] of Object.entries(this.tacticalPatterns)) {
       if (pattern.test(annotation) || pattern.test(move.san)) {
         return theme;
@@ -217,7 +217,7 @@ export class PGNAnalyzer {
     return 'neutral';
   }
 
-  private calculateEmotionIntensity(move: any, evaluation: number): number {
+  private calculateEmotionIntensity(move: { captured?: string; promotion?: string; flags: string }, evaluation: number): number {
     let intensity = 0.5;
     
     if (Math.abs(evaluation) > 2) intensity += 0.3;
@@ -228,8 +228,8 @@ export class PGNAnalyzer {
     return Math.min(intensity, 1.0);
   }
 
-  private extractGameInfo(pgnString: string): any {
-    const info: any = {};
+  private extractGameInfo(pgnString: string): Record<string, string> {
+    const info: Record<string, string> = {};
     const lines = pgnString.split('\n');
     
     for (const line of lines) {

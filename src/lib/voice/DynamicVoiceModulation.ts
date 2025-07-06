@@ -2,7 +2,7 @@
 
 export class DynamicVoiceModulation {
   // Add subtle variations to keep voice feeling alive
-  static addHumanVariation(baseSettings: any): any {
+  static addHumanVariation(baseSettings: Record<string, number>): Record<string, number> {
     return {
       ...baseSettings,
       stability: this.varyValue(baseSettings.stability, 0.05),

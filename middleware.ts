@@ -108,7 +108,7 @@ interface SecurityCheck {
 async function performSecurityChecks(req: NextRequest): Promise<SecurityCheck> {
   const ip = getClientIP(req);
   const userAgent = req.headers.get("user-agent") || "";
-  const country = req.geo?.country || "unknown";
+  const country = (req as any).geo?.country || "unknown";
   
   let riskScore = 0;
   let blockReason = "";
@@ -177,7 +177,7 @@ function getClientIP(req: NextRequest): string {
   return (
     req.headers.get("x-forwarded-for")?.split(",")[0] ||
     req.headers.get("x-real-ip") ||
-    req.ip ||
+    (req as any).ip ||
     "unknown"
   );
 }
@@ -327,7 +327,8 @@ export async function middleware(req: NextRequest) {
       }
 
     } catch (error) {
-      await logSecurityEvent(req, "SECURITY_CHECK_ERROR", { error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      await logSecurityEvent(req, "SECURITY_CHECK_ERROR", { error: errorMessage });
       // Allow access if security check fails (fail-open for availability)
       console.error("Security check failed:", error);
     }

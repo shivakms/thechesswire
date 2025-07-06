@@ -1,5 +1,4 @@
 import { BambaiVoiceEngine } from './BambaiVoiceEngine';
-import { DynamicVoiceModulation } from './DynamicVoiceModulation';
 
 export interface PersonalityClip {
   id: string;
@@ -182,7 +181,7 @@ export class BambaiLivePersonality {
       philosophical: ['*contemplative silence*', '*deep breath*', '*wise nod*']
     };
 
-    const personalityQuirks = quirks[personality];
+      const personalityQuirks = quirks[personality as keyof typeof quirks];
     const randomQuirk = personalityQuirks[Math.floor(Math.random() * personalityQuirks.length)];
     
     return script.replace(/\n\n/g, `\n\n${randomQuirk}\n\n`);

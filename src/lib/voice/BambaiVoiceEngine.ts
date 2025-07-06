@@ -187,8 +187,9 @@ export class BambaiVoiceEngine {
       whisper: { start: '<break time="400ms"/>', end: '<break time="600ms"/>' }
     };
 
-    if (bookends[tone]) {
-      enhanced = `${bookends[tone].start}${enhanced}${bookends[tone].end}`;
+    if (bookends[tone as keyof typeof bookends]) {
+      const bookend = bookends[tone as keyof typeof bookends];
+      enhanced = `${bookend.start}${enhanced}${bookend.end}`;
     }
 
     return `<speak>${enhanced}</speak>`;
@@ -219,9 +220,12 @@ export class BambaiVoiceEngine {
       const enhancedText = this.enhanceText(text, tone);
       
       // Apply human variation to voice settings
-      const voiceSettings = DynamicVoiceModulation.addHumanVariation(
-        this.voiceProfiles[mode]
-      );
+      const baseProfile = this.voiceProfiles[mode];
+      const voiceSettings = DynamicVoiceModulation.addHumanVariation({
+        stability: baseProfile.stability,
+        similarity_boost: baseProfile.similarity_boost,
+        style: baseProfile.style
+      });
 
       // Generate voice via ElevenLabs
       const response = await axios.post(
@@ -260,7 +264,7 @@ export class BambaiVoiceEngine {
     mode: keyof typeof this.voiceProfiles = 'poeticStoryteller'
   ): Promise<Buffer> {
     // Language-specific adjustments
-    const languageAdjustments: Record<string, any> = {
+    const languageAdjustments: Record<string, Record<string, number>> = {
       'es': { style: 0.5, similarity_boost: 0.7 },
       'fr': { style: 0.4, similarity_boost: 0.75 },
       'hi': { style: 0.45, similarity_boost: 0.8 },
@@ -272,6 +276,8 @@ export class BambaiVoiceEngine {
       ...baseSettings,
       ...(languageAdjustments[language] || {})
     };
+    
+    console.log('Multilingual voice settings:', adjustedSettings);
 
     // Generate with language tag
     const languageText = `<speak><lang xml:lang="${language}">${text}</lang></speak>`;

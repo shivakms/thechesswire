@@ -25,7 +25,7 @@ export interface ReplayConfig {
 
 export class ReplayEngine {
   private chess: Chess;
-  private moves: any[];
+  private moves: Array<{ from: string; to: string; san: string; captured?: string; promotion?: string; flags: string }>;
   private analysis: PGNAnalysis | null;
   private voiceEngine: BambaiVoiceEngine;
   private state: ReplayState;
@@ -89,7 +89,7 @@ export class ReplayEngine {
     }, delay);
   }
 
-  private calculateCinematicDelay(move: any): number {
+  private calculateCinematicDelay(move: { captured?: string; promotion?: string; flags: string }): number {
     const baseDelay = 1000 / this.state.playbackSpeed;
     
     if (move.captured) return baseDelay * 1.5;
@@ -100,7 +100,7 @@ export class ReplayEngine {
     return baseDelay;
   }
 
-  private async generateMoveNarration(move: any, moveIndex: number): Promise<void> {
+  private async generateMoveNarration(move: { san: string }, moveIndex: number): Promise<void> {
     if (!this.analysis || !this.analysis.moves[moveIndex]) return;
 
     const analysisMove = this.analysis.moves[moveIndex];
@@ -120,10 +120,10 @@ export class ReplayEngine {
       const emotion = this.analysis.analysis.emotionTimeline[moveIndex]?.emotion || 'neutral';
       const voiceMode = this.selectVoiceModeForEmotion(emotion);
       
-      const audioBuffer = await this.voiceEngine.generateVoice(
+      await this.voiceEngine.generateVoice(
         narrationText,
         voiceMode,
-        emotion === 'dramatic' ? 'dramatic' : 'neutral'
+        emotion === 'tension' ? 'dramatic' : 'neutral'
       );
 
       const voiceUrl = `/api/voice/replay-${Date.now()}-${moveIndex}.mp3`;
@@ -205,7 +205,13 @@ export class ReplayEngine {
     });
   }
 
-  exportSession(): any {
+  exportSession(): {
+    moves: Array<{ from: string; to: string; san: string; captured?: string; promotion?: string; flags: string }>;
+    analysis: PGNAnalysis | null;
+    state: ReplayState;
+    config: ReplayConfig;
+    timestamp: string;
+  } {
     return {
       moves: this.moves,
       analysis: this.analysis,

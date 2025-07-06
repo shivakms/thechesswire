@@ -29,7 +29,8 @@ export default function ScrollTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // Optional: Trigger a subtle voice feedback (Module 82: Bambai AI Whisper Mode)
-    if (typeof window !== 'undefined' && window.chessWireConfig?.bambaiEnabled) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (typeof window !== 'undefined' && (window as any).chessWireConfig?.bambaiEnabled) {
       console.log('🗣️ Bambai AI: "Rising to the top..."');
     }
   };
