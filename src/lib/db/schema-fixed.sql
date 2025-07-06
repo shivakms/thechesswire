@@ -148,3 +148,44 @@ CREATE TRIGGER update_titled_player_verifications_updated_at
     BEFORE UPDATE ON titled_player_verifications
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TABLE IF NOT EXISTS content_analysis_cache (
+  id SERIAL PRIMARY KEY,
+  analysis_id VARCHAR(64) UNIQUE NOT NULL,
+  content_type VARCHAR(20) NOT NULL,
+  analysis_result JSONB NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS content_pipeline_results (
+  id SERIAL PRIMARY KEY,
+  analysis_id VARCHAR(64) NOT NULL,
+  content_type VARCHAR(20) NOT NULL,
+  original_content TEXT NOT NULL,
+  emotional_profile JSONB,
+  narrative_adaptations JSONB,
+  key_moments JSONB,
+  content_tags TEXT[],
+  difficulty_level VARCHAR(20),
+  engagement_score INTEGER,
+  social_snippets JSONB,
+  processing_time_ms INTEGER,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  FOREIGN KEY (analysis_id) REFERENCES content_analysis_cache(analysis_id)
+);
+
+CREATE TABLE IF NOT EXISTS pgn_emotion_analysis (
+  id SERIAL PRIMARY KEY,
+  pgn_hash VARCHAR(64) UNIQUE NOT NULL,
+  emotion_heatmap JSONB NOT NULL,
+  overall_arc TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_pgn_emotion_hash ON pgn_emotion_analysis(pgn_hash);
+CREATE INDEX IF NOT EXISTS idx_pgn_emotion_created ON pgn_emotion_analysis(created_at);
+CREATE INDEX IF NOT EXISTS idx_content_analysis_cache_id ON content_analysis_cache(analysis_id);
+CREATE INDEX IF NOT EXISTS idx_content_pipeline_results_id ON content_pipeline_results(analysis_id);
