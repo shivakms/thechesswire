@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Upload, Download, Settings, BarChart3, FileText, Video, Mic } from 'lucide-react';

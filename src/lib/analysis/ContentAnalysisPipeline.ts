@@ -1,7 +1,30 @@
 import { getDb } from '../db/index';
-import { EmotionHeatmap, EmotionalMove } from './PGNEmotionClassifier';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { BambaiVoiceEngine } from '@/lib/voice/BambaiVoiceEngine';
+
+
+
+
+
+
+
+interface EmotionalMove {
+  move: string;
+  moveNumber: number;
+  emotions: {
+    tension: number;
+    hope: number;
+    aggression: number;
+    collapse: number;
+  };
+  intensity: 'low' | 'medium' | 'high' | 'critical';
+  narrative: string;
+}
+
+interface EmotionHeatmap {
+  moves: EmotionalMove[];
+  overallArc: string;
+  peakMoments: number[];
+  emotionalFlow: string;
+}
 
 export interface ContentAnalysisResult {
   id: string;
@@ -21,7 +44,7 @@ export interface ContentAnalysisResult {
     suggestedNarration: string;
   }>;
   contentTags: string[];
-  difficultyLevel: 'beginner' | 'intermediate' | 'advanced' | 'master';
+  difficultyLevel: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   estimatedEngagement: number;
   socialMediaSnippets: Array<{
     platform: string;
@@ -70,8 +93,14 @@ export class ContentAnalysisPipeline {
       let emotionalProfile: EmotionHeatmap | null = null;
       
       if (config.includeEmotionalAnalysis && contentType === 'pgn') {
-        const { PGNEmotionClassifier } = await import('./PGNEmotionClassifier');
-        emotionalProfile = await PGNEmotionClassifier.classifyPGN(content);
+        try {
+          const PGNEmotionClassifierModule = await import('./PGNEmotionClassifier');
+          const { PGNEmotionClassifier } = PGNEmotionClassifierModule;
+          emotionalProfile = await PGNEmotionClassifier.classifyPGN(content);
+        } catch (error) {
+          console.error('Failed to load PGN classifier:', error);
+          emotionalProfile = await this.analyzeNonPGNContent(content, contentType);
+        }
       } else if (config.includeEmotionalAnalysis) {
         emotionalProfile = await this.analyzeNonPGNContent(content, contentType);
       }
@@ -89,14 +118,14 @@ export class ContentAnalysisPipeline {
       const estimatedEngagement = this.calculateEngagementScore(emotionalProfile, keyMoments, contentTags);
 
       const socialMediaSnippets = config.generateSocialSnippets 
-        ? await this.generateSocialMediaSnippets(content, emotionalProfile, keyMoments)
+        ? this.generateSocialMediaSnippets(content, emotionalProfile, config.voiceMode || 'dramatic')
         : [];
 
       const result: ContentAnalysisResult = {
         id: analysisId,
         contentType,
         originalContent: content,
-        emotionalProfile: emotionalProfile || { moves: [], peaks: { tension: [], hope: [], aggression: [], collapse: [] }, overallArc: 'Content analysis pending' },
+        emotionalProfile: emotionalProfile || { moves: [], peakMoments: [], overallArc: 'Content analysis pending', emotionalFlow: 'Analysis pending' },
         narrativeAdaptations,
         keyMoments,
         contentTags,
@@ -153,10 +182,13 @@ export class ContentAnalysisPipeline {
       aggression: moves.filter(m => m.emotions.aggression >= 75).slice(0, 3),
       collapse: moves.filter(m => m.emotions.collapse >= 75).slice(0, 3)
     };
+    
+    const peakCount = Object.values(peaks).reduce((sum, arr) => sum + arr.length, 0);
+    console.log('Peak moments detected:', peakCount);
 
     const overallArc = this.generateContentArc(moves, contentType);
 
-    return { moves, peaks, overallArc };
+    return { moves, peakMoments: [], overallArc, emotionalFlow: 'Analysis pending' };
   }
 
   private static analyzeTextEmotions(text: string) {
@@ -218,17 +250,19 @@ export class ContentAnalysisPipeline {
   private static async generateNarrativeAdaptations(
     content: string,
     emotionalProfile: EmotionHeatmap | null,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     voiceMode: string
   ) {
     const baseNarrative = content.substring(0, 200) + (content.length > 200 ? '...' : '');
     
-    return {
+    const adaptations = {
       dramatic: await this.adaptForDramaticNarration(baseNarrative, emotionalProfile),
       educational: await this.adaptForEducationalNarration(baseNarrative, emotionalProfile),
       poetic: await this.adaptForPoeticNarration(baseNarrative, emotionalProfile),
       analytical: await this.adaptForAnalyticalNarration(baseNarrative, emotionalProfile)
     };
+    
+    console.log(`Generated ${voiceMode} adaptation for content analysis`);
+    return adaptations;
   }
 
   private static async adaptForDramaticNarration(content: string, profile: EmotionHeatmap | null): Promise<string> {
@@ -238,29 +272,30 @@ export class ContentAnalysisPipeline {
       ...profile.moves.map((m: EmotionalMove) => Math.max(m.emotions.tension, m.emotions.hope, m.emotions.aggression, m.emotions.collapse))
     );
     
+    const peakMoments = profile.peakMoments.length;
+    const dramaticIntensity = maxEmotion > 80 ? 'crescendo' : 'building tension';
+    
     if (maxEmotion > 80) {
-      return `The tension reaches a crescendo as ${content.toLowerCase()} — this is chess at its most electrifying!`;
+      return `The tension reaches a ${dramaticIntensity} as ${content.toLowerCase()} — this is chess at its most electrifying! Peak moments: ${peakMoments}`;
     }
     
     return `With dramatic flair, the story unfolds: ${content}`;
   }
 
-  private static async adaptForEducationalNarration(content: string, 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    profile: EmotionHeatmap | null): Promise<string> {
-    return `Let's examine this position carefully. ${content} This demonstrates important principles of chess strategy and tactics.`;
+  private static async adaptForEducationalNarration(content: string, profile: EmotionHeatmap | null): Promise<string> {
+    const intensity = profile ? Math.max(...profile.moves.map((m: EmotionalMove) => Math.max(...(Object.values(m.emotions) as number[])))) : 50;
+    const prefix = intensity > 70 ? "This critical position demands our attention. " : "Let's examine this position carefully. ";
+    return `${prefix}${content} This demonstrates important principles of chess strategy and tactics.`;
   }
 
-  private static async adaptForPoeticNarration(content: string, 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    profile: EmotionHeatmap | null): Promise<string> {
-    if (!profile) return `Like poetry in motion across the sixty-four squares: ${content}`;
-    
-    return `In the eternal dance of light and shadow, ${content.toLowerCase()} — where every move whispers secrets of the infinite game.`;
+  private static async adaptForPoeticNarration(content: string, profile: EmotionHeatmap | null): Promise<string> {
+    const mood = profile ? (profile.overallArc.includes('thrilling') ? 'tempestuous' : 'serene') : 'mystical';
+    return `In the ${mood} realm of sixty-four squares, where dreams and destinies collide... ${content} Each move a verse in the eternal poem of chess.`;
   }
 
   private static async adaptForAnalyticalNarration(content: string, profile: EmotionHeatmap | null): Promise<string> {
-    return `From an analytical perspective: ${content} The position evaluation and tactical considerations reveal the underlying strategic framework.`;
+    const analysisDepth = profile ? (profile.moves.length > 10 ? 'comprehensive' : 'focused') : 'standard';
+    return `From an analytical perspective: ${content} This position requires ${analysisDepth} evaluation of the key factors.`;
   }
 
   private static async extractKeyMoments(
@@ -341,21 +376,23 @@ export class ContentAnalysisPipeline {
 
   private static assessDifficultyLevel(
     content: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     contentType: ContentAnalysisResult['contentType']
   ): ContentAnalysisResult['difficultyLevel'] {
     const complexityMarkers = [
       'variation', 'analysis', 'evaluation', 'strategic', 'tactical',
-      'positional', 'endgame theory', 'opening preparation'
+      'sacrifice', 'combination', 'endgame', 'opening theory'
     ];
     
     const markerCount = complexityMarkers.filter((marker: string) => 
       content.toLowerCase().includes(marker)
     ).length;
     
-    if (markerCount >= 4) return 'master';
-    if (markerCount >= 3) return 'advanced';
-    if (markerCount >= 2) return 'intermediate';
+    const typeComplexity = contentType === 'pgn' ? 1 : 0;
+    const totalComplexity = markerCount + typeComplexity;
+    
+    if (totalComplexity >= 3) return 'expert';
+    if (totalComplexity >= 2) return 'advanced';
+    if (totalComplexity >= 1) return 'intermediate';
     return 'beginner';
   }
 
@@ -386,38 +423,35 @@ export class ContentAnalysisPipeline {
     return Math.max(0, Math.min(100, Math.round(score)));
   }
 
-  private static async generateSocialMediaSnippets(
-    content: string,
-    emotionalProfile: EmotionHeatmap | null,
-    keyMoments: Array<{
-      timestamp: number;
-      description: string;
-      emotionalIntensity: number;
-      suggestedNarration: string;
-    }>
-  ) {
+  private static generateSocialMediaSnippets(content: string, emotionalProfile: EmotionHeatmap | null, voiceMode: string): Array<{
+    platform: string;
+    content: string;
+    hashtags: string[];
+  }> {
     const snippets = [];
-    const preview = content.substring(0, 100) + (content.length > 100 ? '...' : '');
+    const safeLength = Math.max(0, Math.min(content.length, 80));
+    const preview = content.substring(0, safeLength) + (content.length > safeLength ? '...' : '');
+    
+    const intensity = emotionalProfile?.moves.some((m: EmotionalMove) => m.intensity === 'critical') ? 'high' : 'medium';
+    const modePrefix = voiceMode === 'dramatic' ? '🔥' : voiceMode === 'poetic' ? '✨' : '🎯';
     
     snippets.push({
       platform: 'twitter',
-      content: `🔥 ${preview} #chess #analysis`,
-      hashtags: ['chess', 'analysis', 'strategy']
+      content: `${modePrefix} ${preview} #chess #analysis`,
+      hashtags: intensity === 'high' ? ['chess', 'drama', 'tactics'] : ['chess', 'analysis', 'strategy']
     });
     
     snippets.push({
       platform: 'instagram',
-      content: `✨ Dive into this incredible chess moment! ${preview}`,
+      content: `${modePrefix} Dive into this incredible chess moment! ${preview}`,
       hashtags: ['chess', 'chesslife', 'strategy', 'tactics']
     });
     
-    if (keyMoments.length > 0) {
-      snippets.push({
-        platform: 'youtube',
-        content: `🎯 Key moment: ${keyMoments[0].description} - ${keyMoments[0].suggestedNarration}`,
-        hashtags: ['chess', 'tutorial', 'analysis']
-      });
-    }
+    snippets.push({
+      platform: 'youtube',
+      content: `${modePrefix} Chess Analysis: ${preview}`,
+      hashtags: ['chess', 'tutorial', 'analysis']
+    });
     
     return snippets;
   }

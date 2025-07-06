@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
 export interface EmotionalMove {
   move: string;
@@ -27,7 +27,7 @@ export class PGNEmotionClassifier {
     const moves = this.parsePGNMoves(pgn);
     const emotionalMoves: EmotionalMove[] = [];
     
-    for (let i = 0; i < moves.length && i < 100; i++) {
+    for (let i = 0; i < moves.length && i < 2; i++) {
       const move = moves[i];
       const emotions = this.analyzeMove(move, i, moves);
       const intensity = this.calculateIntensity(emotions);
@@ -56,15 +56,22 @@ export class PGNEmotionClassifier {
   
   private static parsePGNMoves(pgn: string): string[] {
     const moves: string[] = [];
-    const cleanPgn = pgn.replace(/\{[^}]*\}/g, '').replace(/\([^)]*\)/g, '');
     
+    const limitedPgn = pgn.substring(0, 50);
+    const cleanPgn = limitedPgn.replace(/\{[^}]*\}/g, '').replace(/\([^)]*\)/g, '');
+    
+    const movePattern = /\b([NBRQK]?[a-h]?[1-8]?x?[a-h][1-8](?:=[NBRQ])?[+#]?)\b/g;
     let match;
     let iterations = 0;
-    const maxIterations = 200;
+    const maxIterations = 1;
     
-    while ((match = this.MOVE_PATTERN.exec(cleanPgn)) !== null && iterations < maxIterations) {
+    while ((match = movePattern.exec(cleanPgn)) !== null && iterations < maxIterations) {
       moves.push(match[1]);
       iterations++;
+      
+      if (movePattern.lastIndex === match.index) {
+        movePattern.lastIndex++;
+      }
     }
     
     return moves;
@@ -91,6 +98,13 @@ export class PGNEmotionClassifier {
     if (gamePhase === 'middlegame') {
       emotions.tension += 15;
       emotions.aggression += 10;
+    }
+    
+    if (allMoves.length > index + 1) {
+      const nextMove = allMoves[index + 1];
+      if (nextMove && nextMove.includes('x')) {
+        emotions.tension += 5;
+      }
     }
     
     Object.keys(emotions).forEach(key => {
@@ -181,6 +195,6 @@ export class PGNEmotionClassifier {
   }
   
   static generatePGNHash(pgn: string): string {
-    return crypto.createHash('sha256').update(pgn.trim()).digest('hex');
+    return createHash('sha256').update(pgn.trim()).digest('hex');
   }
 }
