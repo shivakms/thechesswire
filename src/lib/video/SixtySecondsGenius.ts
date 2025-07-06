@@ -263,7 +263,10 @@ ${mode.closing}`;
   }
 
   private async renderChessVideo(): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, Math.min(2000, 5000)));
+    const delay = Math.min(2000, 5000);
+    if (delay > 0 && delay <= 5000) {
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
   }
 
   private async getVideoDuration(): Promise<number> {
@@ -279,7 +282,10 @@ ${mode.closing}`;
         const short = await this.generateDailyShort(pgn);
         shorts.push(short);
         
-        await new Promise(resolve => setTimeout(resolve, Math.min(1000, 3000)));
+        const batchDelay = Math.min(1000, 3000);
+        if (batchDelay > 0 && batchDelay <= 3000) {
+          await new Promise(resolve => setTimeout(resolve, batchDelay));
+        }
       } catch (error) {
         console.error(`Failed to generate short for PGN: ${error}`);
       }
