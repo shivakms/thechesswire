@@ -1,7 +1,7 @@
 // File: src/components/PageTransition.tsx
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, Transition } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { FullscreenLoader } from "./Loader";
@@ -12,7 +12,7 @@ interface PageTransitionProps {
 }
 
 export default function PageTransition({ children, className = "" }: PageTransitionProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() || '/';
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("Loading...");
 
@@ -36,7 +36,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
   // Simulate loading for dramatic effect (remove in production for instant transitions)
   useEffect(() => {
     setIsLoading(true);
-    const config = getLoaderConfig(pathname);
+    const config = getLoaderConfig(pathname || '/');
     setLoadingMessage(config.message);
     
     const timer = setTimeout(() => {
@@ -54,7 +54,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
         initial: { opacity: 0, scale: 0.95, rotateX: -10, filter: "blur(10px)" },
         animate: { opacity: 1, scale: 1, rotateX: 0, filter: "blur(0px)" },
         exit: { opacity: 0, scale: 1.05, rotateX: 10, filter: "blur(10px)" },
-        transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }
+        transition: { duration: 0.6, ease: "easeInOut" }
       };
     }
     
@@ -72,7 +72,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
         initial: { opacity: 0, scale: 1.1, filter: "brightness(0.3) blur(20px)" },
         animate: { opacity: 1, scale: 1, filter: "brightness(1) blur(0px)" },
         exit: { opacity: 0, scale: 0.9, filter: "brightness(0.3) blur(20px)" },
-        transition: { duration: 0.8, ease: [0.43, 0.13, 0.23, 0.96] }
+        transition: { duration: 0.8, ease: "easeInOut" }
       };
     }
 
@@ -83,7 +83,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
         exit: { opacity: 0, scale: 1.1, y: -30 },
         transition: { 
           duration: 0.7, 
-          ease: [0.165, 0.84, 0.44, 1],
+          ease: "easeOut",
           scale: { type: "spring", stiffness: 300, damping: 30 }
         }
       };
@@ -118,7 +118,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
           initial={transitionConfig.initial}
           animate={transitionConfig.animate}
           exit={transitionConfig.exit}
-          transition={transitionConfig.transition}
+          transition={transitionConfig.transition as Transition}
           style={{
             background: pathname.startsWith('/replay') 
               ? 'radial-gradient(ellipse at center, rgba(139, 69, 19, 0.03) 0%, transparent 70%)'
