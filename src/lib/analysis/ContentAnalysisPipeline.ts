@@ -1,5 +1,5 @@
-import { getDb } from './db';
-import { PGNEmotionClassifier, EmotionHeatmap, EmotionalMove } from './PGNEmotionClassifier';
+import { getDb } from '../db';
+import { EmotionHeatmap, EmotionalMove } from './PGNEmotionClassifier';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { BambaiVoiceEngine } from '@/lib/voice/BambaiVoiceEngine';
 
@@ -70,6 +70,7 @@ export class ContentAnalysisPipeline {
       let emotionalProfile: EmotionHeatmap | null = null;
       
       if (config.includeEmotionalAnalysis && contentType === 'pgn') {
+        const { PGNEmotionClassifier } = await import('./PGNEmotionClassifier');
         emotionalProfile = await PGNEmotionClassifier.classifyPGN(content);
       } else if (config.includeEmotionalAnalysis) {
         emotionalProfile = await this.analyzeNonPGNContent(content, contentType);
