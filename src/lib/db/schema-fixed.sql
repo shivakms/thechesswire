@@ -148,3 +148,101 @@ CREATE TRIGGER update_titled_player_verifications_updated_at
     BEFORE UPDATE ON titled_player_verifications
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TABLE IF NOT EXISTS articles (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    pgn_data TEXT,
+    ai_enhanced_content TEXT,
+    voice_narration_url TEXT,
+    tags TEXT[],
+    difficulty_level VARCHAR(20) DEFAULT 'beginner',
+    access_level VARCHAR(20) DEFAULT 'freemium',
+    published BOOLEAN DEFAULT FALSE,
+    view_count INTEGER DEFAULT 0,
+    like_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS chess_games (
+    id SERIAL PRIMARY KEY,
+    article_id INTEGER REFERENCES articles(id),
+    pgn TEXT NOT NULL,
+    fen_positions JSONB,
+    move_annotations JSONB,
+    ai_analysis JSONB,
+    emotion_timeline JSONB,
+    brilliancy_score INTEGER DEFAULT 0,
+    blunder_count INTEGER DEFAULT 0,
+    tactical_themes TEXT[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_annotations (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    game_id INTEGER REFERENCES chess_games(id),
+    move_number INTEGER,
+    annotation TEXT,
+    voice_note_url TEXT,
+    annotation_type VARCHAR(50) DEFAULT 'text',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ai_articles (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    game_id INTEGER REFERENCES chess_games(id),
+    generated_title VARCHAR(255),
+    generated_content TEXT,
+    storytelling_mode VARCHAR(50) DEFAULT 'dramatic',
+    historical_context JSONB,
+    alternate_endings JSONB,
+    voice_narration_url TEXT,
+    access_level VARCHAR(20) DEFAULT 'premium',
+    generation_time_ms INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS replay_sessions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    game_id INTEGER REFERENCES chess_games(id),
+    session_data JSONB,
+    voice_mode VARCHAR(50),
+    playback_speed DECIMAL(3,2) DEFAULT 1.0,
+    annotations_enabled BOOLEAN DEFAULT TRUE,
+    access_level VARCHAR(20) DEFAULT 'premium',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS content_analytics (
+    id SERIAL PRIMARY KEY,
+    content_type VARCHAR(50),
+    content_id INTEGER,
+    user_id INTEGER REFERENCES users(id),
+    event_type VARCHAR(50),
+    event_data JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for performance
+CREATE INDEX IF NOT EXISTS idx_articles_user_id ON articles(user_id);
+CREATE INDEX IF NOT EXISTS idx_articles_access_level ON articles(access_level);
+CREATE INDEX IF NOT EXISTS idx_articles_published ON articles(published) WHERE published = TRUE;
+CREATE INDEX IF NOT EXISTS idx_chess_games_article_id ON chess_games(article_id);
+CREATE INDEX IF NOT EXISTS idx_user_annotations_user_id ON user_annotations(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_annotations_game_id ON user_annotations(game_id);
+CREATE INDEX IF NOT EXISTS idx_ai_articles_user_id ON ai_articles(user_id);
+CREATE INDEX IF NOT EXISTS idx_ai_articles_access_level ON ai_articles(access_level);
+CREATE INDEX IF NOT EXISTS idx_replay_sessions_user_id ON replay_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_content_analytics_content_type ON content_analytics(content_type, content_id);
+
+-- Create triggers for updated_at
+CREATE TRIGGER update_articles_updated_at
+    BEFORE UPDATE ON articles
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
