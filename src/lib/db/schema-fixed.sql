@@ -290,3 +290,15 @@ CREATE TRIGGER update_titled_player_verifications_updated_at
     BEFORE UPDATE ON titled_player_verifications
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TABLE IF NOT EXISTS pgn_emotion_analysis (
+  id SERIAL PRIMARY KEY,
+  pgn_hash VARCHAR(64) UNIQUE NOT NULL,
+  emotion_heatmap JSONB NOT NULL,
+  overall_arc TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_pgn_emotion_hash ON pgn_emotion_analysis(pgn_hash);
+CREATE INDEX IF NOT EXISTS idx_pgn_emotion_created ON pgn_emotion_analysis(created_at);

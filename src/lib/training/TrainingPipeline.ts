@@ -53,24 +53,45 @@ export interface SoulScanResult {
 export class TrainingPipeline {
   static async annotateEmotions(pgn: string, position: {fen?: string} | string): Promise<EmotionAnnotation> {
     try {
-      const emotions = {
+      let emotions = {
         tension: Math.random() * 100,
         excitement: Math.random() * 100,
         surprise: Math.random() * 100,
         satisfaction: Math.random() * 100
       };
+      
+      let narrative = "The position crackles with tactical tension...";
 
-      const narratives = [
-        "The position crackles with tactical tension...",
-        "A moment of profound strategic beauty unfolds...",
-        "The pieces dance in perfect harmony...",
-        "Danger lurks in every shadow of the board..."
-      ];
+      try {
+        const { PGNEmotionClassifier } = await import('@/lib/analysis/PGNEmotionClassifier');
+        const classifier = await PGNEmotionClassifier.classifyPGN(pgn);
+        const positionStr = typeof position === 'string' ? position : (position.fen || 'unknown');
+        const relevantMove = classifier.moves.find(m => m.fen === positionStr);
+        
+        if (relevantMove) {
+          emotions = {
+            tension: relevantMove.emotions.tension,
+            excitement: relevantMove.emotions.hope,
+            surprise: relevantMove.emotions.aggression,
+            satisfaction: relevantMove.emotions.collapse
+          };
+          narrative = relevantMove.narrative;
+        }
+      } catch (classifierError) {
+        console.warn('PGN Emotion Classifier not available, using fallback:', classifierError);
+        const narratives = [
+          "The position crackles with tactical tension...",
+          "A moment of profound strategic beauty unfolds...",
+          "The pieces dance in perfect harmony...",
+          "Danger lurks in every shadow of the board..."
+        ];
+        narrative = narratives[Math.floor(Math.random() * narratives.length)];
+      }
 
       const annotation: EmotionAnnotation = {
         position: typeof position === 'string' ? position : (position.fen || 'unknown'),
         emotions,
-        narrative: narratives[Math.floor(Math.random() * narratives.length)]
+        narrative
       };
 
       const db = await getDb();

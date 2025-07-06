@@ -181,7 +181,7 @@ export class BambaiVoiceEngine {
     }
 
     // Add emotional bookends for better flow
-    const bookends = {
+    const bookends: Record<string, { start: string; end: string }> = {
       inspiring: { start: '<break time="500ms"/>', end: '<break time="800ms"/>' },
       dramatic: { start: '<break time="700ms"/>', end: '<break time="1s"/>' },
       whisper: { start: '<break time="400ms"/>', end: '<break time="600ms"/>' }
@@ -219,9 +219,11 @@ export class BambaiVoiceEngine {
       const enhancedText = this.enhanceText(text, tone);
       
       // Apply human variation to voice settings
-      const voiceSettings = DynamicVoiceModulation.addHumanVariation(
-        this.voiceProfiles[mode]
-      );
+      const { use_speaker_boost, ...numericSettings } = this.voiceProfiles[mode];
+      const voiceSettings = {
+        ...DynamicVoiceModulation.addHumanVariation(numericSettings),
+        use_speaker_boost
+      };
 
       // Generate voice via ElevenLabs
       const response = await axios.post(
@@ -259,19 +261,8 @@ export class BambaiVoiceEngine {
     language: string = 'en',
     mode: keyof typeof this.voiceProfiles = 'poeticStoryteller'
   ): Promise<Buffer> {
-    // Language-specific adjustments
-    const languageAdjustments: Record<string, any> = {
-      'es': { style: 0.5, similarity_boost: 0.7 },
-      'fr': { style: 0.4, similarity_boost: 0.75 },
-      'hi': { style: 0.45, similarity_boost: 0.8 },
-      'de': { style: 0.35, similarity_boost: 0.85 }
-    };
-
     const baseSettings = this.voiceProfiles[mode];
-    const adjustedSettings = {
-      ...baseSettings,
-      ...(languageAdjustments[language] || {})
-    };
+    console.log(`Using voice settings for language: ${language}`, baseSettings);
 
     // Generate with language tag
     const languageText = `<speak><lang xml:lang="${language}">${text}</lang></speak>`;
@@ -303,6 +294,62 @@ export class BambaiVoiceEngine {
       console.log('🧹 Voice cache cleared');
     } catch (error) {
       console.error('Cache clear error:', error);
+    }
+  }
+
+  static async generateEmotionalNarration(
+    emotions: { tension: number; hope: number; aggression: number; collapse: number },
+    move: string
+  ): Promise<string> {
+    try {
+      const narrative = await this.adaptNarrativeForEmotions(emotions, move);
+      return narrative;
+    } catch (error) {
+      console.error('Failed to generate emotional narration:', error);
+      return `${move} — a moment in the eternal dance of chess.`;
+    }
+  }
+
+  private static async adaptNarrativeForEmotions(
+    emotions: { tension: number; hope: number; aggression: number; collapse: number },
+    move: string
+  ): Promise<string> {
+    const { tension, hope, aggression, collapse } = emotions;
+    
+    if (collapse > 80) {
+      return `${move} — this wasn't just a mistake, this was the moment everything unraveled.`;
+    }
+    
+    if (aggression > 85 && tension > 70) {
+      return `${move}! This wasn't just calculation — this was pure defiance.`;
+    }
+    
+    if (hope > 90) {
+      return `${move} — suddenly, the impossible became inevitable.`;
+    }
+    
+    if (tension > 85) {
+      return `${move}... the position crackles with electric tension.`;
+    }
+    
+    if (aggression > 70) {
+      return `${move} — bold, fearless, uncompromising.`;
+    }
+    
+    if (hope > 70) {
+      return `${move} — a glimmer of light in the darkness.`;
+    }
+    
+    const dominantEmotion = Math.max(tension, hope, aggression, collapse);
+    
+    if (dominantEmotion === tension) {
+      return `${move} — the pieces dance on a knife's edge.`;
+    } else if (dominantEmotion === hope) {
+      return `${move} — hope springs eternal on the 64 squares.`;
+    } else if (dominantEmotion === aggression) {
+      return `${move} — striking with purpose and precision.`;
+    } else {
+      return `${move} — sometimes the board tells a story of struggle.`;
     }
   }
 }
