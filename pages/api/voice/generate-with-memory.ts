@@ -3,8 +3,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { BambaiVoiceEngine } from '@/lib/voice/BambaiVoiceEngine';
 import { VoiceMemorySystem } from '@/lib/voice/VoiceMemorySystem';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]';
+// import { getServerSession } from 'next-auth';
+// import { authOptions } from '../auth/[...nextauth]';
 
 const bambai = new BambaiVoiceEngine();
 const memorySystem = new VoiceMemorySystem();
@@ -15,9 +15,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Get user session
-    const session = await getServerSession(req, res, authOptions);
-    const userId = session?.user?.id || 'anonymous';
+    // Get user session (NextAuth disabled for now)
+    // const session = await getServerSession(req, res, authOptions);
+    const userId = 'anonymous';
 
     const { 
       text, 
