@@ -277,4 +277,70 @@ This game showcases ${analysis.analysis.difficultyLevel}-level chess with ${anal
 
     return enhancedContent;
   }
+
+  async analyzeEmotionalContent(pgnString: string): Promise<{
+    brilliantMoves: Array<{ moveNumber: number; san: string; evaluation: number }>;
+    sacrifices: Array<{ moveNumber: number; san: string; material: string }>;
+    blunders: Array<{ moveNumber: number; san: string; evaluation: number }>;
+    comebacks: Array<{ moveNumber: number; evalSwing: number }>;
+    majorBlunders: Array<{ moveNumber: number; san: string; evaluation: number }>;
+    keyPosition: string;
+  }> {
+    const analysis = await this.analyzePGN(pgnString);
+    
+    const brilliantMoves = analysis.moves
+      .filter(move => move.isBrilliant)
+      .map(move => ({
+        moveNumber: move.moveNumber,
+        san: move.san,
+        evaluation: move.evaluation || 0
+      }));
+
+    const sacrifices = analysis.moves
+      .filter(move => move.tacticalTheme === 'sacrifice')
+      .map(move => ({
+        moveNumber: move.moveNumber,
+        san: move.san,
+        material: move.annotation || 'piece'
+      }));
+
+    const blunders = analysis.moves
+      .filter(move => move.isBlunder)
+      .map(move => ({
+        moveNumber: move.moveNumber,
+        san: move.san,
+        evaluation: move.evaluation || 0
+      }));
+
+    const majorBlunders = blunders.filter(blunder => Math.abs(blunder.evaluation) > 5);
+
+    const comebacks = [];
+    for (let i = 1; i < analysis.moves.length; i++) {
+      const prevEval = analysis.moves[i - 1].evaluation || 0;
+      const currEval = analysis.moves[i].evaluation || 0;
+      const evalSwing = Math.abs(currEval - prevEval);
+      
+      if (evalSwing > 3) {
+        comebacks.push({
+          moveNumber: analysis.moves[i].moveNumber,
+          evalSwing
+        });
+      }
+    }
+
+    const keyMoment = analysis.analysis.emotionTimeline
+      .reduce((max, current) => current.intensity > max.intensity ? current : max, 
+              { moveNumber: 1, intensity: 0 });
+    
+    const keyPosition = analysis.moves.find(move => move.moveNumber === keyMoment.moveNumber)?.fen || '';
+
+    return {
+      brilliantMoves,
+      sacrifices,
+      blunders,
+      comebacks,
+      majorBlunders,
+      keyPosition
+    };
+  }
 }
