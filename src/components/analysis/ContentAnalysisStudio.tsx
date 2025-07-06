@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Upload, Download, Settings, BarChart3, FileText, Video, Mic } from 'lucide-react';
-import { ContentAnalysisResult, AnalysisConfig } from '../../lib/analysis/ContentAnalysisPipeline';
+import { ContentAnalysisResult, AnalysisConfig } from '@/lib/analysis/ContentAnalysisPipeline';
 
 interface ContentAnalysisStudioProps {
   onAnalysisComplete?: (result: ContentAnalysisResult) => void;

@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { ContentAnalysisPipeline, AnalysisConfig } from '../../../lib/analysis/ContentAnalysisPipeline';
+import { ContentAnalysisPipeline, AnalysisConfig } from '@/lib/analysis/ContentAnalysisPipeline';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

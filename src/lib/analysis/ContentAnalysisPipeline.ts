@@ -1,4 +1,4 @@
-import { getDb } from '../db';
+import { getDb } from '../db/index';
 import { EmotionHeatmap, EmotionalMove } from './PGNEmotionClassifier';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { BambaiVoiceEngine } from '@/lib/voice/BambaiVoiceEngine';

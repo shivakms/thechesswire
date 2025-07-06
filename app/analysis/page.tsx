@@ -1,6 +1,6 @@
 import React from 'react';
 import { ContentAnalysisStudio } from '../../src/components/analysis/ContentAnalysisStudio';
-import { ContentAnalysisResult } from '../../src/lib/analysis/ContentAnalysisPipeline';
+import { ContentAnalysisResult } from '@/lib/analysis/ContentAnalysisPipeline';
 
 export default function AnalysisPage() {
   return (
