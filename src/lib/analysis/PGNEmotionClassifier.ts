@@ -57,8 +57,12 @@ export class PGNEmotionClassifier {
   private static parsePGNMoves(pgn: string): string[] {
     const moves: string[] = [];
     
-    const limitedPgn = pgn.substring(0, 50);
-    const cleanPgn = limitedPgn.replace(/\{[^}]*\}/g, '').replace(/\([^)]*\)/g, '');
+    if (!pgn || typeof pgn !== 'string' || pgn.length > 50000) {
+      throw new Error('Invalid PGN input - must be string under 50KB');
+    }
+    
+    const limitedPgn = pgn.substring(0, 10000);
+    const cleanPgn = limitedPgn.replace(/\{[^}]{0,200}\}/g, '').replace(/\([^)]{0,200}\)/g, '');
     
     const movePattern = /\b([NBRQK]?[a-h]?[1-8]?x?[a-h][1-8](?:=[NBRQ])?[+#]?)\b/g;
     let match;
