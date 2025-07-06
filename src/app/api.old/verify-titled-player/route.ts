@@ -82,22 +82,26 @@ function getTitleCategory(title: string | null): string | null {
 }
 
 // Helper functions (implement these based on your APIs)
-async function checkFIDEDatabase(fideId: string) {
+async function checkFIDEDatabase(_fideId: string) {
   // Implement FIDE database check
   // Returns: { title: 'GM', name: 'Player Name' } or null
+  return null;
 }
 
-async function checkFIDEByUsername(username: string) {
+async function checkFIDEByUsername(_username: string) {
   // Implement FIDE search by name
   // Returns: { title: 'AGM', name: 'Player Name' } or null
+  return null;
 }
 
-async function checkChessComAPI(username: string) {
+async function checkChessComAPI(_username: string) {
   // Implement Chess.com API check
   // Returns: { title: 'IM', verified: true } or null
+  return null;
 }
 
-async function checkLichessAPI(username: string) {
+async function checkLichessAPI(_username: string) {
   // Implement Lichess API check
   // Returns: { title: 'FM', verified: true } or null
+  return null;
 }

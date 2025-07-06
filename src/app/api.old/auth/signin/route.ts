@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Helper functions
-async function findUserByEmailOrUsername(field: string, value: string) {
+async function findUserByEmailOrUsername(_field: string, _value: string) {
   // In production, query your database
   // Example with Prisma:
   // return await prisma.user.findFirst({
@@ -89,6 +89,7 @@ function generateSessionToken(userId: string): string {
 
 function hashIP(ip: string): string {
   // Hash IP for privacy
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   return require('crypto').createHash('sha256').update(ip).digest('hex');
 }
 
