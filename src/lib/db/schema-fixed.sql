@@ -4,6 +4,148 @@
 -- Enable pgcrypto extension for encryption
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+CREATE TABLE IF NOT EXISTS user_analytics (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  event_type VARCHAR(100),
+  event_data JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS content_analytics (
+  id SERIAL PRIMARY KEY,
+  content_id VARCHAR(255) UNIQUE,
+  content_type VARCHAR(50),
+  views INTEGER DEFAULT 0,
+  engagement INTEGER DEFAULT 0,
+  shares INTEGER DEFAULT 0,
+  avg_watch_time INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS voice_analytics (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  voice_mode VARCHAR(50),
+  duration INTEGER,
+  emotional_tone VARCHAR(50),
+  interaction_type VARCHAR(50),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS premium_usage_analytics (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  feature VARCHAR(100),
+  usage_data JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  stripe_subscription_id VARCHAR(255),
+  stripe_customer_id VARCHAR(255),
+  plan_type VARCHAR(50),
+  status VARCHAR(50),
+  current_period_start TIMESTAMP,
+  current_period_end TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS feature_usage (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  feature VARCHAR(100),
+  usage_amount INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, feature, DATE(created_at))
+);
+
+CREATE TABLE IF NOT EXISTS admin_users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(50) UNIQUE,
+  email VARCHAR(255) UNIQUE,
+  role VARCHAR(20),
+  permissions JSONB,
+  session_token VARCHAR(255),
+  expires_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS admin_action_logs (
+  id SERIAL PRIMARY KEY,
+  admin_id INTEGER REFERENCES admin_users(id),
+  action VARCHAR(255),
+  metadata JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS emotion_annotations (
+  id SERIAL PRIMARY KEY,
+  position_fen TEXT,
+  emotions JSONB,
+  narrative TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ghost_opponents (
+  id SERIAL PRIMARY KEY,
+  ghost_id VARCHAR(255) UNIQUE,
+  name VARCHAR(255),
+  playing_style VARCHAR(100),
+  strengths JSONB,
+  weaknesses JSONB,
+  emotional_profile JSONB,
+  game_history JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS coaching_plans (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) UNIQUE,
+  skill_level VARCHAR(50),
+  focus_areas JSONB,
+  exercises JSONB,
+  progress_tracking JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS soul_scans (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  chess_personality VARCHAR(100),
+  playing_style VARCHAR(100),
+  emotional_patterns JSONB,
+  recommendations JSONB,
+  strengths JSONB,
+  improvement_areas JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS training_exercises (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  exercise_id VARCHAR(255),
+  completed BOOLEAN DEFAULT FALSE,
+  accuracy DECIMAL(5,2),
+  completed_at TIMESTAMP,
+  UNIQUE(user_id, exercise_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_analytics_user_id ON user_analytics(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_analytics_event_type ON user_analytics(event_type);
+CREATE INDEX IF NOT EXISTS idx_user_analytics_created_at ON user_analytics(created_at);
+CREATE INDEX IF NOT EXISTS idx_content_analytics_content_id ON content_analytics(content_id);
+CREATE INDEX IF NOT EXISTS idx_voice_analytics_user_id ON voice_analytics(user_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_stripe_id ON subscriptions(stripe_subscription_id);
+CREATE INDEX IF NOT EXISTS idx_coaching_plans_user_id ON coaching_plans(user_id);
+CREATE INDEX IF NOT EXISTS idx_soul_scans_user_id ON soul_scans(user_id);
+
 -- FIRST: Create the users table
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
