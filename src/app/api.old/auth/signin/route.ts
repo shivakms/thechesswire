@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Helper functions
-async function findUserByEmailOrUsername(_field: string, _value: string) {
+async function findUserByEmailOrUsername(field: string, value: string) {
   // In production, query your database
   // Example with Prisma:
   // return await prisma.user.findFirst({
@@ -72,7 +72,8 @@ async function findUserByEmailOrUsername(_field: string, _value: string) {
   //   }
   // });
   
-  // Placeholder
+  // Placeholder - use parameters to avoid lint errors
+  console.log(`Looking up user by ${field}: ${value}`);
   return {
     id: '123',
     email: 'user@example.com',

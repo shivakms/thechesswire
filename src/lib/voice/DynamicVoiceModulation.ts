@@ -2,12 +2,12 @@
 
 export class DynamicVoiceModulation {
   // Add subtle variations to keep voice feeling alive
-  static addHumanVariation(baseSettings: any): any {
+  static addHumanVariation(baseSettings: Record<string, unknown>): Record<string, unknown> {
     return {
       ...baseSettings,
-      stability: this.varyValue(baseSettings.stability, 0.05),
-      similarity_boost: this.varyValue(baseSettings.similarity_boost, 0.03),
-      style: this.varyValue(baseSettings.style, 0.05)
+      stability: this.varyValue(baseSettings.stability as number, 0.05),
+      similarity_boost: this.varyValue(baseSettings.similarity_boost as number, 0.03),
+      style: this.varyValue(baseSettings.style as number, 0.05)
     };
   }
 

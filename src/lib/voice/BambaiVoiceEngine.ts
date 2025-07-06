@@ -181,7 +181,7 @@ export class BambaiVoiceEngine {
     }
 
     // Add emotional bookends for better flow
-    const bookends = {
+    const bookends: Record<string, { start: string; end: string }> = {
       inspiring: { start: '<break time="500ms"/>', end: '<break time="800ms"/>' },
       dramatic: { start: '<break time="700ms"/>', end: '<break time="1s"/>' },
       whisper: { start: '<break time="400ms"/>', end: '<break time="600ms"/>' }
@@ -260,7 +260,7 @@ export class BambaiVoiceEngine {
     mode: keyof typeof this.voiceProfiles = 'poeticStoryteller'
   ): Promise<Buffer> {
     // Language-specific adjustments
-    const languageAdjustments: Record<string, any> = {
+    const languageAdjustments: Record<string, { style: number; similarity_boost: number }> = {
       'es': { style: 0.5, similarity_boost: 0.7 },
       'fr': { style: 0.4, similarity_boost: 0.75 },
       'hi': { style: 0.45, similarity_boost: 0.8 },
@@ -272,6 +272,8 @@ export class BambaiVoiceEngine {
       ...baseSettings,
       ...(languageAdjustments[language] || {})
     };
+    
+    console.log('Using adjusted settings for language:', language, adjustedSettings);
 
     // Generate with language tag
     const languageText = `<speak><lang xml:lang="${language}">${text}</lang></speak>`;

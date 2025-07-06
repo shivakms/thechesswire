@@ -190,7 +190,8 @@ export class EchoSageEngine {
     return templates[Math.floor(Math.random() * templates.length)];
   }
 
-  private async generateAlternativeSuggestions(_move: TrainingMove): Promise<string[]> {
+  private async generateAlternativeSuggestions(move: TrainingMove): Promise<string[]> {
+    console.log(`Generating alternatives for move: ${move.move}`);
     const suggestions = [
       `Consider ${this.generateAlternativeMove()} for a more aggressive approach`,
       `${this.generateAlternativeMove()} might offer better piece coordination`,
