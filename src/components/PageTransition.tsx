@@ -17,7 +17,8 @@ export default function PageTransition({ children, className = "" }: PageTransit
   const [loadingMessage, setLoadingMessage] = useState("Loading...");
 
   // Determine loader variant and message based on route
-  const getLoaderConfig = (path: string) => {
+  const getLoaderConfig = (path: string | null) => {
+    if (!path) return { variant: 'default' as const, message: "Loading experience..." };
     if (path.startsWith('/replay') || path.startsWith('/analysis')) {
       return { variant: 'chess' as const, message: "Preparing the board..." };
     }
@@ -49,7 +50,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
   // Define different transition styles based on route type
   const transitionConfig = useMemo(() => {
     // Chess-themed transitions for different sections
-    if (pathname.startsWith('/replay') || pathname.startsWith('/analysis')) {
+    if (pathname?.startsWith('/replay') || pathname?.startsWith('/analysis')) {
       return {
         initial: { opacity: 0, scale: 0.95, rotateX: -10, filter: "blur(10px)" },
         animate: { opacity: 1, scale: 1, rotateX: 0, filter: "blur(0px)" },
@@ -58,7 +59,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
       };
     }
     
-    if (pathname.startsWith('/articles')) {
+    if (pathname?.startsWith('/articles')) {
       return {
         initial: { opacity: 0, y: 40, filter: "blur(8px)" },
         animate: { opacity: 1, y: 0, filter: "blur(0px)" },
@@ -67,7 +68,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
       };
     }
 
-    if (pathname.startsWith('/soulcinema')) {
+    if (pathname?.startsWith('/soulcinema')) {
       return {
         initial: { opacity: 0, scale: 1.1, filter: "brightness(0.3) blur(20px)" },
         animate: { opacity: 1, scale: 1, filter: "brightness(1) blur(0px)" },
@@ -76,7 +77,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
       };
     }
 
-    if (pathname.startsWith('/onboarding') || pathname === '/') {
+    if (pathname?.startsWith('/onboarding') || pathname === '/') {
       return {
         initial: { opacity: 0, scale: 0.9, y: 30 },
         animate: { opacity: 1, scale: 1, y: 0 },
@@ -118,17 +119,17 @@ export default function PageTransition({ children, className = "" }: PageTransit
           initial={transitionConfig.initial}
           animate={transitionConfig.animate}
           exit={transitionConfig.exit}
-          transition={transitionConfig.transition}
+          transition={transitionConfig.transition as object}
           style={{
-            background: pathname.startsWith('/replay') 
+            background: pathname?.startsWith('/replay') 
               ? 'radial-gradient(ellipse at center, rgba(139, 69, 19, 0.03) 0%, transparent 70%)'
-              : pathname.startsWith('/soulcinema')
+              : pathname?.startsWith('/soulcinema')
               ? 'radial-gradient(ellipse at center, rgba(64, 224, 208, 0.02) 0%, transparent 70%)'
               : undefined
           }}
         >
           {/* Chess-themed decorative elements for replay pages */}
-          {pathname.startsWith('/replay') && (
+          {pathname?.startsWith('/replay') && (
             <motion.div
               className="absolute inset-0 pointer-events-none overflow-hidden"
               initial={{ opacity: 0 }}
@@ -182,7 +183,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
           )}
 
           {/* SoulCinema film strip effect */}
-          {pathname.startsWith('/soulcinema') && (
+          {pathname?.startsWith('/soulcinema') && (
             <motion.div
               className="absolute inset-0 pointer-events-none overflow-hidden"
               initial={{ opacity: 0 }}
@@ -195,7 +196,7 @@ export default function PageTransition({ children, className = "" }: PageTransit
           )}
 
           {/* Ambient particles for voice/AI pages */}
-          {pathname.startsWith('/echosage') && (
+          {pathname?.startsWith('/echosage') && (
             <motion.div className="absolute inset-0 pointer-events-none">
               {[...Array(5)].map((_, i) => (
                 <motion.div
