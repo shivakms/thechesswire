@@ -174,7 +174,7 @@ export class YouTubeUploader {
   
   private async uploadThumbnail(videoId: string, thumbnailPath: string): Promise<void> {
     try {
-      console.log(`Uploading thumbnail for video ${videoId} from ${thumbnailPath}`);
+      console.log('Uploading thumbnail:', { videoId, thumbnailPath });
       
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -209,7 +209,7 @@ export class YouTubeUploader {
         throw new Error(`Failed to add to playlist: ${response.statusText}`);
       }
       
-      console.log(`Video ${videoId} added to playlist ${playlistId}`);
+      console.log('Video added to playlist:', { videoId, playlistId });
       
     } catch (error) {
       console.error('Failed to add video to playlist:', error);
@@ -222,7 +222,11 @@ export class YouTubeUploader {
     status: YouTubeDocumentary['status'], 
     youtubeId?: string
   ): Promise<void> {
-    console.log(`Updating documentary ${documentaryId} status to ${status}`, youtubeId ? `with YouTube ID: ${youtubeId}` : '');
+    console.log('Updating documentary status:', {
+      documentaryId,
+      status,
+      youtubeId: youtubeId || 'none'
+    });
   }
   
   async getVideoInfo(videoId: string): Promise<any> {
