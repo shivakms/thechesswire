@@ -120,14 +120,14 @@ export function generateSecureToken(length: number = 32): string {
 /**
  * Encrypt object to JSON
  */
-export function encryptObject(obj: any): string {
+export function encryptObject(obj: Record<string, unknown>): string {
   return encrypt(JSON.stringify(obj));
 }
 
 /**
  * Decrypt JSON to object
  */
-export function decryptObject<T = any>(encryptedData: string): T {
+export function decryptObject<T = Record<string, unknown>>(encryptedData: string): T {
   const json = decrypt(encryptedData);
   return JSON.parse(json);
 }
@@ -162,7 +162,7 @@ export function encryptForDb(text: string): string {
 /**
  * Generate session hash for CSRF protection
  */
-export function generateSessionHash(data: any): string {
+export function generateSessionHash(data: Record<string, unknown>): string {
   const payload = JSON.stringify({
     data,
     timestamp: Date.now(),

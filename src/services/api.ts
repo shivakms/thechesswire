@@ -56,7 +56,12 @@ interface SignUpData {
   echoOrigin?: string;
   voiceMode?: string;
   isTitledPlayer?: boolean;
-  titledPlayerData?: any;
+  titledPlayerData?: {
+    title?: string;
+    platform?: string;
+    username?: string;
+    verifiedAt?: string;
+  };
 }
 
 interface SignInData {
