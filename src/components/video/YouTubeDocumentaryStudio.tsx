@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/card';
+import { Badge } from '../ui/badge';
 import { 
   YouTubeDocumentaryGenerator, 
   DocumentaryConfig, 
   YouTubeDocumentary 
-} from '@/lib/video/YouTubeDocumentaryGenerator';
-import { YouTubeUploader, YouTubeUploadResult } from '@/lib/video/YouTubeUploader';
+} from '../../lib/video/YouTubeDocumentaryGenerator';
+import { YouTubeUploader, YouTubeUploadResult } from '../../lib/video/YouTubeUploader';
 
 interface DocumentaryStudioProps {
   onDocumentaryGenerated?: (documentary: YouTubeDocumentary) => void;
@@ -214,7 +214,7 @@ export default function YouTubeDocumentaryStudio({
                     ...prev, 
                     thumbnail: { 
                       ...prev.thumbnail, 
-                      template: e.target.value as DocumentaryConfig['thumbnail']['template']
+                      template: e.target.value as 'dramatic' | 'tactical' | 'endgame' | 'opening'
                     }
                   }))}
                   className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
