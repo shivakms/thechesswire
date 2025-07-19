@@ -11,6 +11,8 @@ export interface User {
   lastLogin: Date;
   ipAddress: string;
   userAgent: string;
+  isPremium?: boolean; // Module 402: Premium membership flag
+  premiumExpiresAt?: Date; // Premium subscription expiry
 }
 
 export interface AuthSession {

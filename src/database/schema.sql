@@ -16,6 +16,8 @@ CREATE TABLE users (
     risk_score INTEGER DEFAULT 0,
     failed_login_attempts INTEGER DEFAULT 0,
     account_locked_until TIMESTAMP,
+    is_premium BOOLEAN DEFAULT FALSE, -- Module 402: Premium membership flag
+    premium_expires_at TIMESTAMP, -- Premium subscription expiry
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
