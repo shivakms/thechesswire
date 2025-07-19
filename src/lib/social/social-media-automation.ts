@@ -435,7 +435,8 @@ class SocialMediaAutomationSystem {
       }
     } catch (error) {
       console.error('Failed to post to platform:', error);
-      await this.updatePostStatus(post.id, 'failed', error.message);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      await this.updatePostStatus(post.id, 'failed', errorMessage);
     }
   }
 

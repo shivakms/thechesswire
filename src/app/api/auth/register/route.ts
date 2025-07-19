@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get client IP and user agent
-    const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Check if user already exists
@@ -66,25 +66,16 @@ export async function POST(request: NextRequest) {
     const newUser = await authService.registerUser({
       email,
       password,
-      firstName,
-      lastName,
       role: role as UserRole,
       ipAddress,
       userAgent
     });
 
-    if (!newUser.success || !newUser.user) {
-      return NextResponse.json(
-        { error: newUser.error || 'Registration failed' },
-        { status: 500 }
-      );
-    }
-
     // Generate JWT tokens
     const tokenPair = JWTService.generateTokenPair(
-      newUser.user.id,
-      newUser.user.email,
-      newUser.user.role
+      newUser.id,
+      newUser.email,
+      newUser.role
     );
 
     // Create response
@@ -92,13 +83,11 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Registration successful',
       user: {
-        id: newUser.user.id,
-        email: newUser.user.email,
-        firstName: newUser.user.firstName,
-        lastName: newUser.user.lastName,
-        role: newUser.user.role,
-        isVerified: newUser.user.isVerified,
-        isActive: newUser.user.isActive
+        id: newUser.id,
+        email: newUser.email,
+        role: newUser.role,
+        isVerified: newUser.isVerified,
+        isActive: newUser.isActive
       },
       tokens: tokenPair
     });
@@ -119,8 +108,8 @@ export async function POST(request: NextRequest) {
     });
 
     console.log('🔐 API Registration successful:', { 
-      email: newUser.user.email, 
-      role: newUser.user.role,
+      email: newUser.email, 
+      role: newUser.role,
       ipAddress 
     });
 

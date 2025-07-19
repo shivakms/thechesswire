@@ -44,6 +44,17 @@ export interface GeneratedVideo {
   errorMessage?: string;
 }
 
+interface Scene {
+  moveNumber: number;
+  move: string;
+  fen: string;
+  duration: number;
+  cameraMovement: string;
+  visualEffect: string;
+  commentary: string | null;
+  musicCue: any;
+}
+
 class SoulCinemaGenerator {
   private themes: VideoTheme[] = [
     {
@@ -194,11 +205,12 @@ class SoulCinemaGenerator {
       console.error('Video generation failed:', error);
       
       // Update video record with error
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       await pool.query(
         `UPDATE soulcinema_videos 
          SET status = 'failed', error_message = $1, completed_at = NOW()
          WHERE id = $2`,
-        [error.message, videoId]
+        [errorMessage, videoId]
       );
 
       // Send error notification
@@ -207,7 +219,7 @@ class SoulCinemaGenerator {
         'error',
         'Video Generation Failed',
         'Sorry, your video generation failed. Please try again.',
-        { videoId, error: error.message }
+        { videoId, error: errorMessage }
       );
     }
   }
@@ -226,14 +238,14 @@ class SoulCinemaGenerator {
       },
       result: game.result,
       theme: theme,
-      scenes: [],
+      scenes: [] as Scene[],
       totalDuration: 0
     };
 
     // Generate scenes for each move
     for (let i = 0; i < moves.length; i++) {
       const move = moves[i];
-      const scene = {
+      const scene: Scene = {
         moveNumber: Math.floor(i / 2) + 1,
         move: move.san,
         fen: move.after,
@@ -375,7 +387,7 @@ class SoulCinemaGenerator {
         [videoId, userId]
       );
 
-      return result.rowCount > 0;
+      return (result.rowCount ?? 0) > 0;
     } catch (error) {
       console.error('Failed to delete video:', error);
       return false;

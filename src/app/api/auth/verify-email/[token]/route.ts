@@ -45,7 +45,7 @@ export async function GET(
         [
           result.rows[0].id,
           'email_verified',
-          request.ip || 'unknown',
+          request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
           request.headers.get('user-agent') || 'unknown',
           JSON.stringify({ email: result.rows[0].email })
         ]

@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if token has expired (24 hours)
-    const tokenAge = Date.now() - (decoded.iat * 1000);
+    const tokenAge = Date.now() - ((decoded.iat || 0) * 1000);
     const maxAge = 24 * 60 * 60 * 1000; // 24 hours
 
     if (tokenAge > maxAge) {
@@ -76,20 +76,15 @@ export async function POST(request: NextRequest) {
     );
 
     // Send welcome email
-    try {
-      await sendEmail({
-        to: user.email,
-        subject: 'Welcome to TheChessWire! 🎉',
-        template: 'welcome',
-        data: {
-          username: user.email.split('@')[0],
-          loginUrl: `${process.env.NEXT_PUBLIC_APP_URL}/auth/gateway`
-        }
-      });
-    } catch (emailError) {
-      console.error('Failed to send welcome email:', emailError);
-      // Don't fail the verification if email fails
-    }
+    const welcomeHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #6366f1;">Welcome to TheChessWire! 🎉</h1>
+        <p>Hello ${user.email.split('@')[0]},</p>
+        <p>Welcome to the most secure, intelligent, and visionary chess journalism platform!</p>
+        <p>Best regards,<br>TheChessWire.news Team</p>
+      </div>
+    `;
+    await sendEmail(user.email, 'Welcome to TheChessWire! 🎉', welcomeHtml);
 
     // Log the verification event
     await pool.query(
@@ -99,7 +94,7 @@ export async function POST(request: NextRequest) {
         'email_verified',
         JSON.stringify({
           verified_at: new Date().toISOString(),
-          ip: request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+          ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
         })
       ]
     );
@@ -154,7 +149,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if token has expired
-    const tokenAge = Date.now() - (decoded.iat * 1000);
+    const tokenAge = Date.now() - ((decoded.iat || 0) * 1000);
     const maxAge = 24 * 60 * 60 * 1000; // 24 hours
 
     if (tokenAge > maxAge) {

@@ -81,10 +81,20 @@ export const SECURITY_HEADERS = {
 };
 
 // Sanctioned countries (example list)
-const TOR_EXIT_NODES = [
+const TOR_EXIT_NODES: string[] = [
   // This would be populated with actual TOR exit node IPs
   // For now, we'll use a placeholder
 ];
+
+function getClientIP(request: NextRequest): string {
+  return (
+    request.headers.get('x-forwarded-for') ||
+    request.headers.get('x-real-ip') ||
+    request.headers.get('cf-connecting-ip') ||
+    request.headers.get('x-client-ip') ||
+    'unknown'
+  );
+}
 
 export async function validateRequest(request: NextRequest): Promise<SecurityResult> {
   const ip = getClientIP(request);

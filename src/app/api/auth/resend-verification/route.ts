@@ -10,10 +10,6 @@ const pool = new Pool({
 
 // Rate limiter for resend verification requests
 const resendLimiter = new RateLimiterMemory({
-  keyGenerator: (req: NextRequest) => {
-    const email = req.body?.email || 'unknown';
-    return `resend_verification:${email}`;
-  },
   points: 3, // 3 attempts
   duration: 3600, // per hour
 });
@@ -31,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     // Check rate limiting
     try {
-      await resendLimiter.consume(request);
+      await resendLimiter.consume(email);
     } catch (error) {
       return NextResponse.json(
         { error: 'rate_limited', message: 'Too many verification requests. Please wait an hour before trying again.' },
@@ -88,17 +84,21 @@ export async function POST(request: NextRequest) {
 
     // Send verification email
     try {
-      await sendEmail({
-        to: user.email,
-        subject: 'Verify Your Email - TheChessWire',
-        template: 'email-verification',
-        data: {
-          username: user.email.split('@')[0],
-          verificationUrl,
-          expiresIn: '24 hours',
-          supportEmail: process.env.SUPPORT_EMAIL || 'support@thechesswire.news'
-        }
-      });
+      const emailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #6366f1;">Verify Your Email - TheChessWire</h1>
+          <p>Hello ${user.email.split('@')[0]},</p>
+          <p>Please verify your email address to complete your registration.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationUrl}" style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Verify Email</a>
+          </div>
+          <p>This link will expire in 24 hours.</p>
+          <p>If you didn't create an account, you can safely ignore this email.</p>
+          <p>Best regards,<br>TheChessWire.news Team</p>
+        </div>
+      `;
+      
+      await sendEmail(user.email, 'Verify Your Email - TheChessWire', emailHtml);
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError);
       return NextResponse.json(
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
         user.id,
         'verification_resent',
         JSON.stringify({
-          ip: request.ip || request.headers.get('x-forwarded-for') || 'unknown',
+          ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
           user_agent: request.headers.get('user-agent') || 'unknown'
         })
       ]

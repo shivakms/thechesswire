@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if token has expired (1 hour)
-    const tokenAge = Date.now() - (decoded.iat * 1000);
+    const tokenAge = Date.now() - ((decoded.iat || 0) * 1000);
     const maxAge = 60 * 60 * 1000; // 1 hour
 
     if (tokenAge > maxAge) {

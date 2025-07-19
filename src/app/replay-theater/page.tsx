@@ -128,16 +128,17 @@ export default function ReplayTheaterPage() {
         });
       });
 
+      const headers = newChess.header();
       const game: Game = {
         id: Date.now().toString(),
-        title: `${newChess.header('White')} vs ${newChess.header('Black')}`,
+        title: `${headers.White || 'Unknown'} vs ${headers.Black || 'Unknown'}`,
         players: {
-          white: newChess.header('White') || 'Unknown',
-          black: newChess.header('Black') || 'Unknown'
+          white: headers.White || 'Unknown',
+          black: headers.Black || 'Unknown'
         },
-        result: newChess.header('Result') || '*',
-        date: newChess.header('Date') || new Date().toISOString().split('T')[0],
-        event: newChess.header('Event') || 'Unknown Event',
+        result: headers.Result || '*',
+        date: headers.Date || new Date().toISOString().split('T')[0],
+        event: headers.Event || 'Unknown Event',
         moves
       };
 
@@ -430,7 +431,7 @@ export default function ReplayTheaterPage() {
                 </label>
                 <select
                   value={narrationMode}
-                  onChange={(e) => setNarrationMode(e.target.value as any)}
+                  onChange={(e) => setNarrationMode(e.target.value as 'calm' | 'expressive' | 'dramatic')}
                   className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
                 >
                   <option value="calm">Calm</option>

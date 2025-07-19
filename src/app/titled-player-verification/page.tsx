@@ -163,7 +163,7 @@ export default function TitledPlayerVerificationPage() {
             formData.append('documents', doc);
           });
         } else if (key === 'selfie' && value) {
-          formData.append('selfie', value);
+          formData.append('selfie', value as File);
         } else if (key !== 'documents' && key !== 'selfie') {
           formData.append(key, value as string);
         }
