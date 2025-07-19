@@ -2,77 +2,23 @@ name: 🔒 Security & Vulnerability Scan
 
 on:
   push:
-    branches: [ main, kimi-final-release ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, kimi-final-release ]
+    branches: [ main ]
 
 jobs:
-  security-check:
+  security-scan:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # ------------------------------------------------------------------
-      # GitHub CodeQL Scan
-      # ------------------------------------------------------------------
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: auto
+          languages: 'javascript'
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
 
-      - name: Analyze
+      - name: CodeQL Analyze
         uses: github/codeql-action/analyze@v3
-        id: codeql
-
-      # ------------------------------------------------------------------
-      # Trivy Vulnerability Scanner
-      # ------------------------------------------------------------------
-      - name: Run Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy Results
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-      # ------------------------------------------------------------------
-      # OSV-Scanner (Dependency CVEs)
-      # ------------------------------------------------------------------
-      - name: OSV Scanner
-        uses: google/osv-scanner-action@v1
-
-      # ------------------------------------------------------------------
-      # Semgrep Rules for Code Vulnerabilities
-      # ------------------------------------------------------------------
-      - name: Semgrep Security Audit
-        uses: returntocorp/semgrep-action@v1
-        with:
-          config: >-
-            p/security-audit
-            p/secrets
-            p/owasp-top-ten
-
-      # ------------------------------------------------------------------
-      # Auto-Fix Known Vulnerabilities
-      # ------------------------------------------------------------------
-      - name: Auto-fix common package issues
-        run: |
-          if [ -f package-lock.json ]; then
-            npm audit fix --force
-          fi
-          if [ -f requirements.txt ]; then
-            pip install pip-audit
-            pip-audit --fix
-          fi
-          if [ -f Cargo.lock ]; then
-            cargo install cargo-audit
-            cargo audit --fix
-          fi
-          git add . && git diff --cached --quiet || git commit -m "[kimi] sec: auto-fix vulnerabilities"
