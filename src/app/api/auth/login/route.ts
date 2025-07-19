@@ -1,100 +1,79 @@
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-
-// Mock database connection - replace with actual database
-const mockUsers = [
-  {
-    id: 1,
-    email: 'test@example.com',
-    password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-    firstName: 'Test',
-    lastName: 'User',
-    username: 'testuser',
-    age: 25,
-    emailVerified: true,
-    createdAt: new Date(),
-  }
-];
+import { authService } from '@/lib/auth/auth';
+import { JWTService } from '@/lib/auth/jwt';
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
-    // Validate input
     if (!email || !password) {
       return NextResponse.json(
-        { message: 'Email and password are required' },
+        { error: 'Email and password are required' },
         { status: 400 }
       );
     }
 
-    // Find user by email
-    const user = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (!user) {
+    // Get client IP and user agent
+    const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+
+    // Authenticate user
+    const result = await authService.login(email, password, ipAddress, userAgent);
+
+    if (!result.success || !result.user || !result.token) {
       return NextResponse.json(
-        { message: 'Invalid email or password' },
+        { error: result.error || 'Authentication failed' },
         { status: 401 }
       );
     }
 
-    // Verify password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    
-    if (!isValidPassword) {
-      return NextResponse.json(
-        { message: 'Invalid email or password' },
-        { status: 401 }
-      );
-    }
-
-    // Check if email is verified
-    if (!user.emailVerified) {
-      return NextResponse.json(
-        { message: 'Please verify your email before logging in' },
-        { status: 401 }
-      );
-    }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { 
-        userId: user.id, 
-        email: user.email,
-        username: user.username 
-      },
-      process.env.JWT_SECRET || 'fallback-secret',
-      { expiresIn: '7d' }
+    // Generate JWT tokens
+    const tokenPair = JWTService.generateTokenPair(
+      result.user.id,
+      result.user.email,
+      result.user.role
     );
 
     // Create response
     const response = NextResponse.json({
-      message: 'Login successful',
+      success: true,
       user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        username: user.username,
+        id: result.user.id,
+        email: result.user.email,
+        role: result.user.role,
+        isVerified: result.user.isVerified,
+        isActive: result.user.isActive
       },
-      token
+      tokens: tokenPair
     });
 
-    // Set HTTP-only cookie
-    response.cookies.set('authToken', token, {
+    // Set HTTP-only cookies for security
+    response.cookies.set('auth_token', tokenPair.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: tokenPair.expiresIn / 1000 // Convert to seconds
+    });
+
+    response.cookies.set('refresh_token', tokenPair.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 // 7 days in seconds
+    });
+
+    console.log('🔐 API Login successful:', { 
+      email: result.user.email, 
+      role: result.user.role,
+      ipAddress 
     });
 
     return response;
 
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('❌ API Login error:', error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
