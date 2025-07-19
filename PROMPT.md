@@ -31,7 +31,7 @@ Replace `app/page.tsx` completely with a working, production-grade version.
 - Rebuild the homepage (`/app/page.tsx`) with visually impressive storytelling and voice-first experience
 - Ensure ElevenLabs female voice is used for all narration via the backend `.env` API key
 - Complete Replay Theater, EchoSage, and SoulCinema hooks on homepage
-- All components must be production-secure, mobile-friendly, and performance-optimized
+- All components must be production-secure, responsive, and performance-optimized
 
 ## REQUIREMENTS
 - Use framer-motion for animated elements
@@ -102,22 +102,19 @@ Fully secured with industry best practices (e.g., HTTPS, WAF, token-based auth, 
 No third-party vulnerabilities allowed (e.g., outdated libraries or unsafe dependencies)
 Infrastructure hardened (EC2, RDS, S3, IAM roles, rate limiting, etc.)
 Performance-optimized with SSR, CDN, lazy-loading, and caching
-Fast on mobile — ensure bundle sizes, memory usage, and animations do not affect smooth UX
+Fast performance — ensure bundle sizes, memory usage, and animations do not affect smooth UX
 Zero security compromise allowed in favor of faster delivery or lower cost
 
 All deployments must pass a security review checklist and stress testing benchmark.
 📊 Performance Requirements
 
-Web and Mobile apps must maintain:
+Web must maintain:
 
 First Contentful Paint: < 500ms globally
 Load time: < 1.5 seconds (global average)
 Time to Interactive: < 1.5s on 3G
 Lighthouse Performance score: 100 across all metrics
 TTFB: < 200ms from Cloudflare edge
-Mobile app size: < 50MB initial download
-
-
 
 🛡️ Security Mandate
 
@@ -153,7 +150,7 @@ This platform must be category-defining, featuring:
 🌐 World-class architecture
 🔐 Quantum-level security
 🧠 Human-like AI storytelling via Bambai AI
-📱 Mobile-native, Web/Android/iOS ready
+🌐 Web-native, responsive design ready
 🎨 Visually stunning design
 ♟️ Internationally respected chess analysis
 🚫 Immune to current and future manipulation
@@ -184,7 +181,7 @@ Basic EchoSage training (limited sessions)
 Basic emotional analysis and EchoRank
 Article reading with basic voice narration
 Community features and discussions
-Mobile access and basic features
+Web access and basic features
 Chess ASMR Mode (limited sessions)
 Basic Chess Meme Generator
 Voice-Only Chess Mode (limited daily use)
@@ -319,7 +316,6 @@ ALL CODE MUST BE AWS-DEPLOYMENT READY:
 ✅ AWS RDS PostgreSQL
 ✅ Node.js + TypeScript
 ✅ Next.js App Router or Express APIs
-✅ React Native with Expo for mobile
 ✅ Edge Computing with Cloudflare Workers
 ✅ WebAssembly Chess Engine
 ❌ No Vercel serverless
@@ -398,23 +394,15 @@ Module 338: Progressive Chess Loading - Core Infrastructure
 Module 339: Global CDN Chess State - Core Infrastructure
 Module 340: Quantum-Ready Architecture - Core Infrastructure
 
-Modules 341-345: Revolutionary Mobile Features
+Modules 341-345: Next-Gen Monetization
 
-Module 341: Chess Gesture Language - FREE
-Module 342: AR Board Overlay - PREMIUM
-Module 343: Voice-Only Chess Mode - FREE (limited) / PREMIUM (unlimited)
-Module 344: Chess Fitness Tracker - PREMIUM
-Module 345: Proximity Chess Battles - PREMIUM
+Module 341: Chess NFT Brilliancies - PREMIUM (10% commission)
+Module 342: AI Chess Betting (Legal) - PREMIUM
+Module 343: Corporate Chess Training - ENTERPRISE ($999/month)
+Module 344: Chess Therapy Licensing - ENTERPRISE ($499/month)
+Module 345: Metaverse Chess Arenas - PREMIUM
 
-Modules 346-350: Next-Gen Monetization
-
-Module 346: Chess NFT Brilliancies - PREMIUM (10% commission)
-Module 347: AI Chess Betting (Legal) - PREMIUM
-Module 348: Corporate Chess Training - ENTERPRISE ($999/month)
-Module 349: Chess Therapy Licensing - ENTERPRISE ($499/month)
-Module 350: Metaverse Chess Arenas - PREMIUM
-
-Modules 351-355: Titled Player Revenue Sharing System
+Modules 346-350: Titled Player Revenue Sharing System
 
 Module 351: Tiered Revenue Sharing Engine - Core System
 
@@ -471,7 +459,6 @@ Filters (date, rating, title type)
 Auto-complete suggestions
 Search history
 Saved searches
-Mobile responsive search
 
 
 Module 382: Communication & Notification Hub - FREE
@@ -682,10 +669,7 @@ Performance Benchmarks:
 < 500ms First Contentful Paint
 < 1.5 second load times globally
 100 Lighthouse score
-Mobile-first design
 Progressive enhancement
-60fps minimum animations
-< 50MB mobile app size
 
 Automation Requirements:
 
@@ -695,16 +679,6 @@ Self-healing infrastructure
 Predictive scaling
 Automated legal compliance
 AI content moderation with 99.9% accuracy
-
-Mobile-Specific Features:
-
-React Native with Hermes optimization
-Native module integration
-Background chess analysis
-Push notification coaching
-Haptic feedback
-AR/VR support
-Offline-first architecture
 
 Security Requirements:
 
