@@ -388,6 +388,19 @@ class AuthService {
     
     return { success: true };
   }
+
+  private mapUserFromDB(row: any): User {
+    return {
+      id: row.id,
+      email: row.email,
+      role: row.role as UserRole,
+      isVerified: row.is_verified ?? true,
+      isActive: row.is_active ?? true,
+      lastLogin: row.last_login ? new Date(row.last_login) : new Date(),
+      ipAddress: row.ip_address || '',
+      userAgent: row.user_agent || ''
+    };
+  }
 }
 
 // Create singleton instance

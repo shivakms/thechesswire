@@ -73,7 +73,9 @@ export default function PGNAnalysis() {
       const text = await file.text();
       const chess = new Chess();
       
-      if (!chess.loadPgn(text)) {
+      try {
+        chess.loadPgn(text);
+      } catch (e) {
         throw new Error('Invalid PGN format');
       }
 
@@ -105,16 +107,16 @@ export default function PGNAnalysis() {
 
       const gameAnalysis: GameAnalysis = {
         moves: analyzedMoves,
-        result: chess.header('Result') || '*',
-        whitePlayer: chess.header('White') || 'Unknown',
-        blackPlayer: chess.header('Black') || 'Unknown',
-        event: chess.header('Event') || 'Unknown Event',
-        site: chess.header('Site') || 'Unknown Site',
-        date: chess.header('Date') || 'Unknown Date',
-        opening: chess.header('Opening') || 'Unknown Opening',
-        eco: chess.header('ECO') || '',
-        timeControl: chess.header('TimeControl') || '',
-        termination: chess.header('Termination') || ''
+        result: gameInfo.Result || '*',
+        whitePlayer: gameInfo.White || 'Unknown',
+        blackPlayer: gameInfo.Black || 'Unknown',
+        event: gameInfo.Event || 'Unknown Event',
+        site: gameInfo.Site || 'Unknown Site',
+        date: gameInfo.Date || 'Unknown Date',
+        opening: gameInfo.Opening || 'Unknown Opening',
+        eco: gameInfo.ECO || '',
+        timeControl: gameInfo.TimeControl || '',
+        termination: gameInfo.Termination || ''
       };
 
       setGame(chess);

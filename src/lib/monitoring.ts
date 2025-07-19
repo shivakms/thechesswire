@@ -128,12 +128,13 @@ class MonitoringSystem {
         }
       });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       this.healthChecks.set('database', {
         name: 'Database Connection',
         status: 'unhealthy',
         responseTime: Date.now() - startTime,
         lastChecked: new Date(),
-        details: { error: error.message }
+        details: { error: errorMessage }
       });
       
       await this.createAlert('critical', 'Database Connection Failed', 'Database is not responding');
@@ -171,12 +172,13 @@ class MonitoringSystem {
           }
         });
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         this.healthChecks.set(service.name, {
           name: `${service.name} API`,
           status: 'unhealthy',
           responseTime: Date.now() - startTime,
           lastChecked: new Date(),
-          details: { error: error.message }
+          details: { error: errorMessage }
         });
         
         await this.createAlert('high', `${service.name} API Down`, `Service is not responding`);
@@ -214,12 +216,13 @@ class MonitoringSystem {
           }
         });
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         this.healthChecks.set(dep.name, {
           name: `${dep.name} API`,
           status: 'unhealthy',
           responseTime: Date.now() - startTime,
           lastChecked: new Date(),
-          details: { error: error.message }
+          details: { error: errorMessage }
         });
         
         await this.createAlert('medium', `${dep.name} API Unavailable`, `External dependency is down`);
@@ -257,12 +260,13 @@ class MonitoringSystem {
         await this.createAlert('medium', 'High Memory Usage', `Memory usage is at ${memoryUsagePercent.toFixed(1)}%`);
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       this.healthChecks.set('system-resources', {
         name: 'System Resources',
         status: 'unhealthy',
         responseTime: Date.now() - startTime,
         lastChecked: new Date(),
-        details: { error: error.message }
+        details: { error: errorMessage }
       });
     }
   }
@@ -280,43 +284,45 @@ class MonitoringSystem {
         this.recordPerformanceMetric('api_response_time', responseTime, {
           url: typeof args[0] === 'string' ? args[0] : 'unknown',
           method: args[1]?.method || 'GET',
-          status: response.status
+          status: response.status.toString()
         });
         
         return response;
       } catch (error) {
         const responseTime = Date.now() - startTime;
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         this.recordPerformanceMetric('api_error_time', responseTime, {
           url: typeof args[0] === 'string' ? args[0] : 'unknown',
           method: args[1]?.method || 'GET',
-          error: error.message
+          error: errorMessage
         });
         throw error;
       }
     };
 
     // Monitor database query performance
-    const originalQuery = pool.query;
-    pool.query = async (...args) => {
-      const startTime = Date.now();
-      try {
-        const result = await originalQuery.apply(pool, args);
-        const queryTime = Date.now() - startTime;
+    // const originalQuery = pool.query;
+    // pool.query = async (...args: any[]) => {
+    //   const startTime = Date.now();
+    //   try {
+    //     const result = await originalQuery.apply(pool, args);
+    //     const queryTime = Date.now() - startTime;
         
-        this.recordPerformanceMetric('database_query_time', queryTime, {
-          query: typeof args[0] === 'string' ? args[0].substring(0, 50) : 'unknown'
-        });
+    //     this.recordPerformanceMetric('database_query_time', queryTime, {
+    //       query: typeof args[0] === 'string' ? args[0].substring(0, 50) : 'unknown'
+    //     });
         
-        return result;
-      } catch (error) {
-        const queryTime = Date.now() - startTime;
-        this.recordPerformanceMetric('database_error_time', queryTime, {
-          query: typeof args[0] === 'string' ? args[0].substring(0, 50) : 'unknown',
-          error: error.message
-        });
-        throw error;
-      }
-    };
+    //     return result;
+    //   } catch (error) {
+    //     const queryTime = Date.now() - startTime;
+    //     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    //     this.recordPerformanceMetric('database_error_time', queryTime, {
+    //       query: typeof args[0] === 'string' ? args[0].substring(0, 50) : 'unknown',
+    //       error: errorMessage
+    //     });
+    //     throw error;
+    //   }
+    // };
   }
 
   // Error Tracking

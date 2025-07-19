@@ -17,14 +17,14 @@ export async function GET(request: NextRequest) {
     // Verify JWT token
     const verification = JWTService.verifyToken(token);
 
-    if (!verification.valid || !verification.payload) {
+    if (!verification) {
       return NextResponse.json(
-        { error: verification.error || 'Invalid token' },
+        { error: 'Invalid token' },
         { status: 401 }
       );
     }
 
-    const { userId, email, role } = verification.payload;
+    const { userId, email, role } = verification;
 
     // Get additional user info from auth service
     const user = await authService.getUserById(userId);
@@ -55,8 +55,8 @@ export async function GET(request: NextRequest) {
         lastLogin: user.lastLogin
       },
       token: {
-        expiresIn: verification.payload.exp,
-        issuedAt: verification.payload.iat
+        expiresIn: verification.exp,
+        issuedAt: verification.iat
       }
     });
 

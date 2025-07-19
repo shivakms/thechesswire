@@ -13,7 +13,7 @@ const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
 const MAX_REQUESTS_PER_HOUR = 100;
 
 export async function rateLimit(request: NextRequest): Promise<RateLimitResult> {
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
   const now = Date.now();
   
   const key = `rate_limit:${ip}`;

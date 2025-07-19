@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if token has expired (1 hour)
-    const tokenAge = Date.now() - (decoded.iat * 1000);
+    const tokenAge = Date.now() - ((decoded.iat || 0) * 1000);
     const maxAge = 60 * 60 * 1000; // 1 hour
 
     if (tokenAge > maxAge) {
@@ -92,27 +92,25 @@ export async function POST(request: NextRequest) {
         user.id,
         'password_reset',
         JSON.stringify({
-          ip: request.ip || request.headers.get('x-forwarded-for') || 'unknown',
+          ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
           user_agent: request.headers.get('user-agent') || 'unknown',
           reset_method: 'email_token'
         })
       ]
     );
 
-    // Send password change notification email
+    // Send password changed notification
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #6366f1;">Password Changed - TheChessWire</h1>
+        <p>Hello ${user.email.split('@')[0]},</p>
+        <p>Your password was successfully changed. If you did not perform this action, please contact support immediately.</p>
+        <p>Best regards,<br>TheChessWire.news Team</p>
+      </div>
+    `;
     try {
       const { sendEmail } = await import('@/lib/email');
-      await sendEmail({
-        to: user.email,
-        subject: 'Password Changed - TheChessWire',
-        template: 'password-changed',
-        data: {
-          username: user.email.split('@')[0],
-          changedAt: new Date().toISOString(),
-          ip: request.ip || request.headers.get('x-forwarded-for') || 'unknown',
-          supportEmail: process.env.SUPPORT_EMAIL || 'support@thechesswire.news'
-        }
-      });
+      await sendEmail(user.email, 'Password Changed - TheChessWire', emailHtml);
     } catch (emailError) {
       console.error('Failed to send password change notification:', emailError);
       // Don't fail the reset if email fails

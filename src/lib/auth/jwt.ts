@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { NextRequest } from 'next/server';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
@@ -16,8 +16,8 @@ export interface JWTPayload {
 export class JWTService {
   private static secret = JWT_SECRET;
 
-  static sign(payload: Omit<JWTPayload, 'iat' | 'exp'>, expiresIn: string = JWT_EXPIRES_IN): string {
-    return jwt.sign(payload, this.secret, { expiresIn });
+  static sign(payload: Omit<JWTPayload, 'iat' | 'exp'>, expiresIn: import('jsonwebtoken').SignOptions['expiresIn'] = '24h'): string {
+    return jwt.sign(payload, JWT_SECRET, { expiresIn });
   }
 
   static verify(token: string): JWTPayload | null {
@@ -48,7 +48,11 @@ export class JWTService {
       type: 'refresh'
     }, '7d');
 
-    return { accessToken, refreshToken };
+    return { 
+      accessToken, 
+      refreshToken,
+      expiresIn: 15 * 60 * 1000 // 15 minutes in milliseconds
+    };
   }
 
   static decode(token: string): JWTPayload | null {
@@ -70,7 +74,7 @@ export class JWTService {
 }
 
 // Legacy function exports for backward compatibility
-export function signJWT(payload: Omit<JWTPayload, 'iat' | 'exp'>, expiresIn: string = JWT_EXPIRES_IN): string {
+export function signJWT(payload: Omit<JWTPayload, 'iat' | 'exp'>, expiresIn: import('jsonwebtoken').SignOptions['expiresIn'] = '24h'): string {
   return JWTService.sign(payload, expiresIn);
 }
 

@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get client IP and user agent
-    const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ipAddress = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Authenticate user

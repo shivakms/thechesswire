@@ -132,15 +132,15 @@ export default function EnhancedPGNAnalysis() {
       tempGame.move(move);
       
       // Calculate evaluation (simplified - in production, use a chess engine)
-      const eval = calculatePositionEvaluation(tempGame);
-      evaluation.push(eval);
+      const moveEvaluation = calculatePositionEvaluation(tempGame);
+      evaluation.push(moveEvaluation);
       
       gameMoves.push({
         move: move.san,
         san: move.san,
         fen: tempGame.fen(),
-        evaluation: eval,
-        comment: generateMoveComment(move, eval, i)
+        evaluation: moveEvaluation,
+        comment: generateMoveComment(move, moveEvaluation, i)
       });
     }
 
@@ -491,7 +491,7 @@ export default function EnhancedPGNAnalysis() {
                   {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                 </button>
                 <button
-                  onClick={() => goToMove(Math.min(analysis?.moves.length - 1 || 0, currentMoveIndex + 1))}
+                  onClick={() => goToMove(Math.min((analysis?.moves?.length || 1) - 1, currentMoveIndex + 1))}
                   className="p-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
                   title="Next Move"
                 >

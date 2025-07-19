@@ -326,6 +326,7 @@ class AdvancedEchoSageCoaching {
       timeLimit: 300, // 5 minutes
       points: 100,
       completed: false,
+      correct: false,
       timeSpent: 0,
       attempts: 0
     };
@@ -366,6 +367,11 @@ class AdvancedEchoSageCoaching {
   ): Promise<Feedback> {
     try {
       const session = await this.getTrainingSession(sessionId);
+      
+      if (!session) {
+        throw new Error('Training session not found');
+      }
+      
       const exercise = session.exercises.find(e => e.id === exerciseId);
       
       if (!exercise) {

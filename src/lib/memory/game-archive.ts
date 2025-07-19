@@ -364,7 +364,7 @@ class GameArchiveSystem {
     if (analysis.blunders > 2) {
       weaknesses.push({
         id: crypto.randomUUID(),
-        category: 'tactics',
+        category: 'middlegame',
         description: 'Too many blunders in games',
         severity: analysis.blunders > 5 ? 'critical' : 'high',
         frequency: 1,

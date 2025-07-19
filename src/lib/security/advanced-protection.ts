@@ -141,7 +141,7 @@ class AdvancedSecuritySystem {
   }
 
   async checkRequest(req: NextRequest): Promise<{ allowed: boolean; reason?: string; riskScore: number }> {
-    const ip = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+    const ip = getClientIP(req);
     const userAgent = req.headers.get('user-agent') || '';
     const country = req.headers.get('cf-ipcountry') || req.headers.get('x-country') || 'unknown';
 
@@ -156,7 +156,7 @@ class AdvancedSecuritySystem {
 
     // 1. Check rate limiting
     try {
-      await rateLimiters.ip.consume(ip);
+      await apiLimiter.consume(ip);
     } catch (error) {
       await this.logSecurityEvent({
         ...securityEvent,

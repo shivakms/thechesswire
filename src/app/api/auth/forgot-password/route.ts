@@ -12,9 +12,11 @@ const forgotPasswordLimiter = new RateLimiterMemory({
 });
 
 export async function POST(request: NextRequest) {
+  // Get client IP for security logging
+  const clientIP = request.headers.get('x-forwarded-for') || 'unknown';
+  
   try {
     // Rate limiting
-    const clientIP = request.headers.get('x-forwarded-for') || 'unknown';
     try {
       await forgotPasswordLimiter.consume(clientIP);
     } catch (rateLimitError) {

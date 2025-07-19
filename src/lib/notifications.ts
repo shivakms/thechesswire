@@ -129,12 +129,27 @@ class NotificationSystem {
       // Get user preferences
       const preferences = await this.getUserPreferences(userId);
       
+      // Map notification type to preference key
+      const typeToPrefKey: Record<string, keyof typeof preferences.email> = {
+        error: 'system',
+        system: 'system',
+        info: 'system',
+        warning: 'system',
+        success: 'system',
+        achievement: 'achievements',
+        achievements: 'achievements',
+        game: 'games',
+        games: 'games',
+        news: 'news',
+        marketing: 'marketing'
+      };
+      const prefKey = typeToPrefKey[type] || 'system';
       // Send notifications based on preferences
-      if (options?.sendEmail !== false && preferences.email[type]) {
+      if (options?.sendEmail !== false && preferences.email[prefKey]) {
         await this.sendEmailNotification(userId, type, title, message, data);
       }
 
-      if (options?.sendPush !== false && preferences.push[type]) {
+      if (options?.sendPush !== false && preferences.push[prefKey]) {
         await this.sendPushNotification(userId, type, title, message, data);
       }
 
@@ -375,19 +390,10 @@ class NotificationSystem {
         const renderedHtml = this.renderTemplate(template.htmlTemplate, data);
         const renderedText = this.renderTemplate(template.textTemplate, data);
 
-        await sendEmail({
-          to: userEmail,
-          subject: renderedSubject,
-          html: renderedHtml,
-          text: renderedText
-        });
+        await sendEmail(userEmail, renderedSubject, renderedHtml, renderedText);
       } else {
         // Fallback to simple email
-        await sendEmail({
-          to: userEmail,
-          subject: title,
-          text: message
-        });
+        await sendEmail(userEmail, title, message);
       }
 
       // Mark email as sent
