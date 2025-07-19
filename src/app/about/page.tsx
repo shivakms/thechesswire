@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Heart, Chess, Brain, Shield, Users, Award, Globe, Zap } from 'lucide-react';
+import { Heart, Gamepad2, Brain, Shield, Users, Award, Globe, Zap } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AboutPage() {
@@ -12,7 +12,7 @@ export default function AboutPage() {
       description: 'Advanced chess analysis powered by cutting-edge artificial intelligence'
     },
     {
-      icon: <Chess className="w-8 h-8" />,
+              icon: <Gamepad2 className="w-8 h-8" />,
       title: 'Cinematic Storytelling',
       description: 'Transform chess games into emotional, cinematic experiences'
     },

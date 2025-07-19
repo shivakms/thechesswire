@@ -5,16 +5,81 @@ interface SecurityResult {
   reason?: string;
 }
 
-// Sanctioned countries (example list)
-const SANCTIONED_COUNTRIES = [
-  'IR', // Iran
-  'KP', // North Korea
-  'CU', // Cuba
-  'SY', // Syria
-  'VE', // Venezuela
-];
+// Security utilities for TheChessWire.news
 
-// Known TOR exit node IPs (example)
+// Sanctioned countries list (example)
+const SANCTIONED_COUNTRIES = ['XX', 'YY', 'ZZ'];
+
+// Rate limiting configuration
+export const RATE_LIMITS = {
+  login: { windowMs: 15 * 60 * 1000, max: 5 }, // 5 attempts per 15 minutes
+  register: { windowMs: 60 * 60 * 1000, max: 3 }, // 3 attempts per hour
+  api: { windowMs: 60 * 1000, max: 100 }, // 100 requests per minute
+  voice: { windowMs: 60 * 1000, max: 10 }, // 10 voice requests per minute
+};
+
+// Security event logging
+export function logSecurityEvent(event: string, details: any, ip?: string) {
+  const timestamp = new Date().toISOString();
+  const referer = typeof window !== 'undefined' ? window.location.href : 'server-side';
+  
+  const logEntry = {
+    timestamp,
+    event,
+    details,
+    ip: ip || 'unknown',
+    userAgent: typeof window !== 'undefined' ? navigator.userAgent : 'server-side',
+    referer
+  };
+
+  // In production, send to security monitoring service
+  console.log('🔒 Security Event:', logEntry);
+  
+  // TODO: Send to security monitoring service (e.g., Sentry, LogRocket)
+  return logEntry;
+}
+
+// IP validation
+export function validateIP(ip: string): boolean {
+  // Basic IP validation
+  const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  return ipRegex.test(ip);
+}
+
+// User agent validation
+export function validateUserAgent(userAgent: string): boolean {
+  // Basic user agent validation
+  return userAgent && userAgent.length > 0 && userAgent.length < 1000;
+}
+
+// Content security policy
+export const CSP_HEADERS = {
+  'Content-Security-Policy': [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com",
+    "img-src 'self' data: https: blob:",
+    "media-src 'self' https: blob:",
+    "connect-src 'self' https://api.stripe.com https://api.openai.com",
+    "frame-src 'self' https://js.stripe.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'"
+  ].join('; ')
+};
+
+// Security headers
+export const SECURITY_HEADERS = {
+  'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  ...CSP_HEADERS
+};
+
+// Sanctioned countries (example list)
 const TOR_EXIT_NODES = [
   // This would be populated with actual TOR exit node IPs
   // For now, we'll use a placeholder

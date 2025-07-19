@@ -1,121 +1,135 @@
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-
-// Mock database connection - replace with actual database
-const mockUsers: any[] = [];
+import { authService } from '@/lib/auth/auth';
+import { JWTService } from '@/lib/auth/jwt';
+import { UserRole } from '@/lib/auth/roles';
 
 export async function POST(request: NextRequest) {
   try {
-    const { firstName, lastName, email, password, username, age } = await request.json();
+    const { email, password, firstName, lastName, role = 'free_user' } = await request.json();
 
     // Validate input
-    if (!firstName || !lastName || !email || !password || !username || !age) {
+    if (!email || !password || !firstName || !lastName) {
       return NextResponse.json(
-        { message: 'All fields are required' },
+        { error: 'All fields are required' },
         { status: 400 }
       );
     }
 
-    // Age verification (18+ required)
-    if (age < 18) {
-      return NextResponse.json(
-        { message: 'You must be 18 or older to register' },
-        { status: 400 }
-      );
-    }
-
-    // Email validation
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return NextResponse.json(
-        { message: 'Please enter a valid email address' },
+        { error: 'Invalid email format' },
         { status: 400 }
       );
     }
 
-    // Password validation
+    // Validate password strength
     if (password.length < 8) {
       return NextResponse.json(
-        { message: 'Password must be at least 8 characters long' },
+        { error: 'Password must be at least 8 characters long' },
         { status: 400 }
       );
     }
 
-    // Username validation
-    if (username.length < 3) {
+    // Validate role
+    const validRoles = Object.values(UserRole);
+    if (!validRoles.includes(role as UserRole)) {
       return NextResponse.json(
-        { message: 'Username must be at least 3 characters long' },
+        { error: 'Invalid role' },
         { status: 400 }
       );
     }
 
-    // Check if email already exists
-    const existingUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+    // Prevent registration of admin roles
+    if (role === 'admin' || role === 'super_admin') {
+      return NextResponse.json(
+        { error: 'Admin roles cannot be registered publicly' },
+        { status: 403 }
+      );
+    }
+
+    // Get client IP and user agent
+    const ipAddress = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const userAgent = request.headers.get('user-agent') || 'unknown';
+
+    // Check if user already exists
+    const existingUser = await authService.getUserByEmail(email);
     if (existingUser) {
       return NextResponse.json(
-        { message: 'An account with this email already exists' },
+        { error: 'User with this email already exists' },
         { status: 409 }
       );
     }
-
-    // Check if username already exists
-    const existingUsername = mockUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
-    if (existingUsername) {
-      return NextResponse.json(
-        { message: 'This username is already taken' },
-        { status: 409 }
-      );
-    }
-
-    // Hash password
-    const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    // Generate email verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     // Create new user
-    const newUser = {
-      id: mockUsers.length + 1,
+    const newUser = await authService.registerUser({
+      email,
+      password,
       firstName,
       lastName,
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      username: username.toLowerCase(),
-      age,
-      emailVerified: false,
-      verificationToken,
-      verificationExpires,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    // Add to mock database
-    mockUsers.push(newUser);
-
-    // TODO: Send verification email
-    // In production, this would send an actual email with the verification link
-    console.log('Verification email would be sent to:', email);
-    console.log('Verification token:', verificationToken);
-
-    // Return success response
-    return NextResponse.json({
-      message: 'Registration successful! Please check your email to verify your account.',
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        username: newUser.username,
-      }
+      role: role as UserRole,
+      ipAddress,
+      userAgent
     });
 
+    if (!newUser.success || !newUser.user) {
+      return NextResponse.json(
+        { error: newUser.error || 'Registration failed' },
+        { status: 500 }
+      );
+    }
+
+    // Generate JWT tokens
+    const tokenPair = JWTService.generateTokenPair(
+      newUser.user.id,
+      newUser.user.email,
+      newUser.user.role
+    );
+
+    // Create response
+    const response = NextResponse.json({
+      success: true,
+      message: 'Registration successful',
+      user: {
+        id: newUser.user.id,
+        email: newUser.user.email,
+        firstName: newUser.user.firstName,
+        lastName: newUser.user.lastName,
+        role: newUser.user.role,
+        isVerified: newUser.user.isVerified,
+        isActive: newUser.user.isActive
+      },
+      tokens: tokenPair
+    });
+
+    // Set HTTP-only cookies for security
+    response.cookies.set('auth_token', tokenPair.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: tokenPair.expiresIn / 1000 // Convert to seconds
+    });
+
+    response.cookies.set('refresh_token', tokenPair.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 // 7 days in seconds
+    });
+
+    console.log('🔐 API Registration successful:', { 
+      email: newUser.user.email, 
+      role: newUser.user.role,
+      ipAddress 
+    });
+
+    return response;
+
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('❌ API Registration error:', error);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  experimental: {
-    serverComponentsExternalPackages: ['pg', 'bcryptjs', 'jsonwebtoken'],
-  },
+  serverExternalPackages: ['pg', 'bcryptjs', 'jsonwebtoken'],
   images: {
     domains: [
       'thechesswire-media.s3.amazonaws.com',
