@@ -1,21 +1,40 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Mail, CheckCircle, XCircle, RefreshCw, ArrowRight } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
+import { CheckCircle, XCircle, Mail, RefreshCw, ArrowLeft } from 'lucide-react';
+import { useVoiceNarration } from '@/hooks/useVoiceNarration';
 import toast from 'react-hot-toast';
 
+interface VerificationStatus {
+  status: 'pending' | 'verifying' | 'success' | 'error' | 'expired';
+  message: string;
+}
+
 export default function VerifyEmailPage() {
-  const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'error'>('pending');
-  const [isLoading, setIsLoading] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>({
+    status: 'pending',
+    message: 'Checking verification status...'
+  });
+  const [isResending, setIsResending] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { playNarration } = useVoiceNarration();
+
   const token = searchParams.get('token');
+  const email = searchParams.get('email');
 
   useEffect(() => {
     if (token) {
       verifyEmail(token);
+    } else {
+      setVerificationStatus({
+        status: 'error',
+        message: 'No verification token provided'
+      });
     }
   }, [token]);
 
@@ -27,82 +46,113 @@ export default function VerifyEmailPage() {
   }, [countdown]);
 
   const verifyEmail = async (verificationToken: string) => {
-    setIsLoading(true);
+    setVerificationStatus({
+      status: 'verifying',
+      message: 'Verifying your email address...'
+    });
+
     try {
-      const response = await fetch(`/api/auth/verify-email/${verificationToken}`, {
-        method: 'GET',
+      const response = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: verificationToken })
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        setVerificationStatus('success');
-        toast.success('Email verified successfully!');
+        setVerificationStatus({
+          status: 'success',
+          message: 'Email verified successfully! Welcome to TheChessWire.'
+        });
+        
+        // Play success narration
+        playNarration(
+          'Congratulations! Your email has been verified successfully. Welcome to TheChessWire, where chess meets artificial intelligence. Your journey begins now.',
+          'expressive'
+        );
+
+        // Redirect to onboarding after 3 seconds
+        setTimeout(() => {
+          router.push('/onboarding');
+        }, 3000);
       } else {
-        setVerificationStatus('error');
-        toast.error('Email verification failed');
+        if (data.error === 'token_expired') {
+          setVerificationStatus({
+            status: 'expired',
+            message: 'Verification link has expired. Please request a new one.'
+          });
+        } else {
+          setVerificationStatus({
+            status: 'error',
+            message: data.message || 'Verification failed. Please try again.'
+          });
+        }
       }
     } catch (error) {
-      setVerificationStatus('error');
-      toast.error('Email verification failed');
-    } finally {
-      setIsLoading(false);
+      setVerificationStatus({
+        status: 'error',
+        message: 'Network error. Please check your connection and try again.'
+      });
     }
   };
 
   const resendVerification = async () => {
-    setIsLoading(true);
+    if (!email) {
+      toast.error('Email address not found');
+      return;
+    }
+
+    setIsResending(true);
     try {
       const response = await fetch('/api/auth/resend-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: searchParams.get('email') }),
+        body: JSON.stringify({ email })
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        toast.success('Verification email sent!');
+        toast.success('Verification email sent! Check your inbox.');
         setCountdown(60); // 60 second cooldown
       } else {
-        toast.error('Failed to send verification email');
+        toast.error(data.message || 'Failed to send verification email');
       }
     } catch (error) {
-      toast.error('Failed to send verification email');
+      toast.error('Network error. Please try again.');
     } finally {
-      setIsLoading(false);
+      setIsResending(false);
     }
   };
 
-  const getStatusContent = () => {
-    switch (verificationStatus) {
+  const getStatusIcon = () => {
+    switch (verificationStatus.status) {
       case 'success':
-        return {
-          icon: <CheckCircle className="w-16 h-16 text-green-400" />,
-          title: 'Email Verified Successfully!',
-          description: 'Your email has been verified. You can now access all features of TheChessWire.news.',
-          buttonText: 'Continue to Dashboard',
-          buttonAction: () => window.location.href = '/dashboard',
-          color: 'text-green-400'
-        };
+        return <CheckCircle className="w-16 h-16 text-green-500" />;
       case 'error':
-        return {
-          icon: <XCircle className="w-16 h-16 text-red-400" />,
-          title: 'Verification Failed',
-          description: 'The verification link is invalid or has expired. Please request a new verification email.',
-          buttonText: 'Request New Verification',
-          buttonAction: resendVerification,
-          color: 'text-red-400'
-        };
+      case 'expired':
+        return <XCircle className="w-16 h-16 text-red-500" />;
+      case 'verifying':
+        return <RefreshCw className="w-16 h-16 text-blue-500 animate-spin" />;
       default:
-        return {
-          icon: <Mail className="w-16 h-16 text-primary-400" />,
-          title: 'Verifying Your Email...',
-          description: 'Please wait while we verify your email address.',
-          buttonText: '',
-          buttonAction: () => {},
-          color: 'text-primary-400'
-        };
+        return <Mail className="w-16 h-16 text-gray-400" />;
     }
   };
 
-  const statusContent = getStatusContent();
+  const getStatusColor = () => {
+    switch (verificationStatus.status) {
+      case 'success':
+        return 'text-green-500';
+      case 'error':
+      case 'expired':
+        return 'text-red-500';
+      case 'verifying':
+        return 'text-blue-500';
+      default:
+        return 'text-gray-400';
+    }
+  };
 
   return (
     <div className="min-h-screen chess-gradient-dark flex items-center justify-center p-4">
@@ -116,143 +166,125 @@ export default function VerifyEmailPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <motion.div
-              className="w-20 h-20 bg-primary-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
-              animate={{ 
-                scale: verificationStatus === 'pending' ? [1, 1.1, 1] : 1,
-                rotate: verificationStatus === 'pending' ? [0, 360] : 0
-              }}
-              transition={{ 
-                scale: { duration: 2, repeat: verificationStatus === 'pending' ? Infinity : 0 },
-                rotate: { duration: 3, repeat: verificationStatus === 'pending' ? Infinity : 0, ease: "linear" }
-              }}
+              className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mx-auto mb-4 glow-effect"
+              whileHover={{ scale: 1.1 }}
             >
-              {verificationStatus === 'pending' && isLoading ? (
-                <RefreshCw className="w-8 h-8 text-primary-400" />
-              ) : (
-                statusContent.icon
-              )}
+              <span className="text-2xl">♟️</span>
             </motion.div>
-            
             <h1 className="text-2xl font-bold text-white mb-2">
-              {statusContent.title}
+              Email Verification
             </h1>
             <p className="text-gray-300">
-              {statusContent.description}
+              {verificationStatus.status === 'pending' && 'Verifying your email address...'}
+              {verificationStatus.status === 'verifying' && 'Please wait while we verify your email...'}
+              {verificationStatus.status === 'success' && 'Your email has been verified!'}
+              {verificationStatus.status === 'error' && 'Verification failed'}
+              {verificationStatus.status === 'expired' && 'Verification link expired'}
             </p>
           </div>
 
-          {/* Status Indicator */}
-          {verificationStatus === 'pending' && (
+          {/* Status Display */}
+          <div className="text-center mb-8">
             <motion.div
-              className="mb-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <div className="flex items-center justify-center space-x-2">
-                <motion.div
-                  className="w-2 h-2 bg-primary-400 rounded-full"
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                />
-                <motion.div
-                  className="w-2 h-2 bg-primary-400 rounded-full"
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-                />
-                <motion.div
-                  className="w-2 h-2 bg-primary-400 rounded-full"
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
-                />
-              </div>
+              {getStatusIcon()}
             </motion.div>
-          )}
-
-          {/* Action Button */}
-          {statusContent.buttonText && (
-            <motion.button
-              onClick={statusContent.buttonAction}
-              disabled={isLoading || countdown > 0}
-              className="w-full bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold py-3 rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed glow-effect flex items-center justify-center space-x-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              {isLoading ? (
-                <>
-                  <motion.div
-                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  />
-                  <span>Processing...</span>
-                </>
-              ) : countdown > 0 ? (
-                <span>Wait {countdown}s</span>
-              ) : (
-                <>
-                  <span>{statusContent.buttonText}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </motion.button>
-          )}
-
-          {/* Additional Options */}
-          {verificationStatus === 'error' && (
-            <motion.div
-              className="mt-6 text-center"
+            
+            <motion.p
+              className={`mt-4 text-lg font-medium ${getStatusColor()}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <p className="text-gray-400 text-sm mb-4">
-                Didn't receive the email? Check your spam folder or try again.
-              </p>
-              <button
-                onClick={() => window.location.href = '/auth/gateway'}
-                className="text-primary-400 hover:text-primary-300 text-sm"
+              {verificationStatus.message}
+            </motion.p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="space-y-4">
+            {verificationStatus.status === 'success' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="text-center"
               >
-                Back to Login
-              </button>
-            </motion.div>
-          )}
+                <p className="text-gray-300 mb-4">
+                  Redirecting to onboarding...
+                </p>
+                <div className="flex justify-center">
+                  <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              </motion.div>
+            )}
 
-          {/* Success Actions */}
-          {verificationStatus === 'success' && (
-            <motion.div
-              className="mt-6 text-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <div className="space-y-3">
+            {(verificationStatus.status === 'error' || verificationStatus.status === 'expired') && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="space-y-4"
+              >
                 <button
-                  onClick={() => window.location.href = '/onboarding'}
-                  className="w-full bg-gray-700 text-white font-medium py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                  onClick={resendVerification}
+                  disabled={isResending || countdown > 0}
+                  className="w-full bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold py-3 rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed glow-effect"
                 >
-                  Complete Onboarding
+                  {isResending ? (
+                    <div className="flex items-center justify-center">
+                      <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                      Sending...
+                    </div>
+                  ) : countdown > 0 ? (
+                    `Resend in ${countdown}s`
+                  ) : (
+                    'Resend Verification Email'
+                  )}
                 </button>
-                <button
-                  onClick={() => window.location.href = '/dashboard'}
-                  className="w-full bg-gray-700 text-white font-medium py-2 rounded-lg hover:bg-gray-600 transition-colors"
-                >
-                  Go to Dashboard
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </motion.div>
 
-        {/* Security Notice */}
-        <motion.div
-          className="mt-6 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <p className="text-gray-400 text-xs">
-            🔐 Your security is our priority. All verification links expire after 24 hours.
-          </p>
+                <button
+                  onClick={() => router.push('/auth/gateway')}
+                  className="w-full bg-gray-700 text-white font-semibold py-3 rounded-lg hover:bg-gray-600 transition-all duration-300"
+                >
+                  <div className="flex items-center justify-center">
+                    <ArrowLeft className="w-5 h-5 mr-2" />
+                    Back to Login
+                  </div>
+                </button>
+              </motion.div>
+            )}
+
+            {verificationStatus.status === 'pending' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="text-center"
+              >
+                <div className="flex justify-center">
+                  <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Help Section */}
+          <motion.div
+            className="mt-8 pt-6 border-t border-gray-700"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+          >
+            <h3 className="text-sm font-medium text-gray-300 mb-3">Need Help?</h3>
+            <div className="space-y-2 text-sm text-gray-400">
+              <p>• Check your spam/junk folder</p>
+              <p>• Make sure you're using the correct email address</p>
+              <p>• Contact support if you continue having issues</p>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>

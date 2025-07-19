@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Lock, Eye, EyeOff, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Lock, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 const resetPasswordSchema = z.object({
@@ -22,34 +22,105 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
+interface PasswordRequirement {
+  id: string;
+  label: string;
+  test: (password: string) => boolean;
+}
+
+const passwordRequirements: PasswordRequirement[] = [
+  {
+    id: 'length',
+    label: 'At least 12 characters',
+    test: (password) => password.length >= 12
+  },
+  {
+    id: 'uppercase',
+    label: 'One uppercase letter',
+    test: (password) => /[A-Z]/.test(password)
+  },
+  {
+    id: 'lowercase',
+    label: 'One lowercase letter',
+    test: (password) => /[a-z]/.test(password)
+  },
+  {
+    id: 'number',
+    label: 'One number',
+    test: (password) => /\d/.test(password)
+  },
+  {
+    id: 'special',
+    label: 'One special character (@$!%*?&)',
+    test: (password) => /[@$!%*?&]/.test(password)
+  }
+];
+
 export default function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [isValidating, setIsValidating] = useState(true);
+  const [isValid, setIsValid] = useState(false);
+  const [email, setEmail] = useState('');
+  
   const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+  const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-  } = useForm<ResetPasswordForm>({
+  const token = searchParams.get('token');
+  const emailParam = searchParams.get('email');
+
+  const form = useForm<ResetPasswordForm>({
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const password = watch('password');
-
   useEffect(() => {
-    if (!token) {
-      toast.error('Invalid reset link');
-      window.location.href = '/auth/forgot-password';
+    if (emailParam) {
+      setEmail(emailParam);
     }
-  }, [token]);
+    
+    if (token) {
+      validateToken(token);
+    } else {
+      setIsValidating(false);
+      setIsValid(false);
+    }
+  }, [token, emailParam]);
+
+  const validateToken = async (resetToken: string) => {
+    try {
+      const response = await fetch('/api/auth/validate-reset-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: resetToken })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsValid(true);
+        setEmail(data.email);
+      } else {
+        setIsValid(false);
+        if (data.error === 'token_expired') {
+          toast.error('Password reset link has expired. Please request a new one.');
+        } else {
+          toast.error('Invalid password reset link.');
+        }
+      }
+    } catch (error) {
+      setIsValid(false);
+      toast.error('Failed to validate reset link.');
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
   const onSubmit = async (data: ResetPasswordForm) => {
-    if (!token) return;
+    if (!token) {
+      toast.error('No reset token provided');
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -58,47 +129,65 @@ export default function ResetPasswordPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           token,
-          password: data.password,
-        }),
+          password: data.password
+        })
       });
 
+      const result = await response.json();
+
       if (response.ok) {
-        setIsSuccess(true);
         toast.success('Password reset successfully!');
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          router.push('/auth/gateway');
+        }, 2000);
       } else {
-        const error = await response.json();
-        toast.error(error.message || 'Password reset failed');
+        if (result.error === 'token_expired') {
+          toast.error('Password reset link has expired. Please request a new one.');
+        } else if (result.error === 'invalid_token') {
+          toast.error('Invalid password reset link.');
+        } else {
+          toast.error(result.message || 'Failed to reset password');
+        }
       }
     } catch (error) {
-      toast.error('Password reset failed');
+      toast.error('Network error. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const getPasswordStrength = (password: string) => {
-    if (!password) return { score: 0, label: '', color: '' };
-    
-    let score = 0;
-    if (password.length >= 12) score++;
-    if (/[a-z]/.test(password)) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/\d/.test(password)) score++;
-    if (/[@$!%*?&]/.test(password)) score++;
+    const requirements = passwordRequirements.map(req => req.test(password));
+    const metCount = requirements.filter(Boolean).length;
+    const percentage = (metCount / requirements.length) * 100;
 
-    const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
-    const colors = ['text-red-400', 'text-orange-400', 'text-yellow-400', 'text-blue-400', 'text-green-400'];
-    
-    return {
-      score: Math.min(score, 4),
-      label: labels[score - 1] || '',
-      color: colors[score - 1] || ''
-    };
+    if (percentage < 40) return { level: 'weak', color: 'text-red-500', bg: 'bg-red-500' };
+    if (percentage < 80) return { level: 'medium', color: 'text-yellow-500', bg: 'bg-yellow-500' };
+    return { level: 'strong', color: 'text-green-500', bg: 'bg-green-500' };
   };
 
-  const passwordStrength = getPasswordStrength(password);
+  const currentPassword = form.watch('password') || '';
 
-  if (isSuccess) {
+  if (isValidating) {
+    return (
+      <div className="min-h-screen chess-gradient-dark flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <motion.div
+            className="glass-morphism-dark rounded-2xl p-8 shadow-2xl text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-300">Validating reset link...</p>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isValid) {
     return (
       <div className="min-h-screen chess-gradient-dark flex items-center justify-center p-4">
         <div className="w-full max-w-md">
@@ -108,39 +197,32 @@ export default function ResetPasswordPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {/* Success Header */}
             <div className="text-center mb-8">
               <motion.div
-                className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
+                className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring" }}
+                transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <CheckCircle className="w-10 h-10 text-green-400" />
+                <XCircle className="w-8 h-8 text-white" />
               </motion.div>
-              
               <h1 className="text-2xl font-bold text-white mb-2">
-                Password Reset Successfully!
+                Invalid Reset Link
               </h1>
               <p className="text-gray-300">
-                Your password has been updated. You can now log in with your new password.
+                This password reset link is invalid or has expired.
               </p>
             </div>
 
-            {/* Action Buttons */}
-            <motion.div
-              className="space-y-3"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
+            <motion.button
+              onClick={() => router.push('/auth/forgot-password')}
+              className="w-full bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold py-3 rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <button
-                onClick={() => window.location.href = '/auth/gateway'}
-                className="w-full bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold py-3 rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all duration-300 glow-effect"
-              >
-                Continue to Login
-              </button>
-            </motion.div>
+              Request New Reset Link
+            </motion.button>
           </motion.div>
         </div>
       </div>
@@ -162,19 +244,23 @@ export default function ResetPasswordPage() {
               className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mx-auto mb-4 glow-effect"
               whileHover={{ scale: 1.1 }}
             >
-              <Lock className="w-8 h-8 text-white" />
+              <span className="text-2xl">♟️</span>
             </motion.div>
-            
             <h1 className="text-2xl font-bold text-white mb-2">
               Reset Your Password
             </h1>
             <p className="text-gray-300">
-              Enter your new password below. Make sure it's strong and secure.
+              Create a new secure password for your account.
             </p>
+            {email && (
+              <p className="text-primary-400 text-sm mt-2">
+                {email}
+              </p>
+            )}
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 New Password
@@ -183,7 +269,7 @@ export default function ResetPasswordPage() {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  {...register('password')}
+                  {...form.register('password')}
                   className="w-full pl-10 pr-12 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Enter your new password"
                 />
@@ -195,33 +281,55 @@ export default function ResetPasswordPage() {
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.password.message}
+              {form.formState.errors.password && (
+                <p className="text-error-400 text-sm mt-1">
+                  {form.formState.errors.password.message}
                 </p>
               )}
-              
-              {/* Password Strength Indicator */}
-              {password && (
-                <div className="mt-2">
-                  <div className="flex space-x-1 mb-1">
-                    {[1, 2, 3, 4, 5].map((level) => (
-                      <div
-                        key={level}
-                        className={`h-1 flex-1 rounded-full ${
-                          level <= passwordStrength.score
-                            ? passwordStrength.color.replace('text-', 'bg-')
-                            : 'bg-gray-600'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <p className={`text-xs ${passwordStrength.color}`}>
-                    {passwordStrength.label}
-                  </p>
-                </div>
-              )}
             </div>
+
+            {/* Password Strength Indicator */}
+            {currentPassword && (
+              <motion.div
+                className="space-y-3"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-300">Password strength:</span>
+                    <span className={getPasswordStrength(currentPassword).color}>
+                      {getPasswordStrength(currentPassword).level}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrength(currentPassword).bg}`}
+                      style={{
+                        width: `${(passwordRequirements.filter(req => req.test(currentPassword)).length / passwordRequirements.length) * 100}%`
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Password Requirements */}
+                <div className="space-y-2">
+                  {passwordRequirements.map((requirement) => (
+                    <div key={requirement.id} className="flex items-center space-x-2">
+                      {requirement.test(currentPassword) ? (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <div className="w-4 h-4 border-2 border-gray-500 rounded-full"></div>
+                      )}
+                      <span className={`text-sm ${requirement.test(currentPassword) ? 'text-green-400' : 'text-gray-400'}`}>
+                        {requirement.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -231,7 +339,7 @@ export default function ResetPasswordPage() {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
-                  {...register('confirmPassword')}
+                  {...form.register('confirmPassword')}
                   className="w-full pl-10 pr-12 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Confirm your new password"
                 />
@@ -243,38 +351,11 @@ export default function ResetPasswordPage() {
                   {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-              {errors.confirmPassword && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.confirmPassword.message}
+              {form.formState.errors.confirmPassword && (
+                <p className="text-error-400 text-sm mt-1">
+                  {form.formState.errors.confirmPassword.message}
                 </p>
               )}
-            </div>
-
-            {/* Password Requirements */}
-            <div className="p-4 bg-gray-800/50 rounded-lg">
-              <h3 className="text-sm font-semibold text-white mb-2">Password Requirements:</h3>
-              <ul className="text-xs text-gray-300 space-y-1">
-                <li className={`flex items-center space-x-2 ${password.length >= 12 ? 'text-green-400' : ''}`}>
-                  <span>✓</span>
-                  <span>At least 12 characters</span>
-                </li>
-                <li className={`flex items-center space-x-2 ${/[a-z]/.test(password) ? 'text-green-400' : ''}`}>
-                  <span>✓</span>
-                  <span>One lowercase letter</span>
-                </li>
-                <li className={`flex items-center space-x-2 ${/[A-Z]/.test(password) ? 'text-green-400' : ''}`}>
-                  <span>✓</span>
-                  <span>One uppercase letter</span>
-                </li>
-                <li className={`flex items-center space-x-2 ${/\d/.test(password) ? 'text-green-400' : ''}`}>
-                  <span>✓</span>
-                  <span>One number</span>
-                </li>
-                <li className={`flex items-center space-x-2 ${/[@$!%*?&]/.test(password) ? 'text-green-400' : ''}`}>
-                  <span>✓</span>
-                  <span>One special character (@$!%*?&)</span>
-                </li>
-              </ul>
             </div>
 
             <motion.button
@@ -284,48 +365,27 @@ export default function ResetPasswordPage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              {isLoading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <motion.div
-                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  />
-                  <span>Resetting Password...</span>
-                </div>
-              ) : (
-                'Reset Password'
-              )}
+              {isLoading ? 'Resetting Password...' : 'Reset Password'}
             </motion.button>
           </form>
 
           {/* Back to Login */}
           <motion.div
-            className="mt-8 text-center"
+            className="mt-6 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
           >
             <button
-              onClick={() => window.location.href = '/auth/gateway'}
-              className="text-primary-400 hover:text-primary-300 font-medium flex items-center justify-center mx-auto"
+              onClick={() => router.push('/auth/gateway')}
+              className="text-gray-400 hover:text-white transition-colors duration-300"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Login
+              <div className="flex items-center justify-center">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Login
+              </div>
             </button>
           </motion.div>
-        </motion.div>
-
-        {/* Security Notice */}
-        <motion.div
-          className="mt-6 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <p className="text-gray-400 text-xs">
-            🔐 Your new password will be encrypted and stored securely.
-          </p>
         </motion.div>
       </div>
     </div>

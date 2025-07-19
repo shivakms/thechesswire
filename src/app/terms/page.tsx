@@ -1,220 +1,367 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { FileText, Shield, Users, Globe, AlertTriangle, CheckCircle } from 'lucide-react';
+import { FileText, Shield, Users, Globe, Calendar, Mail, AlertTriangle, CheckCircle } from 'lucide-react';
 
 export default function TermsPage() {
-  const sections = [
-    {
-      icon: <FileText className="w-6 h-6" />,
-      title: "Acceptance of Terms",
-      content: "By accessing and using TheChessWire.news, you accept and agree to be bound by the terms and provision of this agreement."
-    },
-    {
-      icon: <Users className="w-6 h-6" />,
-      title: "User Responsibilities",
-      content: "You are responsible for maintaining the confidentiality of your account and for all activities that occur under your account."
-    },
-    {
-      icon: <Shield className="w-6 h-6" />,
-      title: "Security Requirements",
-      content: "You must not attempt to gain unauthorized access to our systems or interfere with the security features of the platform."
-    },
-    {
-      icon: <Globe className="w-6 h-6" />,
-      title: "Global Compliance",
-      content: "You agree to comply with all applicable laws and regulations in your use of our services."
-    },
-    {
-      icon: <AlertTriangle className="w-6 h-6" />,
-      title: "Prohibited Activities",
-      content: "You may not use our services for any illegal, harmful, or unauthorized purposes."
-    },
-    {
-      icon: <CheckCircle className="w-6 h-6" />,
-      title: "Fair Use",
-      content: "You agree to use our services in a manner consistent with fair use policies and community guidelines."
-    }
-  ];
+  const lastUpdated = 'December 15, 2024';
 
   return (
-    <div className="min-h-screen chess-gradient-dark">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       <div className="max-w-4xl mx-auto p-6">
         <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h1 className="text-4xl font-bold text-white mb-4">Terms of Service</h1>
-          <p className="text-xl text-gray-300">Please read these terms carefully before using our platform</p>
-          <p className="text-sm text-gray-400 mt-2">Last updated: {new Date().toLocaleDateString()}</p>
-        </motion.div>
-
-        <motion.div
-          className="glass-morphism-dark rounded-2xl p-8 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          className="bg-white/10 backdrop-blur-md rounded-lg p-8 border border-white/20"
         >
-          <h2 className="text-2xl font-bold text-white mb-6">Agreement to Terms</h2>
-          <p className="text-gray-300 mb-4">
-            These Terms of Service ("Terms") govern your use of TheChessWire.news ("Service") operated by TheChessWire ("we," "us," or "our").
-          </p>
-          <p className="text-gray-300">
-            By accessing or using our Service, you agree to be bound by these Terms. If you disagree with any part of these terms, then you may not access the Service.
-          </p>
-        </motion.div>
-
-        {/* Key Terms */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          {sections.map((section, index) => (
-            <motion.div
-              key={section.title}
-              className="glass-morphism-dark rounded-xl p-6"
-              initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 + index * 0.1 }}
-            >
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="text-primary-400">
-                  {section.icon}
-                </div>
-                <h3 className="text-lg font-semibold text-white">{section.title}</h3>
-              </div>
-              <p className="text-gray-300">{section.content}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Detailed Terms */}
-        <motion.div
-          className="space-y-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">1. Use of Service</h2>
-            <div className="space-y-4 text-gray-300">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Eligibility</h3>
-                <p>You must be at least 18 years old to use our Service as required by GDPR regulations.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Account Registration</h3>
-                <p>You must provide accurate, current, and complete information when creating an account. You are responsible for maintaining the security of your account credentials.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Acceptable Use</h3>
-                <p>You agree to use our Service only for lawful purposes and in accordance with these Terms. You may not use the Service to transmit harmful, offensive, or inappropriate content.</p>
-              </div>
+          {/* Header */}
+          <div className="text-center mb-8">
+            <FileText className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+            <h1 className="text-4xl font-bold text-white mb-2">Terms of Service</h1>
+            <p className="text-gray-300">Please read these terms carefully before using our services</p>
+            <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-400">
+              <Calendar className="w-4 h-4" />
+              <span>Last updated: {lastUpdated}</span>
             </div>
           </div>
 
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">2. Intellectual Property</h2>
-            <div className="space-y-4 text-gray-300">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Our Rights</h3>
-                <p>The Service and its original content, features, and functionality are owned by TheChessWire and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Your Content</h3>
-                <p>You retain ownership of any content you submit to our Service. By submitting content, you grant us a worldwide, non-exclusive license to use, reproduce, and distribute your content.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Chess Games</h3>
-                <p>Chess games and positions are not subject to copyright. However, our analysis, commentary, and AI-generated content are protected by intellectual property rights.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">3. Privacy and Data</h2>
-            <div className="space-y-4 text-gray-300">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Privacy Policy</h3>
-                <p>Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the Service, to understand our practices.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Data Security</h3>
-                <p>We implement industry-standard security measures to protect your data. However, no method of transmission over the internet is 100% secure.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Data Usage</h3>
-                <p>We may use anonymized data to improve our AI models, voice systems, and overall service quality. Your personal information is never sold to third parties.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">4. Prohibited Activities</h2>
-            <div className="space-y-4 text-gray-300">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Security Violations</h3>
-                <p>You may not attempt to gain unauthorized access to our systems, interfere with security features, or use automated tools to access the Service.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Abuse and Harassment</h3>
-                <p>You may not use our Service to harass, abuse, or harm others. This includes sending spam, making threats, or engaging in discriminatory behavior.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Cheating and Fair Play</h3>
-                <p>You may not use external assistance, engines, or other tools during chess analysis or training sessions. Fair play is essential to our community.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">5. Service Availability</h2>
-            <div className="space-y-4 text-gray-300">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Uptime</h3>
-                <p>We strive to maintain 99.9% uptime but cannot guarantee uninterrupted service. We may perform maintenance or updates that temporarily affect availability.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Service Changes</h3>
-                <p>We reserve the right to modify, suspend, or discontinue any part of our Service at any time with reasonable notice to users.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Limitations</h3>
-                <p>Our Service is provided "as is" without warranties of any kind. We are not liable for any damages arising from your use of the Service.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">6. Termination</h2>
-            <div className="space-y-4 text-gray-300">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Account Termination</h3>
-                <p>We may terminate or suspend your account immediately, without prior notice, for conduct that we believe violates these Terms or is harmful to other users.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Data Retention</h3>
-                <p>Upon termination, your right to use the Service will cease immediately. We may retain certain information as required by law or for legitimate business purposes.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Survival</h3>
-                <p>Provisions of these Terms that by their nature should survive termination shall survive termination, including ownership provisions, warranty disclaimers, and limitations of liability.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">7. Contact Information</h2>
-            <p className="text-gray-300 mb-4">
-              If you have any questions about these Terms of Service, please contact us:
+          {/* Introduction */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Agreement to Terms</h2>
+            <p className="text-gray-300 leading-relaxed">
+              By accessing and using TheChessWire.news ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
             </p>
-            <div className="space-y-2 text-gray-300">
-              <p>• Email: legal@thechesswire.news</p>
-              <p>• Terms Questions: terms@thechesswire.news</p>
-              <p>• General Support: support@thechesswire.news</p>
+          </div>
+
+          {/* Key Terms */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Key Terms</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Service</h4>
+                <p className="text-gray-300 text-sm">TheChessWire.news platform and all associated features</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">User</h4>
+                <p className="text-gray-300 text-sm">Any individual or entity using our Service</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Content</h4>
+                <p className="text-gray-300 text-sm">All data, text, graphics, and materials on the platform</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Account</h4>
+                <p className="text-gray-300 text-sm">Your registered profile and associated data</p>
+              </div>
             </div>
+          </div>
+
+          {/* Use License */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Use License</h2>
+            <div className="space-y-4">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Permitted Uses</h3>
+                <ul className="text-gray-300 space-y-2 ml-6">
+                  <li>• Access and use the Service for personal, non-commercial purposes</li>
+                  <li>• Analyze chess games and improve your skills</li>
+                  <li>• Participate in training sessions and challenges</li>
+                  <li>• Share content in accordance with our community guidelines</li>
+                </ul>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Prohibited Uses</h3>
+                <ul className="text-gray-300 space-y-2 ml-6">
+                  <li>• Violate any applicable laws or regulations</li>
+                  <li>• Infringe on intellectual property rights</li>
+                  <li>• Harass, abuse, or harm other users</li>
+                  <li>• Attempt to gain unauthorized access to our systems</li>
+                  <li>• Use automated tools to scrape or collect data</li>
+                  <li>• Distribute malware or harmful code</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* User Accounts */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Users className="w-6 h-6 text-blue-400" />
+              User Accounts
+            </h2>
+            
+            <div className="space-y-4">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Account Creation</h3>
+                <p className="text-gray-300">
+                  You must provide accurate and complete information when creating an account. You are responsible for maintaining the security of your account credentials.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Account Responsibilities</h3>
+                <ul className="text-gray-300 space-y-2 ml-6">
+                  <li>• Keep your password secure and confidential</li>
+                  <li>• Notify us immediately of any unauthorized access</li>
+                  <li>• Ensure your account information remains accurate</li>
+                  <li>• Accept responsibility for all activities under your account</li>
+                </ul>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Account Termination</h3>
+                <p className="text-gray-300">
+                  We reserve the right to terminate or suspend your account at any time for violations of these terms or for any other reason at our sole discretion.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Intellectual Property */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Intellectual Property</h2>
+            
+            <div className="space-y-4">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Our Rights</h3>
+                <p className="text-gray-300">
+                  The Service and its original content, features, and functionality are owned by TheChessWire.news and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Your Rights</h3>
+                <p className="text-gray-300">
+                  You retain ownership of content you create and share on our platform. By posting content, you grant us a non-exclusive, worldwide license to use, display, and distribute your content in connection with the Service.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Chess Game Data</h3>
+                <p className="text-gray-300">
+                  Chess games and moves are not subject to copyright protection. However, our analysis, commentary, and AI-generated content are protected by our intellectual property rights.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Privacy and Data */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Shield className="w-6 h-6 text-blue-400" />
+              Privacy and Data Protection
+            </h2>
+            
+            <p className="text-gray-300 mb-4">
+              Your privacy is important to us. Our collection and use of personal information is governed by our Privacy Policy, which is incorporated into these Terms by reference.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Data Collection</h4>
+                <p className="text-gray-300 text-sm">We collect data necessary to provide and improve our services</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Data Security</h4>
+                <p className="text-gray-300 text-sm">We implement industry-standard security measures</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Data Rights</h4>
+                <p className="text-gray-300 text-sm">You have rights to access, correct, and delete your data</p>
+              </div>
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Data Sharing</h4>
+                <p className="text-gray-300 text-sm">We do not sell your personal information to third parties</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Payment Terms */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Payment Terms</h2>
+            
+            <div className="space-y-4">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Premium Services</h3>
+                <p className="text-gray-300">
+                  Some features require a premium subscription. All payments are processed securely through our payment partners.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Billing</h3>
+                <ul className="text-gray-300 space-y-2 ml-6">
+                  <li>• Subscriptions are billed in advance on a recurring basis</li>
+                  <li>• You may cancel your subscription at any time</li>
+                  <li>• Refunds are provided in accordance with our refund policy</li>
+                  <li>• Price changes will be communicated in advance</li>
+                </ul>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Taxes</h3>
+                <p className="text-gray-300">
+                  You are responsible for any applicable taxes related to your use of our services.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Disclaimers */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <AlertTriangle className="w-6 h-6 text-yellow-400" />
+              Disclaimers
+            </h2>
+            
+            <div className="space-y-4">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Service Availability</h3>
+                <p className="text-gray-300">
+                  We strive to maintain high availability but cannot guarantee uninterrupted access. The Service is provided "as is" without warranties of any kind.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Accuracy of Analysis</h3>
+                <p className="text-gray-300">
+                  While we use advanced AI and chess engines, we cannot guarantee the accuracy of all analysis and recommendations. Use at your own discretion.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Third-Party Content</h3>
+                <p className="text-gray-300">
+                  We may link to third-party websites and services. We are not responsible for the content or practices of these external sites.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Limitation of Liability */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Limitation of Liability</h2>
+            
+            <div className="bg-white/5 p-6 rounded-lg">
+              <p className="text-gray-300 mb-4">
+                To the maximum extent permitted by law, TheChessWire.news shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to:
+              </p>
+              
+              <ul className="text-gray-300 space-y-2 ml-6">
+                <li>• Loss of profits, data, or business opportunities</li>
+                <li>• Damages resulting from use or inability to use the Service</li>
+                <li>• Any errors or omissions in content or analysis</li>
+                <li>• Unauthorized access to or alteration of your data</li>
+                <li>• Any other damages arising from your use of the Service</li>
+              </ul>
+              
+              <p className="text-gray-300 mt-4">
+                Our total liability shall not exceed the amount you paid for our services in the 12 months preceding the claim.
+              </p>
+            </div>
+          </div>
+
+          {/* Indemnification */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Indemnification</h2>
+            
+            <p className="text-gray-300">
+              You agree to indemnify and hold harmless TheChessWire.news, its officers, directors, employees, and agents from any claims, damages, losses, or expenses arising from your use of the Service or violation of these Terms.
+            </p>
+          </div>
+
+          {/* Governing Law */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Globe className="w-6 h-6 text-blue-400" />
+              Governing Law
+            </h2>
+            
+            <p className="text-gray-300">
+              These Terms shall be governed by and construed in accordance with the laws of the jurisdiction where TheChessWire.news is incorporated, without regard to conflict of law principles.
+            </p>
+          </div>
+
+          {/* Dispute Resolution */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Dispute Resolution</h2>
+            
+            <div className="space-y-4">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Informal Resolution</h3>
+                <p className="text-gray-300">
+                  We encourage you to contact us first to resolve any disputes informally before pursuing formal legal action.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Arbitration</h3>
+                <p className="text-gray-300">
+                  Any disputes that cannot be resolved informally may be resolved through binding arbitration in accordance with the rules of the American Arbitration Association.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Changes to Terms */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Changes to Terms</h2>
+            
+            <p className="text-gray-300">
+              We reserve the right to modify these Terms at any time. We will notify users of significant changes via email or through the Service. Your continued use of the Service after changes become effective constitutes acceptance of the new Terms.
+            </p>
+          </div>
+
+          {/* Severability */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Severability</h2>
+            
+            <p className="text-gray-300">
+              If any provision of these Terms is found to be unenforceable or invalid, that provision will be limited or eliminated to the minimum extent necessary so that the Terms will otherwise remain in full force and effect.
+            </p>
+          </div>
+
+          {/* Contact Information */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Mail className="w-6 h-6 text-blue-400" />
+              Contact Information
+            </h2>
+            
+            <div className="bg-white/5 p-6 rounded-lg">
+              <p className="text-gray-300 mb-4">
+                If you have any questions about these Terms of Service, please contact us:
+              </p>
+              
+              <div className="space-y-2 text-gray-300">
+                <p><strong>Email:</strong> legal@thechesswire.news</p>
+                <p><strong>Address:</strong> TheChessWire.news, Legal Team</p>
+                <p><strong>Support:</strong> support@thechesswire.news</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Acknowledgment */}
+          <div className="mb-8">
+            <div className="bg-blue-500/20 border border-blue-500/50 rounded-lg p-6">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Acknowledgment</h3>
+                  <p className="text-blue-300">
+                    By using TheChessWire.news, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our Service.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="text-center pt-8 border-t border-white/20">
+            <p className="text-gray-400 text-sm">
+              These Terms of Service are effective as of {lastUpdated} and apply to all users of TheChessWire.news.
+            </p>
           </div>
         </motion.div>
       </div>
