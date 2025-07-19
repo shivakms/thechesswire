@@ -663,6 +663,39 @@ Self-evolving based on platform needs
 The "CEO AI" that runs everything
 Ultimate failsafe system
 
+## 📦 Additional Phase 4 Modules (NEW)
+
+### Module 402: Premium Membership Access Control System
+- Add `is_premium: boolean` to `users` table
+- Create `checkPremiumAccess(user)` for all premium feature gates
+- Gate components: `VoicePlayer.tsx`, `ReplayBoard.tsx`, `DownloadPDF.tsx`
+- Extend `articles` schema with `early_access_until?`, `premium_only?`
+- Build `/upgrade` page + `UpgradeToPremium.tsx` CTA with Stripe integration
+
+### Module 403: Spotlight Chess Platform Engine
+- Auto-generates summaries for `/spotlight/[source]`
+- Major Platforms:
+- ICC - /spotlight/icc
+- Chess.com - /spotlight/chesscom
+- Lichess - /spotlight/lichess
+- Reddit (r/chess) - /spotlight/reddit
+- Chessable - /spotlight/chessable
+- FIDE - /spotlight/fide
+- ChessBase - /spotlight/chessbase
+- TCEC - /spotlight/tcec
+- Chess24 - /spotlight/chess24
+
+Rising Platform Ideas:
+- DecodeChess
+- OpeningTree
+- Aimchess
+- ForwardChess / CT-ART
+
+- Article schema additions: `source: string`, `is_rising: boolean`, `trend_score?: number`
+- AI summary with disclaimer:  
+  *“This article is AI-generated and references public content from [Platform]. TheChessWire is not affiliated with [Platform].”*
+- Optional: Premium-only features for each spotlight source
+
 🎯 Development Requirements
 Performance Benchmarks:
 
