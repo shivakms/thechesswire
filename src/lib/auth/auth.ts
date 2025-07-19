@@ -1,4 +1,6 @@
 import { UserRole, isSuperAdmin, isAdmin, canAccessDashboard } from './roles';
+import bcrypt from 'bcryptjs';
+import { pool } from '../database';
 
 export interface User {
   id: string;
@@ -20,18 +22,34 @@ export interface AuthSession {
   userAgent: string;
 }
 
-// Super Admin credentials (you)
+// Password verification function
+export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+  try {
+    return await bcrypt.compare(password, hashedPassword);
+  } catch (error) {
+    console.error('Password verification failed:', error);
+    return false;
+  }
+}
+
+// Password hashing function
+export async function hashPassword(password: string): Promise<string> {
+  const saltRounds = 12;
+  return await bcrypt.hash(password, saltRounds);
+}
+
+// Super Admin credentials from environment variables
 const SUPER_ADMIN_CREDENTIALS = {
-  email: 'thechesswirenews@gmail.com', // Your email
-  password: 'super-admin-secure-password-2024', // Change this to your secure password
+  email: process.env.SUPER_ADMIN_EMAIL || 'thechesswirenews@gmail.com',
+  password: process.env.SUPER_ADMIN_PASSWORD || '', // Must be set in environment
   role: UserRole.SUPER_ADMIN,
   id: 'super-admin-001'
 };
 
-// Admin credentials (for testing)
+// Admin credentials from environment variables
 const ADMIN_CREDENTIALS = {
-  email: 'admin@chesswire.com',
-  password: 'admin-secure-password-2024',
+  email: process.env.ADMIN_EMAIL || 'admin@chesswire.com',
+  password: process.env.ADMIN_PASSWORD || '', // Must be set in environment
   role: UserRole.ADMIN,
   id: 'admin-001'
 };
@@ -287,7 +305,69 @@ class AuthService {
 
   // Get user by ID (for admin functions)
   async getUserById(userId: string): Promise<User | null> {
-    return this.users.get(userId) || null;
+    try {
+      const result = await pool.query(
+        'SELECT * FROM users WHERE id = $1',
+        [userId]
+      );
+      
+      if (result.rows.length === 0) {
+        return null;
+      }
+      
+      return this.mapUserFromDB(result.rows[0]);
+    } catch (error) {
+      console.error('Error getting user by ID:', error);
+      return null;
+    }
+  }
+
+  async getUserByEmail(email: string): Promise<User | null> {
+    try {
+      const result = await pool.query(
+        'SELECT * FROM users WHERE email = $1',
+        [email]
+      );
+      
+      if (result.rows.length === 0) {
+        return null;
+      }
+      
+      return this.mapUserFromDB(result.rows[0]);
+    } catch (error) {
+      console.error('Error getting user by email:', error);
+      return null;
+    }
+  }
+
+  async registerUser(userData: {
+    email: string;
+    password: string;
+    role?: UserRole;
+    ipAddress?: string;
+    userAgent?: string;
+  }): Promise<User> {
+    try {
+      const hashedPassword = await hashPassword(userData.password);
+      
+      const result = await pool.query(
+        `INSERT INTO users (email, password_hash, role, ip_address, user_agent, created_at)
+         VALUES ($1, $2, $3, $4, $5, NOW())
+         RETURNING *`,
+        [
+          userData.email,
+          hashedPassword,
+          userData.role || 'user',
+          userData.ipAddress || 'unknown',
+          userData.userAgent || 'unknown'
+        ]
+      );
+      
+      return this.mapUserFromDB(result.rows[0]);
+    } catch (error) {
+      console.error('Error registering user:', error);
+      throw error;
+    }
   }
 
   // Update user role (Super Admin only)

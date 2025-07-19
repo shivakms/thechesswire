@@ -1,196 +1,331 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Shield, Lock, Eye, Database, Globe, Users } from 'lucide-react';
+import { Shield, Eye, Lock, Database, Users, Globe, Calendar, Mail } from 'lucide-react';
 
 export default function PrivacyPage() {
-  const sections = [
-    {
-      icon: <Shield className="w-6 h-6" />,
-      title: "Data Protection",
-      content: "We implement industry-leading encryption and security measures to protect your personal information. All data is encrypted in transit and at rest using AES-256 encryption."
-    },
-    {
-      icon: <Lock className="w-6 h-6" />,
-      title: "Privacy Controls",
-      content: "You have full control over your data. You can view, export, or delete your information at any time through your account settings."
-    },
-    {
-      icon: <Eye className="w-6 h-6" />,
-      title: "Transparency",
-      content: "We are transparent about how we collect, use, and protect your data. This privacy policy explains our practices in clear, understandable terms."
-    },
-    {
-      icon: <Database className="w-6 h-6" />,
-      title: "Data Minimization",
-      content: "We only collect the data necessary to provide our services. We do not sell, rent, or share your personal information with third parties."
-    },
-    {
-      icon: <Globe className="w-6 h-6" />,
-      title: "Global Standards",
-      content: "We comply with GDPR, CCPA, and other international privacy regulations to ensure your rights are protected regardless of your location."
-    },
-    {
-      icon: <Users className="w-6 h-6" />,
-      title: "User Rights",
-      content: "You have the right to access, correct, delete, and port your data. Contact us anytime to exercise these rights."
-    }
-  ];
+  const lastUpdated = 'December 15, 2024';
 
   return (
-    <div className="min-h-screen chess-gradient-dark">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       <div className="max-w-4xl mx-auto p-6">
         <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h1 className="text-4xl font-bold text-white mb-4">Privacy Policy</h1>
-          <p className="text-xl text-gray-300">Your privacy and data security are our top priorities</p>
-          <p className="text-sm text-gray-400 mt-2">Last updated: {new Date().toLocaleDateString()}</p>
-        </motion.div>
-
-        <motion.div
-          className="glass-morphism-dark rounded-2xl p-8 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          className="bg-white/10 backdrop-blur-md rounded-lg p-8 border border-white/20"
         >
-          <h2 className="text-2xl font-bold text-white mb-6">Our Commitment to Privacy</h2>
-          <p className="text-gray-300 mb-4">
-            At TheChessWire.news, we believe that privacy is a fundamental human right. We are committed to protecting your personal information and ensuring that you have control over your data.
-          </p>
-          <p className="text-gray-300">
-            This privacy policy explains how we collect, use, and protect your information when you use our platform. By using TheChessWire.news, you agree to the collection and use of information in accordance with this policy.
-          </p>
-        </motion.div>
-
-        {/* Privacy Principles */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          {sections.map((section, index) => (
-            <motion.div
-              key={section.title}
-              className="glass-morphism-dark rounded-xl p-6"
-              initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 + index * 0.1 }}
-            >
-              <div className="flex items-center space-x-3 mb-3">
-                <div className="text-primary-400">
-                  {section.icon}
-                </div>
-                <h3 className="text-lg font-semibold text-white">{section.title}</h3>
-              </div>
-              <p className="text-gray-300">{section.content}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Detailed Policy Sections */}
-        <motion.div
-          className="space-y-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Information We Collect</h2>
-            <div className="space-y-4 text-gray-300">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Account Information</h3>
-                <p>When you create an account, we collect your email address, username, and password (encrypted). We may also collect your chess rating, preferences, and usage patterns.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Usage Data</h3>
-                <p>We collect information about how you use our platform, including games analyzed, features used, and interaction patterns. This helps us improve our services.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Technical Information</h3>
-                <p>We collect technical information such as your IP address, browser type, device information, and cookies to ensure security and optimize performance.</p>
-              </div>
+          {/* Header */}
+          <div className="text-center mb-8">
+            <Shield className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+            <h1 className="text-4xl font-bold text-white mb-2">Privacy Policy</h1>
+            <p className="text-gray-300">Your privacy is our priority</p>
+            <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-400">
+              <Calendar className="w-4 h-4" />
+              <span>Last updated: {lastUpdated}</span>
             </div>
           </div>
 
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">How We Use Your Information</h2>
-            <div className="space-y-4 text-gray-300">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Service Provision</h3>
-                <p>We use your information to provide, maintain, and improve our chess analysis and AI narration services.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Personalization</h3>
-                <p>We use your preferences and usage patterns to personalize your experience and provide relevant content.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Security</h3>
-                <p>We use your information to detect and prevent fraud, abuse, and security threats.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Communication</h3>
-                <p>We may use your email address to send you important updates, security alerts, and service notifications.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Data Security</h2>
-            <div className="space-y-4 text-gray-300">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Encryption</h3>
-                <p>All data is encrypted using AES-256 encryption both in transit (TLS 1.3) and at rest. We use industry-standard security protocols to protect your information.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Access Controls</h3>
-                <p>We implement strict access controls and authentication measures to ensure only authorized personnel can access your data.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Regular Audits</h3>
-                <p>We conduct regular security audits and penetration testing to identify and address potential vulnerabilities.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Your Rights</h2>
-            <div className="space-y-4 text-gray-300">
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Access</h3>
-                <p>You have the right to access all personal information we hold about you.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Correction</h3>
-                <p>You can request corrections to any inaccurate or incomplete information.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Deletion</h3>
-                <p>You can request the deletion of your personal information, subject to legal requirements.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Portability</h3>
-                <p>You can request a copy of your data in a machine-readable format.</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-2">Objection</h3>
-                <p>You can object to the processing of your personal information in certain circumstances.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-morphism-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Contact Us</h2>
-            <p className="text-gray-300 mb-4">
-              If you have any questions about this privacy policy or our data practices, please contact us:
+          {/* Introduction */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Introduction</h2>
+            <p className="text-gray-300 leading-relaxed">
+              TheChessWire.news ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.
             </p>
-            <div className="space-y-2 text-gray-300">
-              <p>• Email: privacy@thechesswire.news</p>
-              <p>• Data Protection Officer: dpo@thechesswire.news</p>
-              <p>• Data Export/Deletion: <a href="/data-request" className="text-primary-400 hover:text-primary-300">Data Request Tool</a></p>
+          </div>
+
+          {/* Information We Collect */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Database className="w-6 h-6 text-blue-400" />
+              Information We Collect
+            </h2>
+            
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-3">Personal Information</h3>
+                <ul className="text-gray-300 space-y-2 ml-6">
+                  <li>• Email address and password for account creation</li>
+                  <li>• Username and profile information</li>
+                  <li>• Chess rating and playing history</li>
+                  <li>• Communication preferences</li>
+                  <li>• Payment information (processed securely by Stripe)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-3">Usage Information</h3>
+                <ul className="text-gray-300 space-y-2 ml-6">
+                  <li>• Games played and analysis performed</li>
+                  <li>• Training sessions and progress data</li>
+                  <li>• Feature usage and interaction patterns</li>
+                  <li>• Device information and browser type</li>
+                  <li>• IP address and location data</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-3">Technical Information</h3>
+                <ul className="text-gray-300 space-y-2 ml-6">
+                  <li>• Cookies and similar tracking technologies</li>
+                  <li>• Log files and server analytics</li>
+                  <li>• Performance and error data</li>
+                  <li>• Security event logs</li>
+                </ul>
+              </div>
             </div>
+          </div>
+
+          {/* How We Use Your Information */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Eye className="w-6 h-6 text-blue-400" />
+              How We Use Your Information
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Service Provision</h3>
+                <p className="text-gray-300 text-sm">
+                  To provide and maintain our chess analysis, training, and content services.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Personalization</h3>
+                <p className="text-gray-300 text-sm">
+                  To personalize your experience and provide relevant content and recommendations.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Communication</h3>
+                <p className="text-gray-300 text-sm">
+                  To send you important updates, newsletters, and marketing communications.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Security</h3>
+                <p className="text-gray-300 text-sm">
+                  To protect against fraud, abuse, and security threats.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Analytics</h3>
+                <p className="text-gray-300 text-sm">
+                  To analyze usage patterns and improve our services.
+                </p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-2">Legal Compliance</h3>
+                <p className="text-gray-300 text-sm">
+                  To comply with legal obligations and enforce our terms of service.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Information Sharing */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Users className="w-6 h-6 text-blue-400" />
+              Information Sharing
+            </h2>
+            
+            <p className="text-gray-300 mb-4">
+              We do not sell, trade, or rent your personal information to third parties. We may share your information in the following circumstances:
+            </p>
+            
+            <ul className="text-gray-300 space-y-2 ml-6">
+              <li>• <strong>Service Providers:</strong> With trusted third-party service providers who assist us in operating our platform</li>
+              <li>• <strong>Legal Requirements:</strong> When required by law or to protect our rights and safety</li>
+              <li>• <strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
+              <li>• <strong>Consent:</strong> With your explicit consent for specific purposes</li>
+            </ul>
+          </div>
+
+          {/* Data Security */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Lock className="w-6 h-6 text-blue-400" />
+              Data Security
+            </h2>
+            
+            <div className="bg-white/5 p-6 rounded-lg">
+              <p className="text-gray-300 mb-4">
+                We implement comprehensive security measures to protect your information:
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Encryption</h4>
+                  <p className="text-gray-300 text-sm">All data is encrypted in transit and at rest using industry-standard protocols.</p>
+                </div>
+                
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Access Controls</h4>
+                  <p className="text-gray-300 text-sm">Strict access controls and authentication mechanisms protect your data.</p>
+                </div>
+                
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Regular Audits</h4>
+                  <p className="text-gray-300 text-sm">We conduct regular security audits and vulnerability assessments.</p>
+                </div>
+                
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Incident Response</h4>
+                  <p className="text-gray-300 text-sm">We have procedures in place to respond to security incidents.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Your Rights (GDPR) */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Globe className="w-6 h-6 text-blue-400" />
+              Your Rights (GDPR)
+            </h2>
+            
+            <p className="text-gray-300 mb-4">
+              Under the General Data Protection Regulation (GDPR), you have the following rights:
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Right to Access</h4>
+                <p className="text-gray-300 text-sm">Request a copy of your personal data.</p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Right to Rectification</h4>
+                <p className="text-gray-300 text-sm">Correct inaccurate or incomplete data.</p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Right to Erasure</h4>
+                <p className="text-gray-300 text-sm">Request deletion of your personal data.</p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Right to Portability</h4>
+                <p className="text-gray-300 text-sm">Receive your data in a structured format.</p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Right to Object</h4>
+                <p className="text-gray-300 text-sm">Object to processing of your data.</p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Right to Restriction</h4>
+                <p className="text-gray-300 text-sm">Limit how we process your data.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Cookies */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Cookies and Tracking</h2>
+            
+            <p className="text-gray-300 mb-4">
+              We use cookies and similar technologies to enhance your experience:
+            </p>
+            
+            <div className="space-y-4">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Essential Cookies</h4>
+                <p className="text-gray-300 text-sm">Required for basic functionality and security.</p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Analytics Cookies</h4>
+                <p className="text-gray-300 text-sm">Help us understand how you use our platform.</p>
+              </div>
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h4 className="text-white font-semibold mb-2">Preference Cookies</h4>
+                <p className="text-gray-300 text-sm">Remember your settings and preferences.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Data Retention */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Data Retention</h2>
+            
+            <p className="text-gray-300 mb-4">
+              We retain your personal information for as long as necessary to provide our services and comply with legal obligations:
+            </p>
+            
+            <ul className="text-gray-300 space-y-2 ml-6">
+              <li>• <strong>Account Data:</strong> Until you delete your account or request deletion</li>
+              <li>• <strong>Usage Data:</strong> For up to 3 years for analytics and improvement</li>
+              <li>• <strong>Payment Data:</strong> As required by financial regulations</li>
+              <li>• <strong>Security Logs:</strong> For up to 1 year for security monitoring</li>
+            </ul>
+          </div>
+
+          {/* International Transfers */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">International Data Transfers</h2>
+            
+            <p className="text-gray-300">
+              Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place to protect your data in accordance with this Privacy Policy and applicable laws.
+            </p>
+          </div>
+
+          {/* Children's Privacy */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Children's Privacy</h2>
+            
+            <p className="text-gray-300">
+              Our services are not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.
+            </p>
+          </div>
+
+          {/* Changes to Privacy Policy */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Changes to This Privacy Policy</h2>
+            
+            <p className="text-gray-300">
+              We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date. We encourage you to review this Privacy Policy periodically.
+            </p>
+          </div>
+
+          {/* Contact Information */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <Mail className="w-6 h-6 text-blue-400" />
+              Contact Us
+            </h2>
+            
+            <div className="bg-white/5 p-6 rounded-lg">
+              <p className="text-gray-300 mb-4">
+                If you have any questions about this Privacy Policy or our data practices, please contact us:
+              </p>
+              
+              <div className="space-y-2 text-gray-300">
+                <p><strong>Email:</strong> privacy@thechesswire.news</p>
+                <p><strong>Address:</strong> TheChessWire.news, Privacy Team</p>
+                <p><strong>Data Protection Officer:</strong> dpo@thechesswire.news</p>
+              </div>
+              
+              <div className="mt-6 p-4 bg-blue-500/20 border border-blue-500/50 rounded-lg">
+                <p className="text-blue-300 text-sm">
+                  <strong>EU Representative:</strong> For EU residents, you may also contact our EU representative for GDPR-related inquiries.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="text-center pt-8 border-t border-white/20">
+            <p className="text-gray-400 text-sm">
+              This Privacy Policy is effective as of {lastUpdated} and applies to all users of TheChessWire.news.
+            </p>
           </div>
         </motion.div>
       </div>

@@ -66,18 +66,17 @@ export async function POST(request: NextRequest) {
       );
 
       // Log age verification
-      await logSecurityEvent({
-        userId,
-        eventType: 'age_verification_completed',
-        ipAddress: request.ip || 'unknown',
-        userAgent: request.headers.get('user-agent') || 'unknown',
-        details: { 
-          age,
-          dateOfBirth,
-          consent,
-          gdprCompliant: true
+      await logSecurityEvent(
+        'age_verification_completed',
+        {
+          userId,
+          eventType: 'age_verification_completed',
+          ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+          userAgent: request.headers.get('user-agent') || 'unknown',
+          age: age,
+          verified: true
         }
-      });
+      );
 
       return NextResponse.json({
         message: 'Age verification completed successfully',

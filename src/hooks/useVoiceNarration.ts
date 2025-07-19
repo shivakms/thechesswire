@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 
-type VoiceMode = 'calm' | 'expressive' | 'dramatic' | 'poetic';
+type VoiceMode = 'calm' | 'expressive' | 'dramatic' | 'poetic' | 'epic';
 
 interface VoiceNarrationReturn {
   playNarration: (text: string, mode: VoiceMode) => Promise<void>;

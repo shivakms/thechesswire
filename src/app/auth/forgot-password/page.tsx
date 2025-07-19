@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, ArrowLeft, Shield, CheckCircle } from 'lucide-react';
+import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 const forgotPasswordSchema = z.object({
@@ -15,20 +16,20 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordPage() {
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [countdown, setCountdown] = useState(0);
+  const [isEmailSent, setIsEmailSent] = useState(false);
+  const [email, setEmail] = useState('');
+  
+  const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ForgotPasswordForm>({
+  const form = useForm<ForgotPasswordForm>({
     resolver: zodResolver(forgotPasswordSchema),
   });
 
   const onSubmit = async (data: ForgotPasswordForm) => {
     setIsLoading(true);
+    setEmail(data.email);
+
     try {
       const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
@@ -36,54 +37,53 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify(data),
       });
 
+      const result = await response.json();
+
       if (response.ok) {
-        setIsSubmitted(true);
-        setCountdown(60); // 60 second cooldown
-        toast.success('Password reset email sent!');
+        setIsEmailSent(true);
+        toast.success('Password reset email sent! Check your inbox.');
       } else {
-        const error = await response.json();
-        toast.error(error.message || 'Failed to send reset email');
+        if (result.error === 'user_not_found') {
+          toast.error('No account found with this email address');
+        } else if (result.error === 'rate_limited') {
+          toast.error('Too many requests. Please wait before trying again.');
+        } else {
+          toast.error(result.message || 'Failed to send reset email');
+        }
       }
     } catch (error) {
-      toast.error('Failed to send reset email');
+      toast.error('Network error. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleResend = async () => {
-    if (countdown > 0) return;
-    
+    if (!email) return;
+
     setIsLoading(true);
     try {
       const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'user@example.com' }), // This would be the actual email
+        body: JSON.stringify({ email }),
       });
 
+      const result = await response.json();
+
       if (response.ok) {
-        setCountdown(60);
         toast.success('Password reset email sent again!');
       } else {
-        toast.error('Failed to send reset email');
+        toast.error(result.message || 'Failed to send reset email');
       }
     } catch (error) {
-      toast.error('Failed to send reset email');
+      toast.error('Network error. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Countdown effect
-  React.useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [countdown]);
-
-  if (isSubmitted) {
+  if (isEmailSent) {
     return (
       <div className="min-h-screen chess-gradient-dark flex items-center justify-center p-4">
         <div className="w-full max-w-md">
@@ -96,99 +96,90 @@ export default function ForgotPasswordPage() {
             {/* Success Header */}
             <div className="text-center mb-8">
               <motion.div
-                className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"
+                className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring" }}
+                transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <CheckCircle className="w-10 h-10 text-green-400" />
+                <CheckCircle className="w-8 h-8 text-white" />
               </motion.div>
-              
               <h1 className="text-2xl font-bold text-white mb-2">
                 Check Your Email
               </h1>
               <p className="text-gray-300">
-                We've sent a password reset link to your email address. 
-                Click the link to reset your password.
+                We've sent a password reset link to:
+              </p>
+              <p className="text-primary-400 font-medium mt-2">
+                {email}
               </p>
             </div>
 
-            {/* Security Notice */}
+            {/* Instructions */}
             <motion.div
-              className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg"
+              className="mb-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <div className="flex items-start space-x-3">
-                <Shield className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-sm font-semibold text-blue-400 mb-1">
-                    Security Notice
-                  </h3>
-                  <p className="text-xs text-gray-300">
-                    The reset link will expire in 1 hour for your security. 
-                    If you didn't request this, you can safely ignore this email.
-                  </p>
-                </div>
+              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                <h3 className="text-sm font-medium text-blue-300 mb-3">What's Next?</h3>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-2">1.</span>
+                    Check your email inbox (and spam folder)
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-2">2.</span>
+                    Click the "Reset Password" link in the email
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-blue-400 mr-2">3.</span>
+                    Create a new secure password
+                  </li>
+                </ul>
               </div>
             </motion.div>
 
             {/* Action Buttons */}
             <motion.div
-              className="space-y-3"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
+              className="space-y-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
             >
               <button
                 onClick={handleResend}
-                disabled={isLoading || countdown > 0}
-                className="w-full bg-gray-700 text-white font-medium py-3 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold py-3 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? (
-                  <>
-                    <motion.div
-                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    />
-                    <span>Sending...</span>
-                  </>
-                ) : countdown > 0 ? (
-                  <span>Resend in {countdown}s</span>
-                ) : (
-                  <>
-                    <Mail className="w-4 h-4" />
-                    <span>Resend Email</span>
-                  </>
-                )}
+                {isLoading ? 'Sending...' : 'Resend Email'}
               </button>
 
               <button
-                onClick={() => window.location.href = '/auth/gateway'}
-                className="w-full bg-primary-500 text-white font-medium py-3 rounded-lg hover:bg-primary-600 transition-colors"
+                onClick={() => router.push('/auth/gateway')}
+                className="w-full bg-gray-700 text-white font-semibold py-3 rounded-lg hover:bg-gray-600 transition-all duration-300"
               >
-                Back to Login
+                <div className="flex items-center justify-center">
+                  <ArrowLeft className="w-5 h-5 mr-2" />
+                  Back to Login
+                </div>
               </button>
             </motion.div>
-          </motion.div>
 
-          {/* Additional Help */}
-          <motion.div
-            className="mt-6 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            <p className="text-gray-400 text-sm mb-2">
-              Didn't receive the email?
-            </p>
-            <ul className="text-gray-400 text-xs space-y-1">
-              <li>• Check your spam or junk folder</li>
-              <li>• Verify the email address is correct</li>
-              <li>• Wait a few minutes for delivery</li>
-            </ul>
+            {/* Help Section */}
+            <motion.div
+              className="mt-8 pt-6 border-t border-gray-700"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+            >
+              <h3 className="text-sm font-medium text-gray-300 mb-3">Need Help?</h3>
+              <div className="space-y-2 text-sm text-gray-400">
+                <p>• Check your spam/junk folder</p>
+                <p>• Make sure you're using the correct email address</p>
+                <p>• Contact support if you continue having issues</p>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>
@@ -210,11 +201,10 @@ export default function ForgotPasswordPage() {
               className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mx-auto mb-4 glow-effect"
               whileHover={{ scale: 1.1 }}
             >
-              <Mail className="w-8 h-8 text-white" />
+              <span className="text-2xl">♟️</span>
             </motion.div>
-            
             <h1 className="text-2xl font-bold text-white mb-2">
-              Forgot Your Password?
+              Forgot Password?
             </h1>
             <p className="text-gray-300">
               Enter your email address and we'll send you a link to reset your password.
@@ -222,7 +212,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Email Address
@@ -231,14 +221,14 @@ export default function ForgotPasswordPage() {
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="email"
-                  {...register('email')}
+                  {...form.register('email')}
                   className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Enter your email address"
                 />
               </div>
-              {errors.email && (
-                <p className="text-red-400 text-sm mt-1">
-                  {errors.email.message}
+              {form.formState.errors.email && (
+                <p className="text-error-400 text-sm mt-1">
+                  {form.formState.errors.email.message}
                 </p>
               )}
             </div>
@@ -250,53 +240,45 @@ export default function ForgotPasswordPage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              {isLoading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <motion.div
-                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  />
-                  <span>Sending Reset Link...</span>
-                </div>
-              ) : (
-                'Send Reset Link'
-              )}
+              {isLoading ? 'Sending...' : 'Send Reset Link'}
             </motion.button>
           </form>
 
           {/* Back to Login */}
           <motion.div
-            className="mt-8 text-center"
+            className="mt-6 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
           >
             <button
-              onClick={() => window.location.href = '/auth/gateway'}
-              className="text-primary-400 hover:text-primary-300 font-medium flex items-center justify-center mx-auto"
+              onClick={() => router.push('/auth/gateway')}
+              className="text-gray-400 hover:text-white transition-colors duration-300"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Login
+              <div className="flex items-center justify-center">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Login
+              </div>
             </button>
           </motion.div>
-        </motion.div>
 
-        {/* Security Notice */}
-        <motion.div
-          className="mt-6 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <p className="text-gray-400 text-xs">
-            🔐 For security reasons, we'll only send reset links to verified email addresses.
-          </p>
+          {/* Security Notice */}
+          <motion.div
+            className="mt-8 pt-6 border-t border-gray-700"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <div className="flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-gray-400">
+                <p className="font-medium text-yellow-400 mb-1">Security Notice</p>
+                <p>Password reset links expire in 1 hour for your security. If you don't receive an email, check your spam folder.</p>
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </div>
   );
-}
-
-// Import React for useEffect
-import React from 'react'; 
+} 

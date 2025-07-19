@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { pool } from './database';
 
 interface SecurityResult {
   allowed: boolean;
@@ -47,9 +48,9 @@ export function validateIP(ip: string): boolean {
 }
 
 // User agent validation
-export function validateUserAgent(userAgent: string): boolean {
-  // Basic user agent validation
-  return userAgent && userAgent.length > 0 && userAgent.length < 1000;
+export function isValidUserAgent(userAgent: string | null): boolean {
+  if (!userAgent) return false;
+  return userAgent.length > 0 && userAgent.length < 1000;
 }
 
 // Content security policy
@@ -86,12 +87,12 @@ const TOR_EXIT_NODES = [
 ];
 
 export async function validateRequest(request: NextRequest): Promise<SecurityResult> {
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const ip = getClientIP(request);
   const userAgent = request.headers.get('user-agent') || '';
   const referer = request.headers.get('referer') || '';
   
   // Check for missing or suspicious User-Agent
-  if (!userAgent || userAgent.length < 10) {
+  if (!isValidUserAgent(userAgent)) {
     return {
       allowed: false,
       reason: 'Invalid User-Agent',
