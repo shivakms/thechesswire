@@ -1,4 +1,4 @@
-name: 🔒 Security & Vulnerability Scan
+name: Security & Vulnerability Scan
 
 on:
   push:
@@ -6,19 +6,26 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
-  security-scan:
+  codeql:
+    name: Analyze with CodeQL
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: 'javascript'
+          languages: javascript
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
 
-      - name: CodeQL Analyze
+      - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
