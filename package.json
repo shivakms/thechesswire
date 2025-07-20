@@ -55,7 +55,7 @@
     "react-use": "^17.5.0",
     "socket.io": "^4.8.0",
     "socket.io-client": "^4.8.0",
-    "sharp": "^0.33.0",
+    "sharp": "^0.34.3",
     "next-pwa": "^5.6.0",
     "workbox-webpack-plugin": "^7.0.0",
     "compression": "^1.7.4",
