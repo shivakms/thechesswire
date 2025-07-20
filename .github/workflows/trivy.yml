@@ -8,7 +8,10 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 3 * * 1' # Runs weekly on Mondays at 03:00 UTC
+    - cron: '0 3 * * 1' # Weekly scan on Mondays at 03:00 UTC
+
+permissions:
+  contents: read
 
 jobs:
   trivy:
@@ -19,14 +22,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Trivy
+      - name: Run Trivy vulnerability scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
           scan-ref: .
           severity: CRITICAL,HIGH
           format: table
-          exit-code: 1
+          exit-code: 1 # 🔥 This will fail the workflow if vulnerabilities are found
+          output: trivy-results.txt
 
       - name: Upload Trivy scan report
         if: always()
