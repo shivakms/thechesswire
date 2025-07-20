@@ -53,7 +53,7 @@ pool.on('connect', () => {
 });
 
 pool.on('error', (err) => {
-  logError('❌ Database connection error', err);
+  logger.error('❌ Database connection error', err);
 });
 
 pool.on('acquire', () => {
@@ -72,7 +72,7 @@ export const initializeDatabase = async () => {
     client.release();
     logger.info('✅ Database connection test successful');
   } catch (error) {
-    logError('❌ Database connection test failed', error);
+    logger.error('❌ Database connection test failed', error);
     throw error;
   }
 };
@@ -94,7 +94,7 @@ export const query = async (text: string, params?: any[]) => {
     return res;
   } catch (error) {
     const duration = Date.now() - start;
-    logError(`Database query failed after ${duration}ms`, error);
+    logger.error(`Database query failed after ${duration}ms`, error);
     throw error;
   }
 };
