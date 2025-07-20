@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: read
-  security-events: write
+  security-events: write  # ✅ THIS IS WHAT LETS CODEQL UPLOAD RESULTS
 
 jobs:
   codeql:
