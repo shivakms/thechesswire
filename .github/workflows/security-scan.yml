@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: read
-  security-events: write  # ✅ REQUIRED for CodeQL results to be uploaded
+  security-events: write
 
 jobs:
   codeql:
