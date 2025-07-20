@@ -1,19 +1,10 @@
-name: Security & Vulnerability Scan
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-permissions:
-  contents: read
-  security-events: write  # ✅ THIS IS WHAT LETS CODEQL UPLOAD RESULTS
-
 jobs:
-  codeql:
-    name: Analyze with CodeQL
+  analyze:
+    name: Analyze
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # ✅ enables SARIF upload
 
     steps:
       - name: Checkout repository
@@ -29,3 +20,5 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+        with:
+          token: ${{ secrets.CODEQL_PAT }}   # 👈 add it here
