@@ -10,42 +10,58 @@ permissions:
   contents: read
 
 jobs:
-  trivy-dependency-scan:
-    name: Dependency Vulnerability Scan (SBOM)
+  install-trivy:
+    name: ♻️ Install Trivy
     runs-on: ubuntu-latest
+    outputs:
+      trivy-path: ${{ steps.set-output.outputs.path }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Trivy
+      - name: 🚀 Install Trivy
+        id: set-output
         run: |
-          sudo apt-get update && sudo apt-get install wget -y
-          wget -qO- https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb stable main" | sudo tee /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update && sudo apt-get install trivy -y
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+          echo "path=/usr/local/bin/trivy" >> $GITHUB_OUTPUT
 
-      - name: Run Trivy on package-lock.json
-        run: trivy fs --scanners vuln --exit-code 1 --severity HIGH,CRITICAL .
-
-  trivy-docker-scan:
-    name: Docker Image Vulnerability Scan
+  scan-dependencies:
+    name: 📦 Dependency Vulnerability Scan
+    needs: install-trivy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker
+      - name: Run Trivy File System Scan
+        run: |
+          echo "🔍 Scanning project dependencies..."
+          trivy fs --exit-code 1 --severity HIGH,CRITICAL .
+
+  scan-docker:
+    name: 🐳 Docker Image Scan
+    needs: install-trivy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for Dockerfile
+        id: check
+        run: |
+          if [ -f Dockerfile ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Docker (for buildx)
+        if: steps.check.outputs.found == 'true'
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
+      - name: Build Docker Image
+        if: steps.check.outputs.found == 'true'
         run: docker build -t thechesswire-app .
 
-      - name: Install Trivy
+      - name: Run Trivy Image Scan
+        if: steps.check.outputs.found == 'true'
         run: |
-          sudo apt-get update && sudo apt-get install wget -y
-          wget -qO- https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
-          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb stable main" | sudo tee /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update && sudo apt-get install trivy -y
-
-      - name: Scan Docker image
-        run: trivy image --exit-code 1 --severity HIGH,CRITICAL thechesswire-app
+          echo "🐳 Scanning Docker image thechesswire-app..."
+          trivy image --exit-code 1 --severity HIGH,CRITICAL thechesswire-app
