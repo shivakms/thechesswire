@@ -691,6 +691,59 @@ Rising Platform Ideas:
 - Aimchess
 - ForwardChess / CT-ART
 
+### Module 404: AI Assistant Chatbot (Bambai AI Assistant)
+Objective
+Build a fully self-hosted, production-grade AI Assistant Chatbot for TheChessWire.news to help
+users with chess-related questions, platform guidance, and abuse support. The bot must require
+zero human intervention and maintain ultra-high performance, cybersecurity, and privacy
+compliance.
+Tech Stack
+- Langchain (Node.js or Python)
+- OpenAI GPT-4 Turbo (via API)
+- PostgreSQL or Chroma/Pinecone for Vector Store
+- ElevenLabs (optional voice support)
+- Deployed on AWS EC2
+- Modularized in /phase6-chatbot/
+Directory Structure
+/phase6-chatbot/
+vector_index/ # Vector DB for PGNs, articles, terms
+chatbot_core/ # Langchain agent, tools, memory
+public_ui/ # Optional chat widget
+api/
+ask.ts # Chat query endpoint
+utils/
+pgn_explainer.ts # PGN parser module
+.env.example
+README.md
+Chatbot Capabilities
+1. Answer Chess Questions
+2. Platform Support
+3. Abuse / Bug Reporting
+4. Legal + Policy Support
+5. Memory and Logs
+6. Voice Mode (Optional)
+7. Fallback Flow
+Security and Performance Requirements
+- Secure .env API keys
+- Rate-limit /api/ask
+- Moderate toxic input
+- Refresh vector DB daily
+- Restrict CORS to *.thechesswire.news
+Data Sources for RAG
+- PGN files in /public/pgns/
+- Article text from Supabase/Postgres
+- Terms, Privacy, FAQ docs
+- Optional: admin PDFs
+Personality: Bambai AI
+- Elegant, witty, and knowledgeable
+- Refers to herself as Bambai AI
+- Non-argumentative, warm tone
+Deployment Notes
+- Run on Node.js in EC2 or Docker
+- Use existing PostgreSQL or Chroma
+- Route UI to /api/ask
+- Add /chat route if desired
+
 - Article schema additions: `source: string`, `is_rising: boolean`, `trend_score?: number`
 - AI summary with disclaimer:  
   *“This article is AI-generated and references public content from [Platform]. TheChessWire is not affiliated with [Platform].”*
