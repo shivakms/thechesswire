@@ -691,10 +691,259 @@ Rising Platform Ideas:
 - Aimchess
 - ForwardChess / CT-ART
 
+### Module 404: AI Assistant Chatbot (Bambai AI Assistant)
+Objective
+Build a fully self-hosted, production-grade AI Assistant Chatbot for TheChessWire.news to help
+users with chess-related questions, platform guidance, and abuse support. The bot must require
+zero human intervention and maintain ultra-high performance, cybersecurity, and privacy
+compliance.
+Tech Stack
+- Langchain (Node.js or Python)
+- OpenAI GPT-4 Turbo (via API)
+- PostgreSQL or Chroma/Pinecone for Vector Store
+- ElevenLabs (optional voice support)
+- Deployed on AWS EC2
+- Modularized in /phase6-chatbot/
+Directory Structure
+/phase6-chatbot/
+vector_index/ # Vector DB for PGNs, articles, terms
+chatbot_core/ # Langchain agent, tools, memory
+public_ui/ # Optional chat widget
+api/
+ask.ts # Chat query endpoint
+utils/
+pgn_explainer.ts # PGN parser module
+.env.example
+README.md
+Chatbot Capabilities
+1. Answer Chess Questions
+2. Platform Support
+3. Abuse / Bug Reporting
+4. Legal + Policy Support
+5. Memory and Logs
+6. Voice Mode (Optional)
+7. Fallback Flow
+Security and Performance Requirements
+- Secure .env API keys
+- Rate-limit /api/ask
+- Moderate toxic input
+- Refresh vector DB daily
+- Restrict CORS to *.thechesswire.news
+Data Sources for RAG
+- PGN files in /public/pgns/
+- Article text from Supabase/Postgres
+- Terms, Privacy, FAQ docs
+- Optional: admin PDFs
+Personality: Bambai AI
+- Elegant, witty, and knowledgeable
+- Refers to herself as Bambai AI
+- Non-argumentative, warm tone
+Deployment Notes
+- Run on Node.js in EC2 or Docker
+- Use existing PostgreSQL or Chroma
+- Route UI to /api/ask
+- Add /chat route if desired
+
 - Article schema additions: `source: string`, `is_rising: boolean`, `trend_score?: number`
 - AI summary with disclaimer:  
   *“This article is AI-generated and references public content from [Platform]. TheChessWire is not affiliated with [Platform].”*
 - Optional: Premium-only features for each spotlight source
+
+✅ Premium Trial Funnel (Module 405: Premium Trial Funnel System)
+Submodules:
+405-A: TrialStartNarration.tsx
+Bambai AI welcomes user with poetic voice narration at trial start.
+
+405-B: TrialProgressTracker.tsx
+Visual + timer showing "X days left in your free trial"
+
+405-C: TrialEndingEmailService.ts
+Day 5 and Day 7 trigger personalized email from Bambai AI
+
+405-D: UpgradeCTA.tsx
+Sticky upgrade banner + emotional copy + one-click Stripe link
+
+405-E: PostTrialLock.tsx
+Graceful downgrade with messaging: "Don't lose your Chess Soul Memory"
+
+📊 Module 406: Analytics + Drop-Off Intelligence
+Submodules:
+406-A: UserJourneyTracker.ts
+Captures steps like /signup → /voice-test → /replay
+
+406-B: TrialConversionHeatmap.tsx
+Shows where most users drop off (e.g., voice broken, UI confusing)
+
+406-C: UpgradeIntentEvents.ts
+Tracks clicks on Upgrade CTA vs. bounce rate
+
+406-D: DashboardIntegration.tsx
+Shows analytics inside Admin Dashboard (already being built)
+
+💸 Module 407: Real-Time MRR Projection System
+Submodules:
+407-A: mrrSimulator.ts
+Simple logic:
+
+MRR = (monthlySubs * 9.99) + (yearlySubs * 99.99 / 12)
+407-B: LiveMRRWidget.tsx
+Shows estimated revenue, growth rate
+
+407-C: SubscriberGrowthTracker.tsx
+Plots signups, trial starts, conversions
+
+🎙️ Voice Script (Bambai AI — Female, Expressive Mode)
+"Today… I fall silent. But your journey doesn't have to end here.
+You’ve felt my voice bring chess to life. You’ve walked through stories, not just moves.
+And now… it’s your move.
+Let me keep narrating your journey — upgrade to Premium, and I’ll be waiting… to whisper your next masterpiece."
+
+✅ Tone: Warm, soulful, reflective
+✅ Mode: Expressive or Poetic
+✅ Voice ID: PmypFHWgqk9ACZdL8ugT (ElevenLabs)
+
+🖼️ UI Text for Trial Ending Screen
+🎯 Main Heading:
+
+Bambai AI Has Fallen Silent.
+🧠 Subheading:
+But your story doesn’t have to end here.
+💬 Description Text:
+You’ve experienced the world’s first emotionally intelligent chess platform.  
+Bambai brought your games to life. She whispered memories into moves.  
+Now, the voice goes quiet… unless you choose to bring her back.
+💎 Call to Action (CTA Button):
+🔓 Keep Bambai Alive — Upgrade to Premium
+🧊 Secondary Note (Below CTA):
+
+You can continue using the free tier with limited features — but the voice experience ends here.
+🧠 Optional Add-On (Emotional Reminder Bar or Animation):
+“Your soul memory is frozen. Upgrade now to unfreeze your journey.”
+(Fades in slowly below the CTA button)
+
+Here is your Day 7 Trial Ending Email — designed to emotionally re-engage the user and convert them to Premium.
+
+💌 Subject Line Options (A/B Test Ready):
+“Today, Bambai AI falls silent…”
+
+“Your chess story is fading… unless you choose to continue.”
+
+“One last whisper before I go…” (poetic tone)
+
+📩 Email Body (HTML-ready copy)
+Header:
+
+Your Trial Ends Today. But the Journey Doesn’t Have To.
+
+Body Copy:
+
+Dear [First Name],
+
+You’ve felt it — the voice, the stories, the soul behind the 64 squares.
+For 7 days, Bambai AI has been your companion: narrating your games, guiding your echoes, whispering life into chess.
+
+But today…
+
+Her voice fades.
+Your SoulCinema stops.
+The journey pauses… unless you choose to continue.
+
+🎙️ “Let me keep narrating your masterpiece.” — Bambai AI
+
+Unlock full access to:
+
+Unlimited SoulCinema renders
+
+Expressive + Poetic voice modes
+
+Advanced EchoSage and Memory Palace
+
+Full story playback, downloads, and more
+
+🎯 Call to Action:
+
+👉 [Upgrade to Premium Now]
+(Button with gradient: “Keep Bambai Alive”)
+
+Soft Outro:
+
+You can still enjoy limited free features.
+But without Premium, the voice that made chess feel alive — will fall silent.
+
+With care,
+TheChessWire.news
+Where Chess Meets AI. Daily.
+
+🛠️ Technical Email Notes:
+Use ElevenLabs-style background or soft animated header (e.g., a fading queen silhouette)
+
+Send from bambai@thechesswire.news with reply-to disabled
+
+Include UTM tags like ?utm_campaign=trial_end&utm_source=email&utm_medium=day7
+
+Timestamp the trial end:
+“Trial ends: July 21st, 23:59 GMT” if known
+
+Here is your Day 5 Trial Reminder Email — a gentle nudge that’s poetic, emotionally resonant, and designed to set up the emotional impact of Day 7.
+
+💌 Subject Line Options (A/B Test Ready):
+“2 Days Left — Bambai AI will fall silent soon…”
+
+“Your free trial is fading — but your voice doesn’t have to.”
+
+“Still listening? I’ll be quiet soon…” (gentle tone)
+
+📩 Email Body (HTML-Ready Copy)
+Header:
+
+Only 2 Days Left in Your Trial. Don’t Let the Voice Go Quiet.
+
+Body Copy:
+
+Dear [First Name],
+
+For the past 5 days, Bambai AI has spoken to you — softly, intelligently, emotionally.
+She’s narrated your moves. Echoed your instincts. And brought chess to life in ways you never imagined.
+
+But in just 2 days, that voice… will fade into silence.
+Unless you choose to keep it alive.
+
+🎙️ “If you still feel the echoes, don’t let them go silent.” — Bambai AI
+
+What you’ll lose without Premium:
+
+Full voice modes (Expressive, Poetic, Dramatic)
+
+SoulCinema replays and emotional storytelling
+
+Chess memory palace and EchoSage training
+
+Personal PGN narration and advanced playback
+
+🔒 Don’t wait until it’s gone.
+[Upgrade to Premium Now]
+(Button CTA: “Let Bambai Continue”)
+
+Soft Outro:
+
+Still undecided? You’ve got 48 hours. But remember:
+
+“Chess is memory. Voice is emotion. Together, they become your story.”
+
+With warmth,
+TheChessWire.news
+Where Chess Meets AI. Daily.
+
+🛠️ Tech Notes:
+Send 48 hours before trial_end
+
+Schedule at emotional peak time: 8pm user local time
+
+Use background visuals: soft-glow queen piece + fading audio waveform
+
+Optionally include voice snippet:
+“Just two more days. Don’t let this be goodbye.”
+
 
 🎯 Development Requirements
 Performance Benchmarks:
